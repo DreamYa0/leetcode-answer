@@ -12,15 +12,22 @@
 // 进阶：你能尽量减少完成的操作次数吗？
 // 可以设置一个指针,就是专业收集不是零的数 收集一遍后,后面的一定是0,就再将空出来的位置设置为0,就解决问题了
 pub fn move_zeroes(nums: &mut Vec<i32>) {
-    // 定义一个指针来搜集非零元素
+    // 定义一个指针来记录非零元素的位置
     let mut temp = 0;
     // 开始收集不是零的数
+    // [0,1,0,3,12]
+    // --> [1,0,0,3,12]
+    // --> [1,3,0,0,12]
+    // --> [1,3,12,0,0]
     for i in 0..nums.len() {
         if nums[i] != 0 {
             nums[temp] = nums[i];
             temp += 1;
         }
     }
+
+    // 对num中temp位置之前的数据进行排序
+    nums[..temp].sort();
 
     // 收集完毕后,后面自然就都是0了
     for i in temp..nums.len() {
@@ -34,7 +41,7 @@ mod tests {
 
     #[test]
     fn test_move_zeroes() {
-        let mut nums = vec![0, 1, 0, 3, 12];
+        let mut nums = vec![0, 1, 0, 12, 3];
         move_zeroes(&mut nums);
         println!("{:?}", nums)
     }
