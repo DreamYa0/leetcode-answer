@@ -11,3 +11,5 @@ pub mod max_rotate_function;
 pub mod pivot_index;
 pub mod search_insert;
 pub mod intervals;
+pub mod three_sum;
+pub mod four_sum;

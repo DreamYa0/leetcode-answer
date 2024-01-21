@@ -28,15 +28,25 @@
 // 那么将结果数组中最后一个区间的结束位置更新为当前区间的结束位置和最后一个区间的结束位置中的较大值。
 // 否则，将当前区间添加到结果数组中。
 pub fn merge(intervals: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    // 可变借用
     let mut intervals = intervals;
+    // 使用数组中的第一个元素进行排序
     intervals.sort_by(|a, b| a[0].cmp(&b[0]));
+    // 创建新的数组，并把原始数组中最小的元素放入
     let mut res = vec![intervals[0].clone()];
     for i in 1..intervals.len() {
-        if res.last().unwrap()[1] < intervals[i][0] {
+        // 循环从1开始，因为0已经放入了res数组中
+        let last_index = res.last().unwrap().len() - 1;
+        if res.last().unwrap()[last_index] < intervals[i][0] {
+            // 如果res数组中最后一个数组的最后一个元素小于intervals[i]数组的第一个元素
             res.push(intervals[i].clone());
         } else {
+            // res数组中最后一个元素
             let last_interval = res.last_mut().unwrap();
-            last_interval[1] = last_interval[1].max(intervals[i][1]);
+            // last_interval.len()-1 为最后一个元素的索引
+            let last = last_interval.len() - 1;
+            // 比较res数组中最后一个数组的最后一个元素和intervals[i]数组的最后一个元素，取最大值
+            last_interval[last] = last_interval[last].max(intervals[i][intervals[i].len() - 1]);
         }
     }
     res
