@@ -36,14 +36,14 @@ pub fn three_sum(nums: Vec<i32>) -> Vec<Vec<i32>> {
             continue;
         }
 
-        let count = nums[i] + nums[i + 1] + nums[i + 2];
-        if count > 0 {
+        let s = nums[i] + nums[i + 1] + nums[i + 2];
+        if s > 0 {
             // 由于数组已经排序，后面无论怎么选，选出的三个数的和不会比 s 还小，所以不会找到比 s 更优的答案了。
             break;
         }
-        let count = nums[i] + nums[len - 2] + nums[len - 1];
-        if count < 0 {
-            // 由于数组已经排序，nums[i] 加上后面任意两个数都不超过 s，所以下面的双指针就不需要跑了，
+        let s = nums[i] + nums[len - 2] + nums[len - 1];
+        if s < 0 {
+            // 由于数组已经排序，nums[i] 加上后面任意两个数都不超过 s，所以下面的双指针就不需要跑了，只需要继续取下一个数即可。
             continue;
         }
 
@@ -116,7 +116,7 @@ pub fn three_sum_closest(nums: Vec<i32>, target: i32) -> i32 {
     // 三数之和
     let mut ans = 0;
     // 最小差值
-    let mut min_diff = 100000;
+    let mut min_diff = i32::MAX;
     // 先对数组进行排序
     nums.sort();
     for i in 0..len - 2 {

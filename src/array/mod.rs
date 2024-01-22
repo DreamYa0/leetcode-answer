@@ -13,3 +13,4 @@ pub mod search_insert;
 pub mod intervals;
 pub mod three_sum;
 pub mod four_sum;
+pub mod max_sub_array;
