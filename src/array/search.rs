@@ -3,7 +3,7 @@
 
 // 请必须使用时间复杂度为 O(log n) 的算法。
 
-//  
+//
 
 // 示例 1:
 
@@ -44,8 +44,53 @@ pub fn search_insert(nums: Vec<i32>, target: i32) -> i32 {
     left as i32
 }
 
-#[test]
-fn test_search_insert() {
-    let nums = vec![1, 3, 5, 6];
-    assert_eq!(search_insert(nums, 5), 2);
+// 二分查找
+pub fn binary_search(nums: Vec<i32>, target: i32) -> i32 {
+    let len = nums.len();
+    if len < 3 {
+        if nums[0] == target {
+            return 0;
+        } else if nums[len - 1] == target {
+            return (len - 1) as i32;
+        } else {
+            return -1;
+        }
+    }
+    // 定义左右指针
+    let mut left = 0;
+    let mut right = len - 1;
+    while left <= right {
+        // 计算中间位置
+        let mid = left + (right - left) / 2;
+        // 获取中间值
+        let mid_val = nums[mid];
+        if mid_val > target {
+            // 目标值在左边
+            right = mid - 1;
+        } else if mid_val < target {
+            // 目标值在右边
+            left = mid + 1;
+        } else {
+            // 目标值等于中间值
+            return mid as i32;
+        }
+    }
+    return -1;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_search_insert() {
+        let nums = vec![1, 3, 5, 6];
+        assert_eq!(search_insert(nums, 5), 2);
+    }
+
+    #[test]
+    fn test_binary_search() {
+        let nums = vec![5];
+        assert_eq!(binary_search(nums, -5), -1);
+    }
 }
