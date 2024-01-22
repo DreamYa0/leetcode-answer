@@ -14,3 +14,4 @@ pub mod intervals;
 pub mod three_sum;
 pub mod four_sum;
 pub mod max_sub_array;
+pub mod sort_array;
