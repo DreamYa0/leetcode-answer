@@ -1,9 +1,9 @@
 /// 给定一个字符串 s ，请你找出其中不含有重复字符的 最长子串 的长度。
-/// 
+///
 /// 复杂度分析
-/// 
+///
 /// 时间复杂度：O(n)，其中 n 为 s 的长度。注意 left 至多增加 n 次，所以整个二重循环至多循环 O(n) 次。
-/// 
+///
 /// 空间复杂度：O(∣Σ∣)，其中 ∣Σ∣ 为字符集合的大小，本题中字符均为 ASCII 字符，所以 ∣Σ∣≤128
 pub fn length_of_longest_substring(st: String) -> i32 {
     let s = st.as_bytes();
@@ -53,9 +53,9 @@ pub fn length_of_longest_substring(st: String) -> i32 {
 /// 进阶：
 ///
 /// 如果你已经实现 O(n) 时间复杂度的解法, 请尝试设计一个 O(n log(n)) 时间复杂度的解法。
-/// 
+///
 /// 滑动窗口
-/// 
+///
 /// 接下来就开始介绍数组操作中另一个重要的方法：滑动窗口。
 ///
 /// 所谓滑动窗口，就是不断的调节子序列的起始位置和终止位置，从而得出我们要想的结果。
@@ -76,7 +76,7 @@ pub fn length_of_longest_substring(st: String) -> i32 {
 ///
 /// 这里还是以题目中的示例来举例，s=7， 数组是 2，3，1，2，4，3，来看一下查找的过程：
 /// <img class="marble" src="https://code-thinking.cdn.bcebos.com/gifs/209.%E9%95%BF%E5%BA%A6%E6%9C%80%E5%B0%8F%E7%9A%84%E5%AD%90%E6%95%B0%E7%BB%84.gif" alt="">
-/// 
+///
 /// 最后找到 4，3 是最短距离。
 ///
 /// 其实从动画中可以发现滑动窗口也可以理解为双指针法的一种！只不过这种解法更像是一个窗口的移动，所以叫做滑动窗口更适合一些。
@@ -94,11 +94,34 @@ pub fn length_of_longest_substring(st: String) -> i32 {
 ///
 /// 解题的关键在于 窗口的起始位置如何移动，如图所示：
 /// <img class="marble" src="https://code-thinking-1253855093.file.myqcloud.com/pics/20210312160441942.png" alt="">
-/// 
+///
 /// 可以发现滑动窗口的精妙之处在于根据当前子序列和大小的情况，不断调节子序列的起始位置。从而将O(n^2)暴力解法降为O(n)。
 pub fn min_sub_array_len(target: i32, nums: Vec<i32>) -> i32 {
-    
-    i32::MIN
+    // 定义起始指针
+    let mut left = 0;
+    // 定义和
+    let mut sum = 0;
+    // 定义结果
+    let mut res = std::i32::MAX;
+    for right in 0..nums.len() {
+        // 累加
+        sum += nums[right];
+        // 循环的条件，当和大于等于目标值时，就要开始缩小窗口了
+        while sum >= target {
+            // (right - left + 1) 子序列的长度
+            res = res.min((right - left + 1) as i32);
+            // 调整窗口
+            sum -= nums[left];
+            // 左指针右移
+            left += 1;
+        }
+    }
+    // 如果res没有被赋值，就返回0
+    if res == std::i32::MAX {
+        0
+    } else {
+        res
+    }
 }
 
 #[cfg(test)]
@@ -109,6 +132,14 @@ mod tests {
     fn test_length_of_longest_substring() {
         let st = "abcabcbb".to_string();
         let length = length_of_longest_substring(st);
+        println!("{:?}", length)
+    }
+
+    #[test]
+    fn test_min_sub_array_len() {
+        let target = 7;
+        let nums = vec![2, 3, 1, 2, 4, 3];
+        let length = min_sub_array_len(target, nums);
         println!("{:?}", length)
     }
 }
