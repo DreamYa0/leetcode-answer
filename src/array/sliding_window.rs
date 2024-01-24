@@ -1,3 +1,36 @@
+/// LCR 016. 无重复字符的最长子串
+///
+/// 给定一个字符串 s ，请你找出其中不含有重复字符的 最长连续子字符串 的长度。
+///
+/// 示例 1:
+///
+/// 输入: s = "abcabcbb"
+/// 输出: 3
+/// 解释: 因为无重复字符的最长子字符串是 "abc"，所以其长度为 3。
+/// 示例 2:
+///
+/// 输入: s = "bbbbb"
+/// 输出: 1
+/// 解释: 因为无重复字符的最长子字符串是 "b"，所以其长度为 1。
+/// 示例 3:
+///
+/// 输入: s = "pwwkew"
+/// 输出: 3
+/// 解释: 因为无重复字符的最长子串是 "wke"，所以其长度为 3。
+///      请注意，你的答案必须是 子串 的长度，"pwke" 是一个子序列，不是子串。
+/// 示例 4:
+///
+/// 输入: s = ""
+/// 输出: 0
+///
+///
+/// 提示：
+///
+/// 0 <= s.length <= 5 * 104
+/// s 由英文字母、数字、符号和空格组成
+///
+///
+/// 注意：本题与主站 3 题相同： https://leetcode-cn.com/problems/longest-substring-without-repeating-characters/
 /// 给定一个字符串 s ，请你找出其中不含有重复字符的 最长子串 的长度。
 ///
 /// 复杂度分析
@@ -7,19 +40,27 @@
 /// 空间复杂度：O(∣Σ∣)，其中 ∣Σ∣ 为字符集合的大小，本题中字符均为 ASCII 字符，所以 ∣Σ∣≤128
 pub fn length_of_longest_substring(st: String) -> i32 {
     let s = st.as_bytes();
+    // 最长子串长度
     let mut ans = 0;
+    // 起点指针
     let mut left = 0;
-    let mut window = vec![false; 128]; // 也可以用 HashSet，这里为了效率用的 Vec
+    // 用来标记窗口内是否存在重复元素，也可以用 HashSet，这里为了效率用的 Vec
+    let mut window = vec![false; 128];
     for (right, &c) in s.iter().enumerate() {
         let c = c as usize;
+        // 缩小窗口的条件是，窗口内存在重复元素
         while window[c] {
-            // 加入 c 后，窗口内会有重复元素
+            // 把起点指针右移一位，并且把起点指针所在的元素从窗口中移除
             window[s[left] as usize] = false;
             left += 1;
         }
+
+        // 往窗口中添加元素
         window[c] = true;
-        ans = ans.max(right - left + 1); // 更新窗口长度最大值
+        // 更新窗口长度最大值
+        ans = ans.max(right - left + 1);
     }
+
     ans as i32
 }
 
@@ -130,7 +171,7 @@ mod tests {
 
     #[test]
     fn test_length_of_longest_substring() {
-        let st = "abcabcbb".to_string();
+        let st = "pwwkew".to_string();
         let length = length_of_longest_substring(st);
         println!("{:?}", length)
     }
