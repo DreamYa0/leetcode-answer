@@ -1,16 +1,4 @@
-/// Definition for singly-linked list.
-#[derive(PartialEq, Eq, Clone, Debug)]
-pub struct ListNode<T> {
-    pub val: T,
-    pub next: Option<Box<ListNode<T>>>,
-}
-
-impl<T> ListNode<T> {
-    #[inline]
-    fn new(val: T) -> Self {
-        ListNode { next: None, val }
-    }
-}
+use super::ListNode;
 
 /// 203. 移除链表元素
 /// 给你一个链表的头节点 head 和一个整数 val ，请你删除链表中所有满足 Node.val == val 的节点，并返回 新的头节点 。
