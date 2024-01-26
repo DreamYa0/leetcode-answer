@@ -1,5 +1,4 @@
 pub mod check_possibility;
-pub mod majority_sum;
 pub mod roman_to_int;
 pub mod rotate;
 pub mod pivot_index;
