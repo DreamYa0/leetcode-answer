@@ -1,12 +1,6 @@
 pub mod check_possibility;
-pub mod roman_to_int;
 pub mod rotate;
 pub mod pivot_index;
 pub mod array_search;
 pub mod intervals;
-pub mod prefix_sum;
 pub mod array_sort;
-pub mod two_pointers;
-pub mod dynamic_programming;
-pub mod sliding_window;
-pub mod greedy_algorithm;

@@ -577,6 +577,20 @@ pub fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
     result
 }
 
+/// 反转字符串
+/// https://leetcode.cn/problems/reverse-string/
+pub fn reverse_string(s: &mut Vec<char>) {
+    // 定义右指针，指向末尾
+    let mut rigth = s.len() - 1;
+    for left in 0..s.len() / 2 {
+        let temp = s[left];
+        s[left] = s[rigth];
+        s[rigth] = temp;
+        // 右指针左移
+        rigth -= 1;
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -637,5 +651,12 @@ mod tests {
         let target = 0;
         let result = four_sum(nums, target);
         println!("result = {:?}", result);
+    }
+
+    #[test]
+    fn test_reverse_string() {
+        let mut s = ['h', 'e', 'l', 'l', 'o'].to_vec();
+        reverse_string(&mut s);
+        println!("{:?}", s)
     }
 }
