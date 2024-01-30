@@ -165,6 +165,47 @@ pub fn min_sub_array_len(target: i32, nums: Vec<i32>) -> i32 {
     }
 }
 
+/// 485. 最大连续 1 的个数
+/// 给定一个二进制数组 nums ， 计算其中最大连续 1 的个数。
+///
+///
+/// 示例 1：
+///
+/// 输入：nums = [1,1,0,1,1,1]
+/// 输出：3
+/// 解释：开头的两位和最后的三位都是连续 1 ，所以最大连续 1 的个数是 3.
+/// 示例 2:
+///
+/// 输入：nums = [1,0,1,1,0,1]
+/// 输出：2
+///
+/// 提示：
+///
+/// 1 <= nums.length <= 105
+/// nums[i] 不是 0 就是 1.
+///
+/// 解题思路：滑动窗口
+pub fn find_max_consecutive_ones(nums: Vec<i32>) -> i32 {
+    // 定义慢指针
+    let mut slow = 0;
+    // 最大连续 1 的个数。
+    let mut max_len = 0;
+    // 最大子串 fast - slow + 1 = nums[slow] + nums[slow + 1]..nums[fast]
+    for fast in 0..nums.len() {
+        // 统计 nums[slow] + nums[slow + 1]..nums[fast] 的和
+        let mut sum = 0;
+        for i in slow..=fast {
+            sum += nums[i];
+        }
+
+        while (slow < fast) && (fast - slow + 1) as i32 != sum {
+            slow += 1;
+        }
+        max_len = max_len.max(sum);
+    }
+    max_len
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -182,5 +223,12 @@ mod tests {
         let nums = vec![2, 3, 1, 2, 4, 3];
         let length = min_sub_array_len(target, nums);
         println!("{:?}", length)
+    }
+
+    #[test]
+    fn test_find_max_consecutive_ones() {
+        let nums = [1, 0, 1, 1, 0, 1].to_vec();
+        let find_max_consecutive_ones = find_max_consecutive_ones(nums);
+        println!("{:?}", find_max_consecutive_ones)
     }
 }

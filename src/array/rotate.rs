@@ -21,8 +21,23 @@
 /// 尽可能想出更多的解决方案，至少有 三种 不同的方法可以解决这个问题。
 /// 你可以使用空间复杂度为 O(1) 的 原地 算法解决这个问题吗？
 pub fn rotate(nums: &mut Vec<i32>, k: i32) {
-    let i = nums.len() as i32;
-    nums.rotate_right(k.rem_euclid(i) as usize)
+    let len = nums.len();
+    // 核心点 k % len 因为k有可能超过数组长度
+    let k = k as usize % len;
+    reverse(nums, 0, len);
+    reverse(nums, 0, k as usize);
+    reverse(nums, k as usize, len);
+}
+
+/// 反转数组 , 左闭，右闭 区间
+fn reverse(nums: &mut Vec<i32>, mut start: usize, mut end: usize) {
+    while start < end {
+        let temp = nums[start];
+        nums[start] = nums[end - 1];
+        nums[end - 1] = temp;
+        start += 1;
+        end -= 1;
+    }
 }
 
 /// 旋转函数
