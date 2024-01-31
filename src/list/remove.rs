@@ -195,6 +195,131 @@ pub fn remove_nth_from_end_by_two_pointers(
     dummy_head.next
 }
 
+/// 83. 删除排序链表中的重复元素
+///
+/// 给定一个已排序的链表的头 head ， 删除所有重复的元素，使每个元素只出现一次 。返回 已排序的链表 。
+///
+/// 示例 1：
+///
+/// <img src="https://assets.leetcode.com/uploads/2021/01/04/list1.jpg" />
+///
+/// 输入：head = [1,1,2]
+///
+/// 输出：[1,2]
+///
+/// 示例 2：
+///
+/// <img src="https://assets.leetcode.com/uploads/2021/01/04/list2.jpg" />
+///
+/// 输入：head = [1,1,2,3,3]
+///
+/// 输出：[1,2,3]
+///
+/// 提示：
+///
+/// 链表中节点数目在范围 [0, 300] 内
+///
+/// -100 <= Node.val <= 100
+///
+/// 题目数据保证链表已经按升序 排列
+pub fn delete_duplicates(head: Option<Box<ListNode<i32>>>) -> Option<Box<ListNode<i32>>> {
+    if head.is_none() {
+        return head;
+    }
+    let mut head = head;
+    // 对头节点的可变借用
+    let mut cur = head.as_mut().unwrap();
+    while let Some(next) = cur.next.take() {
+        // 先夺
+        if next.val == cur.val {
+            cur.next = next.next;
+        } else {
+            // 如果不重复，则放回去
+            cur.next = Some(next);
+            // 慢指针前进
+            cur = cur.next.as_mut().unwrap();
+        }
+    }
+    head
+}
+
+/// 82. 删除排序链表中的重复元素 II
+/// 已解答
+/// 中等
+/// 相关标签
+/// 相关企业
+/// 给定一个已排序的链表的头 head ， 删除原始链表中所有重复数字的节点，只留下不同的数字 。返回 已排序的链表 。
+///
+/// 示例 1：
+///
+/// 输入：head = [1,2,3,3,4,4,5]
+/// 
+/// 输出：[1,2,5]
+/// 
+/// 示例 2：
+///
+/// 输入：head = [1,1,1,2,3]
+/// 
+/// 输出：[2,3]
+///
+/// 提示：
+///
+/// 链表中节点数目在范围 [0, 300] 内
+/// 
+/// -100 <= Node.val <= 100
+/// 
+/// 题目数据保证链表已经按升序 排列
+/// 
+/// 方法二：一次遍历
+/// 
+/// 这里说的一次遍历，是说一边遍历、一边统计相邻节点的值是否相等，如果值相等就继续后移找到值不等的位置，然后删除值相等的这个区间。
+///
+/// 其实思路很简单，跟递归方法中的 while 语句跳过所有值相等的节点的思路是一样的：
+/// 如果 cur.val == cur.next.val  说明两个相邻的节点值相等，所以继续后移，
+/// 一直找到 cur.val != cur.next.val  ，此时的 cur.next  就是值不等的节点。
+///
+/// 比如： 1 -> 2 -> 2 -> 2 -> 3，我们用一个 pre 指向 1；当 cur 指向第一个 2 的时候，发现 cur.val == cur.next.val  ，
+/// 所以出现了值重复的节点啊，所以 cur 一直后移到最后一个 2 的时候，发现 cur.val != cur.next.val  ，
+/// 此时 cur.next = 3 ，所以 pre.next = cur.next ，即让1 的 next 节点是 3，就把中间的所有 2 都删除了。
+/// 
+/// 代码中用到了一个常用的技巧：dummy 节点，也叫做 哑节点。它在链表的迭代写法中非常常见，
+/// 因为对于本题而言，我们可能会删除头结点 head，为了维护一个不变的头节点，所以我们添加了 dummy，
+/// 让dummy.next = head，这样即使 head 被删了，那么会操作 dummy.next 指向新的链表头部，所以最终返回的也是 dummy.next。
+/// 
+/// 时间复杂度：O(N)，对链表每个节点遍历了一次。
+/// 
+/// 空间复杂度：O(1)，只使用了常量的空间。
+pub fn delete_duplicates_2(head: Option<Box<ListNode<i32>>>) -> Option<Box<ListNode<i32>>> {
+    if head.is_none() {
+        return head;
+    }
+    // 创建一个虚拟节点作为新链表的头部
+    let mut dummy_head = Box::new(ListNode::new(0));
+    // 定义当前节点
+    let mut pre = dummy_head.as_mut();
+    // `prev_val` 用于记录前一个节点的值
+    let mut prev_val = None;
+    let mut cur = head;
+    while let Some(mut cur_temp) = cur {
+        // 取出当前节点，并将 `head` 移动到下一个节点
+        cur = cur_temp.next.take();
+        // 在潜在移动 `node` 之前，存储当前节点的值
+        let node_val = cur_temp.val;
+        if cur.as_ref().map_or(true, |next| next.val != node_val)
+            && prev_val.map_or(true, |val| val != node_val)
+        {
+            // 如果当前节点是唯一的（值不等于下一个节点或前一个节点的值），则将其添加到新链表中
+            pre.next = Some(cur_temp);
+            // 移动pre节点
+            pre = pre.next.as_mut().unwrap();
+        }
+
+        // 更新 `prev_val` 为当前节点的值
+        prev_val = Some(node_val);
+    }
+    dummy_head.next
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -590,6 +590,134 @@ pub fn maximum_product(nums: Vec<i32>) -> i32 {
     max(min_one * min_two * max_one, max_one * max_two * max_three)
 }
 
+/// 274. H 指数
+/// 给你一个整数数组 citations ，其中 citations[i] 表示研究者的第 i 篇论文被引用的次数。计算并返回该研究者的 h 指数。
+///
+/// 根据维基百科上 h 指数的定义：h 代表“高引用次数” ，一名科研人员的 h 指数 是指他（她）至少发表了 h 篇论文，并且 至少 有 h 篇论文被引用次数大于等于 h 。如果 h 有多种可能的值，h 指数 是其中最大的那个。
+///
+/// 示例 1：
+///
+/// 输入：citations = [3,0,6,1,5]
+/// 输出：3
+/// 解释：给定数组表示研究者总共有 5 篇论文，每篇论文相应的被引用了 3, 0, 6, 1, 5 次。
+///      由于研究者有 3 篇论文每篇 至少 被引用了 3 次，其余两篇论文每篇被引用 不多于 3 次，所以她的 h 指数是 3。
+/// 示例 2：
+///
+/// 输入：citations = [1,3,1]
+/// 输出：1
+///
+/// 提示：
+///
+/// n == citations.length
+/// 1 <= n <= 5000
+/// 0 <= citations[i] <= 1000
+/// 首先解释下示例 1 是怎么算的：
+///
+/// 本题可以做到 O(n) 时间。
+///
+/// 设 n 为 citations 的长度，即这名研究者发表的论文数。根据题意，h 不可能超过 n，所以对于引用次数大于 n 的论文，
+/// 我们在统计的时候，可以看成是引用次数等于 n 的论文。
+/// 例如 n=5，假设 h 是 5，那么无论引用次数是 6 还是 5，都满足 ≥5，所以 6 可以看成是 5，毕竟我们只需要统计有多少个数字是 ≥5 的。
+///
+/// 所以，创建一个长为 n+1 的 cnt 数组，统计 min⁡(citations[i],n) 的出现次数。
+///
+/// 设 s 为引用次数 ≥i 的论文数，我们需要算出满足 s≥i 的最大的 i。
+///
+/// 为了快速算出有多少论文的引用次数 ≥i，我们可以从 i=n 开始倒序循环，每次循环，把 cnt[i] 加到 sss 中。
+/// 由于我们是倒序循环的，只要 s≥i 成立，此时的 iii 就是满足 s≥i 的最大的 i，直接返回 i 作为答案。
+///
+/// 例如示例 1，从 i=5 开始：
+///
+/// i=5，现在 s=2<i，继续循环。
+/// i=4，现在 s=2<i，继续循环。
+/// i=3，现在 s=3≥i，返回 3。
+pub fn h_index(citations: Vec<i32>) -> i32 {
+    let n = citations.len();
+    let mut cnt = vec![0; n + 1];
+    for &c in &citations {
+        // 引用次数 > n，等价于引用次数为 n
+        // 统计相同引用次数出现的次数，数组索引为引用次数对应的值为出现次数
+        cnt[n.min(c as usize)] += 1;
+    }
+    let mut s = 0;
+    // i=0 的时候，s>=i 一定成立
+    for i in (0..=n).rev() {
+        s += cnt[i];
+        // 说明有至少 i 篇论文的引用次数至少为 i
+        if s >= i {
+            return i as i32;
+        }
+    }
+    unreachable!()
+}
+
+/// 303. 区域和检索 - 数组不可变
+/// 给定一个整数数组  nums，处理以下类型的多个查询:
+///
+/// 计算索引 left 和 right （包含 left 和 right）之间的 nums 元素的 和 ，其中 left <= right
+/// 实现 NumArray 类：
+///
+/// NumArray(int[] nums) 使用数组 nums 初始化对象
+/// int sumRange(int i, int j) 返回数组 nums 中索引 left 和 right 之间的元素的 总和 ，
+/// 包含 left 和 right 两点（也就是 nums[left] + nums[left + 1] + ... + nums[right] )
+///
+/// 示例 1：
+///
+/// 输入：
+/// ["NumArray", "sumRange", "sumRange", "sumRange"]
+/// [[[-2, 0, 3, -5, 2, -1]], [0, 2], [2, 5], [0, 5]]
+/// 输出：
+/// [null, 1, -1, -3]
+///
+/// 解释：
+/// NumArray numArray = new NumArray([-2, 0, 3, -5, 2, -1]);
+/// numArray.sumRange(0, 2); /// return 1 ((-2) + 0 + 3)
+/// numArray.sumRange(2, 5); /// return -1 (3 + (-5) + 2 + (-1)) 
+/// numArray.sumRange(0, 5); /// return -3 ((-2) + 0 + 3 + (-5) + 2 + (-1))
+///
+/// 提示：
+///
+/// 1 <= nums.length <= 104
+/// -105 <= nums[i] <= 105
+/// 0 <= i <= j < nums.length
+/// 最多调用 104 次 sumRange 方法
+/// 方法一：前缀和
+/// 具体实现方面，假设数组 nums 的长度为 n，创建长度为 n+1 的前缀和数组 sums，对于 0≤i<n 
+/// 都有 sums[i+1]=sums[i]+nums[i]，则当 0<i≤n 时，sums[i] 表示数组 nums从下标 0 到下标 i−1 的前缀和。
+///
+/// 将前缀和数组 sums 的长度设为 n+1 的目的是为了方便计算 sumRange(i,j)，不需要对 i=0 的情况特殊处理。此时有：
+///
+/// sumRange(i,j)=sums[j+1]−sums[i]
+/// 
+/// 复杂度分析
+///
+/// 时间复杂度：初始化 O(n)，每次检索 O(1)，其中 nnn 是数组 nums 的长度。
+/// 初始化需要遍历数组 nums 计算前缀和，时间复杂度是 O(n)。
+/// 每次检索只需要得到两个下标处的前缀和，然后计算差值，时间复杂度是 O(1)。
+///
+/// 空间复杂度：O(n)，其中 nnn 是数组 nums 的长度。需要创建一个长度为 n+1 的前缀和数组。
+#[allow(dead_code)]
+struct NumArray {
+    // 前缀和数组，数组下标 i 表示愿数组 < i 之前的元素总和
+    sums: Vec<i32>,
+}
+
+#[allow(dead_code)]
+impl NumArray {
+    fn new(nums: Vec<i32>) -> Self {
+        let len = nums.len();
+        let mut sums = vec![0; len + 1];
+        for i in 0..len {
+            sums[i + 1] = sums[i] + nums[i];
+        }
+        Self { sums }
+    }
+
+    fn sum_range(&self, left: i32, right: i32) -> i32 {
+        self.sums[right as usize + 1] - self.sums[left as usize]
+    }
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -661,5 +789,12 @@ mod tests {
         let nums = [-100, -98, -1, 2, 3, 4].to_vec();
         let maximum_product = maximum_product(nums);
         println!("{:?}", maximum_product)
+    }
+
+    #[test]
+    fn test_h_index() {
+        let citations = [3, 0, 6, 1, 5].to_vec();
+        let h_index = h_index(citations);
+        println!("{:?}", h_index)
     }
 }

@@ -4,3 +4,4 @@ pub mod pivot_index;
 pub mod array_search;
 pub mod intervals;
 pub mod array_sort;
+pub mod common;
