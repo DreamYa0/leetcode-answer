@@ -215,11 +215,11 @@ pub fn swap_pairs(head: Option<Box<ListNode<i32>>>) -> Option<Box<ListNode<i32>>
 /// 看如下两个链表，目前curA指向链表A的头结点，curB指向链表B的头结点：
 ///
 /// <img src="https://code-thinking.cdn.bcebos.com/pics/%E9%9D%A2%E8%AF%95%E9%A2%9802.07.%E9%93%BE%E8%A1%A8%E7%9B%B8%E4%BA%A4_1.png" />
-/// 
+///
 /// 面试题02.07.链表相交_1
 ///
 /// 我们求出两个链表的长度，并求出两个链表长度的差值，然后让curA移动到，和curB 末尾对齐的位置，如图：
-/// 
+///
 /// <img src="https://code-thinking.cdn.bcebos.com/pics/%E9%9D%A2%E8%AF%95%E9%A2%9802.07.%E9%93%BE%E8%A1%A8%E7%9B%B8%E4%BA%A4_2.png" />
 ///
 /// 面试题02.07.链表相交_2
@@ -268,13 +268,13 @@ pub fn get_intersection_node(
     // 当head_a移动到和head_b对齐的位置之后，开始同时移动两个链表
     while cur_a.is_some() {
         // 如果出现节点相同则返回，遍历结束
-        if cur_a==cur_b {
+        if cur_a == cur_b {
             return cur_a;
         }
         // 遍历head_a链表
-        cur_a=cur_a.unwrap().next;
+        cur_a = cur_a.unwrap().next;
         // 遍历head_b链表
-        cur_b=cur_b.unwrap().next;
+        cur_b = cur_b.unwrap().next;
     }
 
     // 如果没发现相同的节点则返回None
@@ -288,7 +288,7 @@ pub fn get_intersection_node(
 /// 为了表示给定链表中的环，使用整数 pos 来表示链表尾连接到链表中的位置（索引从 0 开始）。 如果 pos 是 -1，则在该链表中没有环。
 ///
 /// 说明：不允许修改给定的链表。
-/// 
+///
 /// <img src="https://code-thinking-1253855093.file.myqcloud.com/pics/20200816110112704.png" />
 ///
 /// #思路
@@ -310,7 +310,7 @@ pub fn get_intersection_node(
 /// 可以画一个环，然后让 fast指针在任意一个节点开始追赶slow指针。
 ///
 /// 会发现最终都是这种情况， 如下图：
-/// 
+///
 /// <img src="https://code-thinking-1253855093.file.myqcloud.com/pics/20210318162236720.png" />
 ///
 /// fast和slow各自再走一步， fast和slow就相遇了
@@ -318,7 +318,7 @@ pub fn get_intersection_node(
 /// 这是因为fast是走两步，slow是走一步，其实相对于slow来说，fast是一个节点一个节点的靠近slow的，所以fast一定可以和slow重合。
 ///
 /// 动画如下：
-/// 
+///
 /// <img src="https://code-thinking.cdn.bcebos.com/gifs/141.%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8.gif" />
 ///
 /// #如果有环，如何找到这个环的入口
@@ -355,7 +355,7 @@ pub fn get_intersection_node(
 /// 让index1和index2同时移动，每次移动一个节点， 那么他们相遇的地方就是 环形入口的节点。
 ///
 /// 动画如下：
-/// 
+///
 /// <img src="https://code-thinking.cdn.bcebos.com/gifs/142.%E7%8E%AF%E5%BD%A2%E9%93%BE%E8%A1%A8II%EF%BC%88%E6%B1%82%E5%85%A5%E5%8F%A3%EF%BC%89.gif" />
 ///
 /// 那么 n如果大于1是什么情况呢，就是fast指针在环形转n圈之后才遇到 slow指针。
@@ -367,19 +367,19 @@ pub fn get_intersection_node(
 /// 在推理过程中，大家可能有一个疑问就是：为什么第一次在环中相遇，slow的 步数 是 x+y 而不是 x + 若干环的长度 + y 呢？
 ///
 /// 即文章链表：环找到了，那入口呢？ (opens new window)中如下的地方：
-/// 
+///
 /// <img src="https://code-thinking-1253855093.file.myqcloud.com/pics/20210318165123581.png" />
 ///
 /// 首先slow进环的时候，fast一定是先进环来了。
 ///
 /// 如果slow进环入口，fast也在环入口，那么把这个环展开成直线，就是如下图的样子：
-/// 
+///
 /// <img src="https://code-thinking-1253855093.file.myqcloud.com/pics/2021031816503266.png" />
 ///
 /// 可以看出如果slow 和 fast同时在环入口开始走，一定会在环入口3相遇，slow走了一圈，fast走了两圈。
 ///
 /// 重点来了，slow进环的时候，fast一定是在环的任意一个位置，如图：
-/// 
+///
 /// <img src="https://code-thinking-1253855093.file.myqcloud.com/pics/2021031816515727.png" />
 ///
 /// 那么fast指针走到环入口3的时候，已经走了k + n 个节点，slow相应的应该走了(k + n) / 2 个节点。
@@ -400,6 +400,5 @@ pub fn get_intersection_node(
 /// 这次可以说把环形链表这道题目的各个细节，完完整整的证明了一遍，说这是全网最详细讲解不为过吧。
 #[allow(unused_variables)]
 pub fn detect_cycle(head: Option<Box<ListNode<i32>>>) -> Option<Box<ListNode<i32>>> {
-
     None
 }
