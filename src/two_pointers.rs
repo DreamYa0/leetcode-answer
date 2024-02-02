@@ -1,3 +1,5 @@
+use crate::list::ListNode;
+
 /// 给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
 ///
 /// 请注意 ，必须在不复制数组的情况下原地对数组进行操作。
@@ -591,8 +593,62 @@ pub fn reverse_string(s: &mut Vec<char>) {
     }
 }
 
+/// 876. 链表的中间结点
+/// 
+/// 给你单链表的头结点 head ，请你找出并返回链表的中间结点。
+///
+/// 如果有两个中间结点，则返回第二个中间结点。
+///
+/// 示例 1：
+///
+/// 输入：head = [1,2,3,4,5]
+/// 
+/// 输出：[3,4,5]
+/// 
+/// 解释：链表只有一个中间结点，值为 3 。
+/// 
+/// 示例 2：
+///
+/// 输入：head = [1,2,3,4,5,6]
+/// 
+/// 输出：[4,5,6]
+/// 
+/// 解释：该链表有两个中间结点，值分别为 3 和 4 ，返回第二个结点。
+///
+/// 提示：
+///
+/// 链表的结点数范围是 [1, 100]
+/// 
+/// 1 <= Node.val <= 100
+////
+/// 解题思路
+/// 
+/// 考虑借助快慢双指针 fast, slow ，「快指针 fast」每轮走 2 步，「慢指针 slow」每轮走 1 步。fast 的步数恒为 slow 的 2 倍，
+/// 因此当快指针遍历完链表时，慢指针就指向链表中间节点。而由于长度为偶数的链表有两个中间节点，因此需要分两种情况考虑：
+///
+/// 链表长度为奇数： 当 fast 走到链表「尾节点」时，slow 正好走到「中间节点」。
+/// 
+/// 链表长度为偶数： 当 fast 走到「null」时（越过「尾节点」后），slow 正好走到「第二个中间节点」。
+/// 
+/// 总结以上规律，应在当 fast 遇到或越过尾节点 时跳出循环，并返回 slow 即可。
+/// 
+/// <img src="https://pic.leetcode-cn.com/1656953441-Kshqch-figures.gif" alt="链表-删除节点" style="zoom:50%;" />
+pub fn middle_node(head: Option<Box<ListNode<i32>>>) -> Option<Box<ListNode<i32>>> {
+    // 快慢指针
+    let mut slow = head.clone();
+    let mut fast = head;
+    while fast.is_some() && fast.as_ref().unwrap().next.is_some() {
+        slow = slow.unwrap().next;
+        // 快指针走两步，慢指针走一步
+        fast = fast.unwrap().next.unwrap().next;
+    }
+    slow
+}
+
 #[cfg(test)]
 mod tests {
+    use crate::list::ListNode;
+
     use super::*;
 
     #[test]
@@ -658,5 +714,27 @@ mod tests {
         let mut s = ['h', 'e', 'l', 'l', 'o'].to_vec();
         reverse_string(&mut s);
         println!("{:?}", s)
+    }
+
+    #[test]
+    fn test_middle_node() {
+        let head = Some(Box::new(ListNode {
+            val: 1,
+            next: Some(Box::new(ListNode {
+                val: 2,
+                next: Some(Box::new(ListNode {
+                    val: 3,
+                    next: Some(Box::new(ListNode {
+                        val: 4,
+                        next: Some(Box::new(ListNode {
+                            val: 5,
+                            next: None,
+                        })),
+                    })),
+                })),
+            })),
+        }));
+        let res = middle_node(head);
+        println!("{:?}", res)
     }
 }

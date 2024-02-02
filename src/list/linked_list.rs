@@ -1,3 +1,5 @@
+use super::ListNode;
+
 /// 707. 设计链表
 /// 你可以选择使用单链表或者双链表，设计并实现自己的链表。
 ///
@@ -36,7 +38,7 @@
 /// 0 <= index, val <= 1000
 /// 请不要使用内置的 LinkedList 库。
 /// 调用 get、addAtHead、addAtTail、addAtIndex 和 deleteAtIndex 的次数不超过 2000 。
-/// 
+///
 /// 思路
 /// 如果对链表的基础知识还不太懂，可以看这篇文章：关于链表，你该了解这些！(opens new window)
 ///
@@ -45,7 +47,7 @@
 /// 删除链表节点： 链表-删除节点
 ///
 /// <img src="https://code-thinking-1253855093.file.myqcloud.com/pics/20200806195114541.png" alt="链表-删除节点" style="zoom:50%;" />
-/// 
+///
 /// 添加链表节点： 链表-添加节点
 ///
 /// <img src="https://code-thinking-1253855093.file.myqcloud.com/pics/20200806195134331.png" alt="链表-添加节点" style="zoom:50%;" />
@@ -164,5 +166,162 @@ impl MyLinkedList {
             cur.next = Some(node);
             cur = cur.next.as_mut().unwrap();
         }
+    }
+}
+
+/// 21. 合并两个有序链表
+/// 
+/// 将两个升序链表合并为一个新的 升序 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 
+///
+/// 示例 1：
+///
+/// 输入：l1 = [1,2,4], l2 = [1,3,4]
+/// 
+/// 输出：[1,1,2,3,4,4]
+/// 
+/// 示例 2：
+///
+/// 输入：l1 = [], l2 = []
+/// 
+/// 输出：[]
+/// 
+/// 示例 3：
+///
+/// 输入：l1 = [], l2 = [0]
+/// 
+/// 输出：[0]
+///
+/// 提示：
+///
+/// 两个链表的节点数目范围是 [0, 50]
+/// 
+/// -100 <= Node.val <= 100
+/// 
+/// l1 和 l2 均按 非递减顺序 排列
+///
+/// 递归解法
+/// 
+/// 根据以上规律考虑本题目：
+///
+/// 终止条件：当两个链表都为空时，表示我们对链表已合并完成。
+/// 
+/// 如何递归：我们判断 l1 和 l2 头结点哪个更小，然后较小结点的 next 指针指向其余结点的合并结果。（调用递归）
+pub fn merge_two_lists(
+    list1: Option<Box<ListNode<i32>>>,
+    list2: Option<Box<ListNode<i32>>>,
+) -> Option<Box<ListNode<i32>>> {
+    if list1.is_none() {
+        return list2;
+    } else if list2.is_none() {
+        return list1;
+    } else if list1.as_ref().unwrap().val < list2.as_ref().unwrap().val {
+        let mut list1 = list1;
+        list1.as_mut().unwrap().next = merge_two_lists(list1.as_mut().unwrap().next.take(), list2);
+        list1
+    } else {
+        let mut list2 = list2;
+        list2.as_mut().unwrap().next = merge_two_lists(list1, list2.as_mut().unwrap().next.take());
+        list2
+    }
+}
+
+/// 23. 合并 K 个升序链表
+/// 给你一个链表数组，每个链表都已经按升序排列。
+///
+/// 请你将所有链表合并到一个升序链表中，返回合并后的链表。
+///
+///
+/// 示例 1：
+///
+/// 输入：lists = [[1,4,5],[1,3,4],[2,6]]
+/// 
+/// 输出：[1,1,2,3,4,4,5,6]
+/// 
+/// 解释：链表数组如下：
+/// 
+/// ```
+/// [
+///   1->4->5,
+///   1->3->4,
+///   2->6
+/// ]
+/// ```
+/// 
+/// 将它们合并到一个有序链表中得到。
+/// 
+/// 1->1->2->3->4->4->5->6
+/// 
+/// 示例 2：
+///
+/// 输入：lists = []
+/// 
+/// 输出：[]
+/// 
+/// 示例 3：
+///
+/// 输入：lists = [[]]
+/// 
+/// 输出：[]
+///
+/// 提示：
+///
+/// k == lists.length
+/// 
+/// 0 <= k <= 10^4
+/// 
+/// ```
+/// 0 <= lists[i].length <= 500
+/// ```
+/// 
+/// -10^4 <= lists[i][j] <= 10^4
+/// 
+/// lists[i] 按 升序 排列
+/// 
+/// lists[i].length 的总和不超过 10^4
+pub fn merge_k_lists(lists: Vec<Option<Box<ListNode<i32>>>>) -> Option<Box<ListNode<i32>>> {
+    let mut res = None;
+    for list in lists {
+        res = merge_two_lists(res, list);
+    }
+    res
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_merge_two_lists() {
+        let l1 = ListNode {
+            val: 1,
+            next: Some(Box::new(ListNode {
+                val: 2,
+                next: Some(Box::new(ListNode::new(4))),
+            })),
+        };
+        let l2 = ListNode {
+            val: 1,
+            next: Some(Box::new(ListNode {
+                val: 3,
+                next: Some(Box::new(ListNode::new(4))),
+            })),
+        };
+        let res = merge_two_lists(Some(Box::new(l1)), Some(Box::new(l2)));
+        assert_eq!(res, Some(Box::new(ListNode {
+            val: 1,
+            next: Some(Box::new(ListNode {
+                val: 1,
+                next: Some(Box::new(ListNode {
+                    val: 2,
+                    next: Some(Box::new(ListNode {
+                        val: 3,
+                        next: Some(Box::new(ListNode {
+                            val: 4,
+                            next: Some(Box::new(ListNode::new(4))),
+                        })),
+                    })),
+                })),
+            })),
+        })));
     }
 }
