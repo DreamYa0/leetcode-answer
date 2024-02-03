@@ -206,6 +206,211 @@ pub fn find_max_consecutive_ones(nums: Vec<i32>) -> i32 {
     max_len
 }
 
+/// 438.找到字符串中所有字母的异位词
+/// 给定两个字符串 s 和 p，找到 s 中所有 p 的 异位词 的子串，返回这些子串的起始索引。不考虑答案输出的顺序。
+///
+/// 异位词 指由相同字母重排列形成的字符串（包括相同的字符串）。
+///
+///
+/// 示例 1:
+///
+/// 输入: s = "cbaebabacd", p = "abc"
+/// 输出: [0,6]
+/// 解释:
+/// 起始索引等于 0 的子串是 "cba", 它是 "abc" 的异位词。
+/// 起始索引等于 6 的子串是 "bac", 它是 "abc" 的异位词。
+///  示例 2:
+///
+/// 输入: s = "abab", p = "ab"
+/// 输出: [0,1,2]
+/// 解释:
+/// 起始索引等于 0 的子串是 "ab", 它是 "ab" 的异位词。
+/// 起始索引等于 1 的子串是 "ba", 它是 "ab" 的异位词。
+/// 起始索引等于 2 的子串是 "ab", 它是 "ab" 的异位词。
+///
+/// 提示:
+///
+/// 1 <= s.length, p.length <= 3 * 104
+/// s 和 p 仅包含小写字母
+///
+/// 解题思路
+/// 滑动窗口
+pub fn find_anagrams(s: String, p: String) -> Vec<i32> {
+    let mut res = Vec::with_capacity(s.len());
+    let (n, m) = (s.len(), p.len());
+    if n < m {
+        return res;
+    }
+
+    let mut tab = [0; 26];
+    // 定义滑动窗口
+    let mut windows = [0; 26];
+
+    // 初始化 tab数组
+    for i in p.as_bytes() {
+        // [0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        tab[(i - b'a') as usize] += 1;
+    }
+
+    // 初始化windows数组，从s字符串中取m-1长度的字符放到windows中
+    for i in 0..(m - 1) {
+        // 遍历到m前一个元素截止，m是开区间
+        // [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        windows[(s.as_bytes()[i] - b'a') as usize] += 1;
+    }
+
+    // 开始滑动窗口，滑动范围是从m到n
+    for i in (m - 1)..n {
+        // [0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+        windows[(s.as_bytes()[i] - b'a') as usize] += 1;
+        if windows == tab {
+            // 如果出现相等，则把起始索引放入结果集中
+            res.push((i + 1 - m) as i32);
+        }
+        // 从 cur数组中剪掉滑动窗口起始点之前的数据
+        // 第一次循环是 i = m - 1 第一次循环窗口往前滑动一位，所以就需要把windows[0]位置的数据减掉
+        windows[(s.as_bytes()[i + 1 - m] - b'a') as usize] -= 1;
+    }
+    res
+}
+
+/// 强化练习 1：定长子串中元音的最大数目
+///
+/// 给你字符串 s 和整数 k 。
+///
+/// 请返回字符串 s 中长度为 k 的单个子字符串中可能包含的最大元音字母数。
+///
+/// 英文中的 元音字母 为（a, e, i, o, u）。
+///
+/// 示例 1：
+///
+/// 输入：s = "abciiidef", k = 3
+///
+/// 输出：3
+///
+/// 解释：子字符串 "iii" 包含 3 个元音字母。
+///
+/// 示例 2：
+///
+/// 输入：s = "aeiou", k = 2
+///
+/// 输出：2
+///
+/// 解释：任意长度为 2 的子字符串都包含 2 个元音字母。
+///
+/// 示例 3：
+///
+/// 输入：s = "leetcode", k = 3
+///
+/// 输出：2
+///
+/// 解释："lee"、"eet" 和 "ode" 都包含 2 个元音字母。
+///
+/// 示例 4：
+///
+/// 输入：s = "rhythms", k = 4
+///
+/// 输出：0
+///
+/// 解释：字符串 s 中不含任何元音字母。
+///
+/// 示例 5：
+///
+/// 输入：s = "tryhard", k = 4
+///
+/// 输出：1
+///
+/// 提示：
+///
+/// 1 <= s.length <= 10^5
+///
+/// s 由小写英文字母组成
+///
+/// 1 <= k <= s.length
+///
+/// 解题思路
+///
+/// 固定滑动窗口
+pub fn max_vowels(s: String, k: i32) -> i32 {
+    let k = k as usize;
+    // 把字符串转换成字符数组
+    let s: Vec<char> = s.chars().collect();
+    let mut r = k;
+    // 定义一个闭包，用来判断字符是否是元音
+    let is_vowel = |x| match x {
+        'a' | 'e' | 'i' | 'o' | 'u' => 1,
+        _ => 0,
+    };
+    // 计算第一个窗口内元音的个数 0 - k
+    let mut cur_vowels = (&s[..k]).iter().map(|&x| is_vowel(x)).sum::<i32>();
+    // 定义最大元音数
+    let mut max_vowels = cur_vowels;
+    while r < s.len() {
+        // 如果是元音则当前元音数加1
+        cur_vowels += is_vowel(s[r]);
+        // 如果不是元音则当前元音数减1
+        cur_vowels -= is_vowel(s[r - k]);
+        // 更新最大元音数
+        max_vowels = max_vowels.max(cur_vowels);
+        // 窗口右移
+        r += 1;
+    }
+    max_vowels
+}
+
+/// 强化练习 3：字符串的排列
+///
+/// 给你两个字符串 s1 和 s2 ，写一个函数来判断 s2 是否包含 s1 的排列。如果是，返回 true ；否则，返回 false 。
+///
+/// 换句话说，s1 的排列之一是 s2 的 子串 。
+///
+/// 示例 1：
+///
+/// 输入：s1 = "ab" s2 = "eidbaooo"
+///
+/// 输出：true
+///
+/// 解释：s2 包含 s1 的排列之一 ("ba").
+///
+/// 示例 2：
+///
+/// 输入：s1= "ab" s2 = "eidboaoo"
+///
+/// 输出：false
+///
+/// 提示：
+///
+/// 1 <= s1.length, s2.length <= 104
+///
+/// s1 和 s2 仅包含小写字母
+pub fn check_inclusion(s1: String, s2: String) -> bool {
+    let (s, p) = (s2, s1);
+    let mut rst = vec![];
+    if s.len() < p.len() {
+        return false;
+    }
+    let mut count_p = [0; 128];
+    let mut count_s = [0; 128];
+    let s = s.as_bytes();
+    let p = p.as_bytes();
+    for i in 0..p.len() {
+        count_p[p[i] as usize] += 1;
+        count_s[s[i] as usize] += 1;
+    }
+    if count_p == count_s {
+        rst.push(0);
+    }
+    for r in p.len()..s.len() {
+        let l = r - p.len();
+        count_s[s[r] as usize] += 1;
+        count_s[s[l] as usize] -= 1;
+        if count_p == count_s {
+            rst.push(l as i32 + 1);
+        }
+    }
+    !rst.is_empty()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -230,5 +435,29 @@ mod tests {
         let nums = [1, 0, 1, 1, 0, 1].to_vec();
         let find_max_consecutive_ones = find_max_consecutive_ones(nums);
         println!("{:?}", find_max_consecutive_ones)
+    }
+
+    #[test]
+    fn test_find_anagrams() {
+        let s = "cbaebabacd".to_string();
+        let p = "abc".to_string();
+        let find_anagrams = find_anagrams(s, p);
+        println!("{:?}", find_anagrams)
+    }
+
+    #[test]
+    fn test_max_vowels() {
+        let s = "abciiidef".to_string();
+        let k = 3;
+        let max_vowels = max_vowels(s, k);
+        println!("{:?}", max_vowels)
+    }
+
+    #[test]
+    fn test_check_inclusion() {
+        let s1 = "hello".to_string();
+        let s2 = "ooolleoooleh".to_string();
+        let check_inclusion = check_inclusion(s1, s2);
+        println!("{:?}", check_inclusion)
     }
 }
