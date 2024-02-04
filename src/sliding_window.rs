@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 /// LCR 016. 无重复字符的最长子串
 ///
 /// 给定一个字符串 s ，请你找出其中不含有重复字符的 最长连续子字符串 的长度。
@@ -44,7 +46,7 @@ pub fn length_of_longest_substring(st: String) -> i32 {
     let mut ans = 0;
     // 起点指针
     let mut left = 0;
-    // 用来标记窗口内是否存在重复元素，也可以用 HashSet，这里为了效率用的 Vec
+    // 用来标记窗口内是否存在重复元素，也可以用 HashSet，这里为了效率用的 Vec，数组长度定义128是因为u8的范围是0-127
     let mut window = vec![false; 128];
     for (right, &c) in s.iter().enumerate() {
         let c = c as usize;
@@ -151,7 +153,7 @@ pub fn min_sub_array_len(target: i32, nums: Vec<i32>) -> i32 {
         while sum >= target {
             // (right - left + 1) 子序列的长度
             res = res.min((right - left + 1) as i32);
-            // 调整窗口
+            // 调整窗口，滑出窗口的需要减掉
             sum -= nums[left];
             // 左指针右移
             left += 1;
@@ -504,7 +506,10 @@ pub fn get_averages(nums: Vec<i32>, k: i32) -> Vec<i32> {
     }
 
     // 统计第一个窗口的和
-    let mut sum = nums[..(2 * k + 1) as usize].iter().map(|x| *x as i64).sum::<i64>();
+    let mut sum = nums[..(2 * k + 1) as usize]
+        .iter()
+        .map(|x| *x as i64)
+        .sum::<i64>();
     // 计算第一个窗口的平均值
     res.push((sum / (2 * k + 1) as i64) as i32);
     // 滑动窗口
@@ -524,6 +529,209 @@ pub fn get_averages(nums: Vec<i32>, k: i32) -> Vec<i32> {
     }
     res
 }
+
+/// 强化练习 6：滑动窗口最大值
+///
+/// 给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。
+///
+/// 返回 滑动窗口中的最大值 。
+///
+/// 示例 1：
+///
+/// 输入：nums = [1,3,-1,-3,5,3,6,7], k = 3
+///
+/// 输出：[3,3,5,5,6,7]
+///
+/// 解释：
+///
+/// ```
+/// 滑动窗口的位置                最大值
+/// ---------------               -----
+/// [1  3  -1] -3  5  3  6  7       3
+///  1 [3  -1  -3] 5  3  6  7       3
+///  1  3 [-1  -3  5] 3  6  7       5
+///  1  3  -1 [-3  5  3] 6  7       5
+///  1  3  -1  -3 [5  3  6] 7       6
+///  1  3  -1  -3  5 [3  6  7]      7
+/// ```
+/// 示例 2：
+///
+/// 输入：nums = [1], k = 1
+///
+/// 输出：[1]
+///
+/// 提示：
+///
+/// 1 <= nums.length <= 105
+///
+/// -104 <= nums[i] <= 104
+///
+/// 1 <= k <= nums.length
+///
+/// 单调队列套路
+///
+/// 入（元素进入队尾，同时维护队列单调性）
+///
+/// 出（元素离开队首）
+///
+/// 记录/维护答案（根据队首）
+pub fn max_sliding_window(nums: Vec<i32>, k: i32) -> Vec<i32> {
+    let k = k as usize;
+    let mut ans = Vec::new();
+    // 双端队列
+    let mut q = VecDeque::new();
+    for (i, &x) in nums.iter().enumerate() {
+        // 1. 入
+        while !q.is_empty() && nums[*q.back().unwrap()] <= x {
+            // 维护 q 的单调性
+            q.pop_back();
+        }
+        // 入队
+        q.push_back(i);
+        // 2. 出
+        if i - q[0] >= k {
+            // 队首已经离开窗口了
+            q.pop_front();
+        }
+        // 3. 记录答案
+        if i >= k - 1 {
+            // 由于队首到队尾单调递减，所以窗口最大值就是队首
+            ans.push(nums[q[0]]);
+        }
+    }
+    ans
+}
+
+/// 1438. 绝对差不超过限制的最长连续子数组
+///
+/// 给你一个整数数组 nums ，和一个表示限制的整数 limit，请你返回最长连续子数组的长度，该子数组中的任意两个元素之间的绝对差必须小于或者等于 limit 。
+///
+/// 如果不存在满足条件的子数组，则返回 0 。
+///
+/// 示例 1：
+///
+/// 输入：nums = [8,2,4,7], limit = 4
+///
+/// 输出：2
+///
+/// 解释：所有子数组如下：
+///
+/// ```
+/// [8] 最大绝对差 |8-8| = 0 <= 4.
+/// [8,2] 最大绝对差 |8-2| = 6 > 4.
+/// [8,2,4] 最大绝对差 |8-2| = 6 > 4.
+/// [8,2,4,7] 最大绝对差 |8-2| = 6 > 4.
+/// [2] 最大绝对差 |2-2| = 0 <= 4.
+/// [2,4] 最大绝对差 |2-4| = 2 <= 4.
+/// [2,4,7] 最大绝对差 |2-7| = 5 > 4.
+/// [4] 最大绝对差 |4-4| = 0 <= 4.
+/// [4,7] 最大绝对差 |4-7| = 3 <= 4.
+/// [7] 最大绝对差 |7-7| = 0 <= 4.
+/// ```
+///
+/// 因此，满足题意的最长子数组的长度为 2 。
+///
+/// 示例 2：
+///
+/// 输入：nums = [10,1,2,4,7,2], limit = 5
+///
+/// 输出：4
+///
+/// 解释：满足题意的最长子数组是 [2,4,7,2]，其最大绝对差 |2-7| = 5 <= 5 。
+///
+/// 示例 3：
+///
+/// 输入：nums = [4,2,2,2,4,4,2,2], limit = 0
+///
+/// 输出：3
+///
+/// 提示：
+///
+/// 1 <= nums.length <= 10^5
+///
+/// 1 <= nums[i] <= 10^9
+///
+/// 0 <= limit <= 10^9
+pub fn longest_subarray(nums: Vec<i32>, limit: i32) -> i32 {
+    let mut max_q = VecDeque::new();
+    let mut min_q = VecDeque::new();
+    let mut left = 0;
+    let mut right = 0;
+    let mut res = 0;
+    while right < nums.len() {
+        while !max_q.is_empty() && nums[right] > nums[*max_q.back().unwrap()] {
+            max_q.pop_back();
+        }
+        while !min_q.is_empty() && nums[right] < nums[*min_q.back().unwrap()] {
+            min_q.pop_back();
+        }
+        max_q.push_back(right);
+        min_q.push_back(right);
+        while nums[*max_q.front().unwrap()] - nums[*min_q.front().unwrap()] > limit {
+            if *max_q.front().unwrap() < *min_q.front().unwrap() {
+                left = max_q.pop_front().unwrap() + 1;
+            } else {
+                left = min_q.pop_front().unwrap() + 1;
+            }
+        }
+        res = res.max(right - left + 1);
+        right += 1;
+    }
+    res as i32
+}
+
+/// 强化练习 4：最小覆盖子串
+/// 
+/// 给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
+///
+/// 注意：
+///
+/// 对于 t 中重复字符，我们寻找的子字符串中该字符数量必须不少于 t 中该字符数量。
+/// 
+/// 如果 s 中存在这样的子串，我们保证它是唯一的答案。
+///  
+/// 示例 1：
+///
+/// 输入：s = "ADOBECODEBANC", t = "ABC"
+/// 
+/// 输出："BANC"
+/// 
+/// 解释：最小覆盖子串 "BANC" 包含来自字符串 t 的 'A'、'B' 和 'C'。
+/// 
+/// 示例 2：
+///
+/// 输入：s = "a", t = "a"
+/// 
+/// 输出："a"
+/// 
+/// 解释：整个字符串 s 是最小覆盖子串。
+/// 
+/// 示例 3:
+///
+/// 输入: s = "a", t = "aa"
+/// 
+/// 输出: ""
+/// 
+/// 解释: t 中两个字符 'a' 均应包含在 s 的子串中，
+/// 
+/// 因此没有符合条件的子字符串，返回空字符串。 
+///
+/// 提示：
+///
+/// m == s.length
+/// 
+/// n == t.length
+/// 
+/// 1 <= m, n <= 105
+/// 
+/// s 和 t 由英文字母组成
+///  
+/// 进阶：你能设计一个在 o(m+n) 时间内解决此问题的算法吗？
+#[allow(unused)]
+pub fn min_window(s: String, t: String) -> String {
+    "".to_string()
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -581,5 +789,21 @@ mod tests {
         let k = 3;
         let get_averages = get_averages(nums, k);
         println!("{:?}", get_averages)
+    }
+
+    #[test]
+    fn test_max_sliding_window() {
+        let nums = vec![1, 3, -1, -3, 5, 3, 6, 7];
+        let k = 3;
+        let max_sliding_window = max_sliding_window(nums, k);
+        println!("{:?}", max_sliding_window)
+    }
+
+    #[test]
+    fn test_longest_subarray() {
+        let nums = vec![8, 2, 4, 7];
+        let limit = 4;
+        let longest_subarray = longest_subarray(nums, limit);
+        println!("{:?}", longest_subarray)
     }
 }
