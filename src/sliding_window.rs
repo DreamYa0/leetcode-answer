@@ -237,8 +237,8 @@ pub fn find_max_consecutive_ones(nums: Vec<i32>) -> i32 {
 /// 滑动窗口
 pub fn find_anagrams(s: String, p: String) -> Vec<i32> {
     let mut res = Vec::with_capacity(s.len());
-    let (n, m) = (s.len(), p.len());
-    if n < m {
+    let (s_len, p_len) = (s.len(), p.len());
+    if s_len < p_len {
         return res;
     }
 
@@ -246,30 +246,34 @@ pub fn find_anagrams(s: String, p: String) -> Vec<i32> {
     // 定义滑动窗口
     let mut windows = [0; 26];
 
-    // 初始化 tab数组
+    // 初始化 tab数组,统计p字符串中每个字符出现的次数
     for i in p.as_bytes() {
         // [0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         tab[(i - b'a') as usize] += 1;
     }
 
-    // 初始化windows数组，从s字符串中取m-1长度的字符放到windows中
-    for i in 0..(m - 1) {
+    // 初始化windows数组，从s字符串中取p_len长度的字符放到windows中
+    for i in 0..p_len {
         // 遍历到m前一个元素截止，m是开区间
         // [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         windows[(s.as_bytes()[i] - b'a') as usize] += 1;
+        if tab == windows {
+            // 如果出现相等，则把起始索引放入结果集中
+            res.push(0);
+        }
     }
 
     // 开始滑动窗口，滑动范围是从m到n
-    for i in (m - 1)..n {
+    for i in p_len..s_len {
         // [0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
         windows[(s.as_bytes()[i] - b'a') as usize] += 1;
-        if windows == tab {
-            // 如果出现相等，则把起始索引放入结果集中
-            res.push((i + 1 - m) as i32);
-        }
         // 从 cur数组中剪掉滑动窗口起始点之前的数据
         // 第一次循环是 i = m - 1 第一次循环窗口往前滑动一位，所以就需要把windows[0]位置的数据减掉
-        windows[(s.as_bytes()[i + 1 - m] - b'a') as usize] -= 1;
+        windows[(s.as_bytes()[i - p_len] - b'a') as usize] -= 1;
+        if windows == tab {
+            // 如果出现相等，则把起始索引放入结果集中
+            res.push((i - p_len + 1) as i32);
+        }
     }
     res
 }
@@ -387,6 +391,7 @@ pub fn check_inclusion(s1: String, s2: String) -> bool {
     let (s, p) = (s2, s1);
     let mut rst = vec![];
     if s.len() < p.len() {
+        // 如果s的长度小于p的长度，直接返回false
         return false;
     }
     let mut count_p = [0; 128];
@@ -394,21 +399,130 @@ pub fn check_inclusion(s1: String, s2: String) -> bool {
     let s = s.as_bytes();
     let p = p.as_bytes();
     for i in 0..p.len() {
+        // 分别统计 s1 和 s2 中的字符出现的次数
         count_p[p[i] as usize] += 1;
         count_s[s[i] as usize] += 1;
     }
     if count_p == count_s {
+        // 如果s1和s2的前p.len()个字符的出现次数相同，则把0放入结果集中
         rst.push(0);
     }
     for r in p.len()..s.len() {
+        // 滑动窗口左边滑出的元素索引
         let l = r - p.len();
+        // 对新滑入窗口的字符进行统计
         count_s[s[r] as usize] += 1;
+        // 对滑出窗口的字符进行统计
         count_s[s[l] as usize] -= 1;
         if count_p == count_s {
+            // 如果s1和s2的前p.len()个字符的出现次数相同，则把l+1放入结果集中
             rst.push(l as i32 + 1);
         }
     }
     !rst.is_empty()
+}
+
+/// 强化练习 5：半径为 k 的子数组平均值
+///
+/// 给你一个下标从 0 开始的数组 nums ，数组中有 n 个整数，另给你一个整数 k 。
+///
+/// 半径为 k 的子数组平均值 是指：nums 中一个以下标 i 为 中心 且 半径 为 k 的子数组中所有元素的平均值，即下标在 i - k 和 i + k 范围（含 i - k 和 i + k）内所有元素的平均值。如果在下标 i 前或后不足 k 个元素，那么 半径为 k 的子数组平均值 是 -1 。
+///
+/// 构建并返回一个长度为 n 的数组 avgs ，其中 avgs[i] 是以下标 i 为中心的子数组的 半径为 k 的子数组平均值 。
+///
+/// x 个元素的 平均值 是 x 个元素相加之和除以 x ，此时使用截断式 整数除法 ，即需要去掉结果的小数部分。
+///
+/// 例如，四个元素 2、3、1 和 5 的平均值是 (2 + 3 + 1 + 5) / 4 = 11 / 4 = 2.75，截断后得到 2 。
+///
+/// 示例 1：
+///
+/// 输入：nums = [7,4,3,9,1,8,5,2,6], k = 3
+///
+/// 输出：[-1,-1,-1,5,4,4,-1,-1,-1]
+///
+/// 解释：
+///
+/// - avg[0]、avg[1] 和 avg[2] 是 -1 ，因为在这几个下标前的元素数量都不足 k 个。
+///
+/// - 中心为下标 3 且半径为 3 的子数组的元素总和是：7 + 4 + 3 + 9 + 1 + 8 + 5 = 37 。
+///
+/// - 使用截断式 整数除法，avg[3] = 37 / 7 = 5 。
+///
+/// - 中心为下标 4 的子数组，avg[4] = (4 + 3 + 9 + 1 + 8 + 5 + 2) / 7 = 4 。
+///
+/// - 中心为下标 5 的子数组，avg[5] = (3 + 9 + 1 + 8 + 5 + 2 + 6) / 7 = 4 。
+///
+/// - avg[6]、avg[7] 和 avg[8] 是 -1 ，因为在这几个下标后的元素数量都不足 k 个。
+///
+/// 示例 2：
+///
+/// 输入：nums = [100000], k = 0
+///
+/// 输出：[100000]
+///
+/// 解释：
+///
+/// - 中心为下标 0 且半径 0 的子数组的元素总和是：100000 。
+///
+/// - avg[0] = 100000 / 1 = 100000 。
+///
+/// 示例 3：
+///
+/// 输入：nums = [8], k = 100000
+///
+/// 输出：[-1]
+///
+/// 解释：
+///
+/// - avg[0] 是 -1 ，因为在下标 0 前后的元素数量均不足 k 。
+///
+/// 提示：
+///
+/// n == nums.length
+///
+/// 1 <= n <= 105
+///
+/// 0 <= nums[i], k <= 105
+pub fn get_averages(nums: Vec<i32>, k: i32) -> Vec<i32> {
+    // 定义结果集
+    let mut res = Vec::<i32>::with_capacity(nums.len());
+    // 滑动窗口的区间范围为 k - nums.len()-k
+    if k == 0 {
+        // 如果k=0，直接返回nums
+        return nums;
+    }
+
+    if nums.len() < (2 * k + 1) as usize {
+        for _ in 0..nums.len() {
+            res.push(-1);
+        }
+        return res;
+    }
+    // 0 - k 都是-1
+    for _ in 0..k as usize {
+        res.push(-1);
+    }
+
+    // 统计第一个窗口的和
+    let mut sum = nums[..(2 * k + 1) as usize].iter().map(|x| *x as i64).sum::<i64>();
+    // 计算第一个窗口的平均值
+    res.push((sum / (2 * k + 1) as i64) as i32);
+    // 滑动窗口
+    for i in (2 * k + 1)..nums.len() as i32 {
+        // 滑动窗口左边滑出的元素索引
+        let l = i - (2 * k + 1);
+        // 对新滑入窗口的字符进行统计
+        sum += nums[i as usize] as i64;
+        // 对滑出窗口的字符进行统计
+        sum -= nums[l as usize] as i64;
+        // 计算滑动窗口的平均值
+        res.push((sum / (2 * k + 1) as i64) as i32);
+    }
+    // nums.len()-k 到 nums.len() 都是-1
+    for _ in 0..k as usize {
+        res.push(-1);
+    }
+    res
 }
 
 #[cfg(test)]
@@ -459,5 +573,13 @@ mod tests {
         let s2 = "ooolleoooleh".to_string();
         let check_inclusion = check_inclusion(s1, s2);
         println!("{:?}", check_inclusion)
+    }
+
+    #[test]
+    fn test_get_averages() {
+        let nums = vec![7, 4, 3, 9, 1, 8, 5, 2, 6];
+        let k = 3;
+        let get_averages = get_averages(nums, k);
+        println!("{:?}", get_averages)
     }
 }
