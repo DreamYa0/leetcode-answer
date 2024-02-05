@@ -60,7 +60,7 @@ pub fn move_zeroes(nums: &mut Vec<i32>) {
 pub fn remove_element(nums: &mut Vec<i32>, val: i32) -> i32 {
     // 定义一个指针用来存放非val的值
     let mut slow = 0;
-    // 遍历数组
+    // 遍历数组，循环不变量为 slow - fast 之间的元素都不是val
     for fast in 0..nums.len() {
         if nums[fast] != val {
             nums[slow] = nums[fast];
@@ -340,7 +340,7 @@ pub fn three_sum(nums: Vec<i32>) -> Vec<Vec<i32>> {
     }
     // 先对数组进行排序
     nums.sort();
-    
+
     for i in 0..len - 2 {
         if i > 0 && nums[i] == nums[i - 1] {
             // 去重
@@ -594,7 +594,7 @@ pub fn reverse_string(s: &mut Vec<char>) {
 }
 
 /// 876. 链表的中间结点
-/// 
+///
 /// 给你单链表的头结点 head ，请你找出并返回链表的中间结点。
 ///
 /// 如果有两个中间结点，则返回第二个中间结点。
@@ -602,36 +602,36 @@ pub fn reverse_string(s: &mut Vec<char>) {
 /// 示例 1：
 ///
 /// 输入：head = [1,2,3,4,5]
-/// 
+///
 /// 输出：[3,4,5]
-/// 
+///
 /// 解释：链表只有一个中间结点，值为 3 。
-/// 
+///
 /// 示例 2：
 ///
 /// 输入：head = [1,2,3,4,5,6]
-/// 
+///
 /// 输出：[4,5,6]
-/// 
+///
 /// 解释：该链表有两个中间结点，值分别为 3 和 4 ，返回第二个结点。
 ///
 /// 提示：
 ///
 /// 链表的结点数范围是 [1, 100]
-/// 
+///
 /// 1 <= Node.val <= 100
 ////
 /// 解题思路
-/// 
+///
 /// 考虑借助快慢双指针 fast, slow ，「快指针 fast」每轮走 2 步，「慢指针 slow」每轮走 1 步。fast 的步数恒为 slow 的 2 倍，
 /// 因此当快指针遍历完链表时，慢指针就指向链表中间节点。而由于长度为偶数的链表有两个中间节点，因此需要分两种情况考虑：
 ///
 /// 链表长度为奇数： 当 fast 走到链表「尾节点」时，slow 正好走到「中间节点」。
-/// 
+///
 /// 链表长度为偶数： 当 fast 走到「null」时（越过「尾节点」后），slow 正好走到「第二个中间节点」。
-/// 
+///
 /// 总结以上规律，应在当 fast 遇到或越过尾节点 时跳出循环，并返回 slow 即可。
-/// 
+///
 /// <img src="https://pic.leetcode-cn.com/1656953441-Kshqch-figures.gif" alt="链表-删除节点" style="zoom:50%;" />
 pub fn middle_node(head: Option<Box<ListNode<i32>>>) -> Option<Box<ListNode<i32>>> {
     // 快慢指针
@@ -643,6 +643,263 @@ pub fn middle_node(head: Option<Box<ListNode<i32>>>) -> Option<Box<ListNode<i32>
         fast = fast.unwrap().next.unwrap().next;
     }
     slow
+}
+
+/// 最长连续递增序列
+///
+/// 给定一个未经排序的整数数组，找到最长且 连续递增的子序列，并返回该序列的长度。
+///
+/// 连续递增的子序列 可以由两个下标 l 和 r（l < r）确定，如果对于每个 l <= i < r，都有 nums[i] < nums[i + 1] ，
+/// 那么子序列 [nums[l], nums[l + 1], ..., nums[r - 1], nums[r]] 就是连续递增子序列。
+///
+/// 示例 1：
+///
+/// 输入：nums = [1,3,5,4,7]
+///
+/// 输出：3
+///
+/// 解释：最长连续递增序列是 [1,3,5], 长度为3。
+///
+/// 尽管 [1,3,5,7] 也是升序的子序列, 但它不是连续的，因为 5 和 7 在原数组里被 4 隔开。
+///
+/// 示例 2：
+///
+/// 输入：nums = [2,2,2,2,2]
+///
+/// 输出：1
+///
+/// 解释：最长连续递增序列是 [2], 长度为1。
+///
+/// 提示：
+///
+/// 1 <= nums.length <= 104
+///
+/// -109 <= nums[i] <= 109
+pub fn find_length_of_lcis(nums: Vec<i32>) -> i32 {
+    // 定义结果
+    let mut max_len = 0;
+    // 定义慢指针
+    let mut slow = 0;
+    // 定义快指针
+    let mut fast = 0;
+    // 循环不变量是 [slow,fast) 单调递增
+    while fast < nums.len() {
+        if fast > 0 && nums[fast - 1] >= nums[fast] {
+            // 不满足单调递增条件，右移慢指针
+            slow = fast;
+        }
+        // 快指针右移，由于是左闭右开区间，所以这里应该先右移再计算长度
+        fast += 1;
+        // 统计最大长度
+        max_len = max_len.max(fast - slow);
+    }
+    max_len as i32
+}
+
+/// 删除排序数组中的重复项 II
+///
+/// 给你一个有序数组 nums ，请你 原地 删除重复出现的元素，使得出现次数超过两次的元素只出现两次 ，返回删除后数组的新长度。
+///
+/// 不要使用额外的数组空间，你必须在 原地 修改输入数组 并在使用 O(1) 额外空间的条件下完成。
+///
+/// 说明：
+///
+/// 为什么返回数值是整数，但输出的答案是数组呢？
+///
+/// 请注意，输入数组是以「引用」方式传递的，这意味着在函数里修改输入数组对于调用者是可见的。
+///
+/// 你可以想象内部操作如下:
+///
+/// nums 是以“引用”方式传递的。也就是说，不对实参做任何拷贝
+///
+/// ```
+/// int len = removeDuplicates(nums);
+///
+/// /// 在函数里修改输入数组对于调用者是可见的。
+/// /// 根据你的函数返回的长度, 它会打印出数组中 该长度范围内 的所有元素。
+/// for (int i = 0; i < len; i++) {
+///     print(nums[i]);
+/// }
+/// ```
+///
+/// 示例 1：
+///
+/// 输入：nums = [1,1,1,2,2,3]
+///
+/// 输出：5, nums = [1,1,2,2,3]
+///
+/// 解释：函数应返回新长度 length = 5, 并且原数组的前五个元素被修改为 1, 1, 2, 2, 3。 不需要考虑数组中超出新长度后面的元素。
+///
+/// 示例 2：
+///
+/// 输入：nums = [0,0,1,1,1,1,2,3,3]
+///
+/// 输出：7, nums = [0,0,1,1,2,3,3]
+///
+/// 解释：函数应返回新长度 length = 7, 并且原数组的前七个元素被修改为 0, 0, 1, 1, 2, 3, 3。不需要考虑数组中超出新长度后面的元素。
+///
+/// 提示：
+///
+/// 1 <= nums.length <= 3 * 104
+///
+/// -104 <= nums[i] <= 104
+///
+/// nums 已按升序排列
+pub fn remove_duplicates_ii(nums: &mut Vec<i32>) -> i32 {
+    // 定义慢指针
+    let mut flow = 0;
+    // 遍历数组 , 循环不变量是 [0,len) 区间内的元素是符合条件的
+    for fast in 0..nums.len() {
+        // 如果慢指针小于2 或者 当前元素不等于慢指针前两个元素
+        if flow < 2 || nums[fast] != nums[flow - 2] {
+            // 交换数据
+            nums[flow] = nums[fast];
+            // 慢指针右移
+            flow += 1;
+        }
+    }
+    // 返回慢指针的位置
+    flow as i32
+}
+
+/// 颜色分类
+///
+/// 给定一个包含红色、白色和蓝色、共 n 个元素的数组 nums ，原地对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
+///
+/// 我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
+///
+/// 必须在不使用库内置的 sort 函数的情况下解决这个问题。
+///
+/// 示例 1：
+///
+/// 输入：nums = [2,0,2,1,1,0]
+///
+/// 输出：[0,0,1,1,2,2]
+///
+/// 示例 2：
+///
+/// 输入：nums = [2,0,1]
+///
+/// 输出：[0,1,2]
+///
+/// 提示：
+///
+/// n == nums.length
+///
+/// 1 <= n <= 300
+///
+/// nums[i] 为 0、1 或 2
+///
+/// 进阶：
+///
+/// 你能想出一个仅使用常数空间的一趟扫描算法吗？
+pub fn sort_colors(nums: &mut Vec<i32>) {
+    if nums.len() < 2 {
+        return;
+    }
+    // 定义循环不变量
+    // [0,p0) 区间内的元素都是0
+    // [p0,i) 区间内的元素都是1
+    // [p2,len-1] 区间内的元素都是2
+    // 初始化各个区间的指针
+    let (mut p0, mut i, mut p2) = (0, 0, nums.len());
+    while i < p2 {
+        match nums[i] {
+            0 => {
+                // 交换数据
+                nums.swap(i, p0);
+                // 0 需要处于 [0,p0),所有p0需要右移
+                p0 += 1;
+                // i 需要右移
+                i += 1;
+            }
+            1 => {
+                // 1 需要处于 (p0,i),所有i需要右移,p0保持不动就能满足此区间
+                i += 1;
+            }
+            2 => {
+                // 2 需要处于 (p2,len-1],所有p2需要左移
+                p2 -= 1;
+                // 交换数据
+                nums.swap(i, p2);
+            }
+            _ => {}
+        }
+    }
+}
+
+/// 数组中的第 K 个最大元素
+///
+/// 给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
+///
+/// 请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
+///
+/// 你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。
+///
+/// 示例 1:
+///
+/// ```
+/// 输入: [3,2,1,5,6,4], k = 2
+/// 输出: 5
+/// ```
+///
+/// 示例 2:
+///
+/// ```
+/// 输入: [3,2,3,1,2,4,5,5,6], k = 4
+/// 输出: 4
+/// ```
+///
+/// 提示：
+///
+/// ```
+/// 1 <= k <= nums.length <= 105
+/// -104 <= nums[i] <= 104
+/// ```
+#[allow(unused)]
+pub fn find_kth_largest(nums: Vec<i32>, k: i32) -> i32 {
+    let mut nums = nums;
+    let len = nums.len();
+    // 目标位置
+    let target = len - k as usize;
+    // 定义左右指针
+    let mut left = 0;
+    let mut right = len - 1;
+    // 循环不变量是 [left,right] 区间内的元素都是大于等于 pivot 的
+    while left < right {
+        // 切分元素
+        let index = partition(&mut nums, left as i32, right as i32);
+        if index as usize == target {
+            // 如果切分元素的位置等于目标位置，直接返回
+            return nums[index as usize];
+        } else if (index as usize) < target {
+            // 如果切分元素的位置小于目标位置，左指针右移
+            left = index as usize + 1;
+        } else {
+            // 如果切分元素的位置大于目标位置，右指针左移
+            right = index as usize - 1;
+        }
+    }
+    // 返回目标位置的元素
+    nums[left]
+}
+
+fn partition(arr: &mut Vec<i32>, start: i32, end: i32) -> i32 {
+    // 切分元素
+    let pivot = arr[start as usize];
+    // [start + 1 .. le] <= pivot
+    // (le..i] > pivot
+    // 注意：一定要设置成 start ，否则交换会出错
+    // 把小于等于 pivot 的元素放到左边
+    let mut le = start;
+    for i in start + 1..=end {
+        if arr[i as usize] <= pivot {
+            le += 1;
+            arr.swap(le as usize, i as usize);
+        }
+    }
+    arr.swap(start as usize, le as usize);
+    le
 }
 
 #[cfg(test)]
@@ -726,15 +983,26 @@ mod tests {
                     val: 3,
                     next: Some(Box::new(ListNode {
                         val: 4,
-                        next: Some(Box::new(ListNode {
-                            val: 5,
-                            next: None,
-                        })),
+                        next: Some(Box::new(ListNode { val: 5, next: None })),
                     })),
                 })),
             })),
         }));
         let res = middle_node(head);
         println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_find_length_of_lcis() {
+        let nums = vec![1, 3, 5, 4, 7];
+        let res = find_length_of_lcis(nums);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_sort_colors() {
+        let mut nums = vec![2, 0, 2, 1, 1, 0];
+        sort_colors(&mut nums);
+        println!("{:?}", nums)
     }
 }
