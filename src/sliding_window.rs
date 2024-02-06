@@ -689,7 +689,7 @@ pub fn longest_subarray(nums: Vec<i32>, limit: i32) -> i32 {
 /// 对于 t 中重复字符，我们寻找的子字符串中该字符数量必须不少于 t 中该字符数量。
 ///
 /// 如果 s 中存在这样的子串，我们保证它是唯一的答案。
-///  
+///
 /// 示例 1：
 ///
 /// 输入：s = "ADOBECODEBANC", t = "ABC"
@@ -714,7 +714,7 @@ pub fn longest_subarray(nums: Vec<i32>, limit: i32) -> i32 {
 ///
 /// 解释: t 中两个字符 'a' 均应包含在 s 的子串中，
 ///
-/// 因此没有符合条件的子字符串，返回空字符串。 
+/// 因此没有符合条件的子字符串，返回空字符串。
 ///
 /// 提示：
 ///
@@ -725,7 +725,7 @@ pub fn longest_subarray(nums: Vec<i32>, limit: i32) -> i32 {
 /// 1 <= m, n <= 105
 ///
 /// s 和 t 由英文字母组成
-///  
+///
 /// 进阶：你能设计一个在 o(m+n) 时间内解决此问题的算法吗？
 #[allow(unused)]
 pub fn min_window(s: String, t: String) -> String {
@@ -758,6 +758,137 @@ pub fn min_window(s: String, t: String) -> String {
 #[allow(unused)]
 pub fn find_length(nums1: Vec<i32>, nums2: Vec<i32>) -> i32 {
     i32::MIN
+}
+
+/// 子数组最大平均数 I
+///
+/// 给你一个由 n 个元素组成的整数数组 nums 和一个整数 k 。
+///
+/// 请你找出平均数最大且 长度为 k 的连续子数组，并输出该最大平均数。
+///
+/// 任何误差小于 10-5 的答案都将被视为正确答案。
+///
+/// 示例 1：
+///
+/// 输入：nums = [1,12,-5,-6,50,3], k = 4
+///
+/// 输出：12.75
+///
+/// 解释：最大平均数 (12-5-6+50)/4 = 51/4 = 12.75
+///
+/// 示例 2：
+///
+/// 输入：nums = [5], k = 1
+///
+/// 输出：5.00000
+///
+/// 提示：
+///
+/// ```
+/// n == nums.length
+/// 1 <= k <= n <= 105
+/// -104 <= nums[i] <= 104
+/// ```
+pub fn find_max_average(nums: Vec<i32>, k: i32) -> f64 {
+    // 循环不变量定义
+    // 在每次迭代中，窗口总和是窗口内当前 k 个元素的总和。
+    // 在每次迭代后，我们都会有当前窗口的最大平均值。
+    // 初始化：在循环开始之前，计算数组中前 k 个元素的总和。此时，窗口总和等于这些元素的总和，因此循环不变量在开始时成立。
+    // 保持：在每次迭代中，我们从总和中减去窗口最左边的元素，并加上窗口最右边的新元素。
+    // 这确保了窗口总和始终是当前窗口内 k 个元素的总和，从而维护了循环不变量。
+    // 终止：当窗口到达数组的末尾时，我们已经考虑了所有可能的 k 个连续元素的子数组。循环不变量确保我们已经找到了具有最大平均值的子数组。
+    // 计算前 k 个元素的总和
+    let mut sum = 0;
+    for i in 0..k as usize {
+        // 第一个窗口的和
+        sum += nums[i];
+    }
+    // 初始化最大平均值
+    let mut max_avg = sum as f64 / k as f64;
+    for i in k..nums.len() as i32 {
+        // 滑动窗口
+        sum += nums[i as usize] - nums[(i - k) as usize];
+        // 更新最大平均值
+        max_avg = max_avg.max(sum as f64 / k as f64);
+    }
+    max_avg
+}
+
+/// 爱生气的书店老板
+///
+/// 有一个书店老板，他的书店开了 n 分钟。每分钟都有一些顾客进入这家商店。
+/// 给定一个长度为 n 的整数数组 customers ，其中 customers[i] 是在第 i 分钟开始时进入商店的顾客数量，
+/// 所有这些顾客在第 i 分钟结束后离开。
+///
+/// 在某些时候，书店老板会生气。 如果书店老板在第 i 分钟生气，那么 grumpy[i] = 1，否则 grumpy[i] = 0。
+///
+/// 当书店老板生气时，那一分钟的顾客就会不满意，若老板不生气则顾客是满意的。
+///
+/// 书店老板知道一个秘密技巧，能抑制自己的情绪，可以让自己连续 minutes 分钟不生气，但却只能使用一次。
+///
+/// 请你返回 这一天营业下来，最多有多少客户能够感到满意 。
+///
+/// 示例 1：
+///
+/// 输入：customers = [1,0,1,2,1,1,7,5], grumpy = [0,1,0,1,0,1,0,1], minutes = 3
+///
+/// 输出：16
+///
+/// 解释：书店老板在最后 3 分钟保持冷静。
+///
+/// 感到满意的最大客户数量 = 1 + 1 + 1 + 1 + 7 + 5 = 16.
+///
+/// 示例 2：
+///
+/// 输入：customers = [1], grumpy = [0], minutes = 1
+///
+/// 输出：1
+///
+/// 提示：
+///
+/// ```
+/// n == customers.length == grumpy.length
+/// 1 <= minutes <= n <= 2 * 104
+/// 0 <= customers[i] <= 1000
+/// grumpy[i] == 0 or 1
+/// ```
+pub fn max_satisfied(customers: Vec<i32>, grumpy: Vec<i32>, minutes: i32) -> i32 {
+    // 算法步骤
+    // 1.首先，计算不使用秘密技巧时的满意顾客数。这包括所有老板不生气时的顾客数。
+    // 2.然后，遍历每个可能的 X 分钟时间段，计算如果在这段时间使用秘密技巧，可以额外使多少原本不满意的顾客变得满意。这是通过计算在生气的那些分钟内的顾客数来实现的。
+    // 3.对于每个窗口，计算总的满意顾客数（基本满意顾客数加上额外满意的顾客数），并记录下最大值。
+    // 4.当遍历完所有可能的窗口后，返回记录的最大满意顾客数。
+    // 循环不变量
+    // 在这个算法中，我们可以定义如下循环不变量来帮助我们理解和验证算法的正确性：
+    // 在每次迭代中，我们维护一个固定长度为 X 的窗口，该窗口代表了如果在这段时间内使用秘密技巧，可以额外满足的顾客数量。
+    // 窗口移动过程中，我们记录下能使最多顾客满意的窗口位置。
+    // 初始化
+    // 在开始遍历之前，我们已经计算了不使用秘密技巧时的基本满意顾客数。此时，窗口还未开始移动，因此循环不变量成立。
+    // 保持
+    // 每次窗口移动，我们从额外满意顾客数中减去窗口最左边的值（如果老板在那一分钟生气的话），并加上窗口最右边的新值（如果老板在那一分钟生气的话）。这确保了在每次迭代中，我们都正确地计算了在当前窗口使用秘密技巧能够额外满足的顾客数。
+    // 终止
+    // 当窗口遍历完所有可能的位置后，我们已经考虑了所有可能的使用秘密技巧的时间段。循环不变量确保我们找到了能使最多顾客满意的那个时间段。
+    let len = grumpy.len();
+    // 定义前缀和数组
+    let mut pre_sum = vec![0; len + 1];
+    // 统计 1. 所有本来就不生气的顾客数量；2. 前缀和数组
+    let mut origin_count = 0;
+    for i in 0..len {
+        if grumpy[i] == 0 {
+            origin_count += customers[i];
+            pre_sum[i + 1] = pre_sum[i];
+        } else {
+            pre_sum[i + 1] = pre_sum[i] + customers[i];
+        }
+    }
+    // 计算不使用秘密技巧时的满意顾客数
+    let mut max_angry_count = 0;
+    for i in 0..len {
+        if (i + minutes as usize) as usize <= len {
+            max_angry_count = max_angry_count.max(pre_sum[i + minutes as usize] - pre_sum[i]);
+        }
+    }
+    origin_count + max_angry_count
 }
 
 #[cfg(test)]
@@ -832,5 +963,22 @@ mod tests {
         let limit = 4;
         let longest_subarray = longest_subarray(nums, limit);
         println!("{:?}", longest_subarray)
+    }
+
+    #[test]
+    fn test_find_max_average() {
+        let nums = vec![1, 12, -5, -6, 50, 3];
+        let k = 4;
+        let find_max_average = find_max_average(nums, k);
+        println!("{:?}", find_max_average)
+    }
+
+    #[test]
+    fn test_max_satisfied() {
+        let customers = vec![1, 0, 1, 2, 1, 1, 7, 5];
+        let grumpy = vec![0, 1, 0, 1, 0, 1, 0, 1];
+        let minutes = 3;
+        let max_satisfied = max_satisfied(customers, grumpy, minutes);
+        println!("{:?}", max_satisfied)
     }
 }
