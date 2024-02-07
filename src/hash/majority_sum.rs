@@ -58,11 +58,13 @@ use std::collections::HashMap;
 ///
 /// C++中map，有三种类型：
 ///
+/// ```
 /// 映射	底层实现	是否有序	数值是否可以重复	能否更改数值	查询效率	增删效率
 /// std::map	红黑树	key有序	key不可重复	key不可修改	O(log n)	O(log n)
 /// std::multimap	红黑树	key有序	key可重复	key不可修改	O(log n)	O(log n)
 /// std::unordered_map	哈希表	key无序	key不可重复	key不可修改	O(1)	O(1)
 /// std::unordered_map 底层实现为哈希表，std::map 和std::multimap 的底层实现是红黑树。
+/// ```
 ///
 /// 同理，std::map 和std::multimap 的key也是有序的（这个问题也经常作为面试题，考察对语言容器底层的理解）。 更多哈希表的理论知识请看关于哈希表，你该了解这些！ (opens new window)。
 ///

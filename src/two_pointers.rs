@@ -884,7 +884,7 @@ pub fn find_kth_largest(nums: Vec<i32>, k: i32) -> i32 {
     nums[left]
 }
 
-fn partition(arr: &mut Vec<i32>, start: i32, end: i32) -> i32 {
+fn partition(arr: &mut [i32], start: i32, end: i32) -> i32 {
     // 切分元素
     let pivot = arr[start as usize];
     // [start + 1 .. le] <= pivot
