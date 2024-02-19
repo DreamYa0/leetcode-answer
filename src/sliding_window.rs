@@ -195,18 +195,18 @@ pub fn find_max_consecutive_ones(nums: Vec<i32>) -> i32 {
     let mut slow = 0;
     // 最大连续 1 的个数。
     let mut max_len = 0;
-    // 最大子串 fast - slow + 1 = nums[slow] + nums[slow + 1]..nums[fast]
+    // 当前长度
+    let mut cur_len = 0;
     for fast in 0..nums.len() {
-        // 统计 nums[slow] + nums[slow + 1]..nums[fast] 的和
-        let mut sum = 0;
-        for i in slow..=fast {
-            sum += nums[i];
+        if nums[fast] == 1 {
+            cur_len += 1;
         }
 
-        while (slow < fast) && (fast - slow + 1) as i32 != sum {
+        while (slow < fast) && nums[fast] == 0 {
             slow += 1;
+            cur_len -= 1;
         }
-        max_len = max_len.max(sum);
+        max_len = max_len.max(cur_len);
     }
     max_len
 }
@@ -1675,8 +1675,138 @@ pub fn max_turbulence_size(arr: Vec<i32>) -> i32 {
     answer + 1
 }
 
+/// 159. 至多包含两个不同字符的最长子串
+///
+/// 给你一个字符串 s ，请你找出 至多 包含 两个不同字符 的最长子串，并返回该子串的长度。
+///
+/// 示例 1：
+///
+/// 输入：s = "eceba"
+///
+/// 输出：3
+///
+/// 解释：满足题目要求的子串是 "ece" ，长度为 3 。
+///
+/// 示例 2：
+///
+/// 输入：s = "ccaabbb"
+///
+/// 输出：5
+///
+/// 解释：满足题目要求的子串是 "aabbb" ，长度为 5 。
+///
+/// 提示：
+///
+/// 1 <= s.length <= 105
+///
+/// s 由英文字母组成
+pub fn length_of_longest_substring_two_distinct(s: String) -> i32 {
+    // 长度小于3直接返回
+    if s.len() < 3 {
+        return s.len() as i32;
+    }
+
+    // 转换为字节数组
+    let s = s.as_bytes();
+    // 定义hash表来统计s中字符出现的次数
+    let mut cnt = vec![0; 128];
+    // 计数
+    let mut count = 0;
+    // 定义最大长度
+    let mut max_len = 2;
+    // 定义左指针
+    let mut left = 0;
+    for right in 0..s.len() {
+        // 字符计数
+        cnt[s[right] as usize] += 1;
+        // 如果是第一次出现的字符，计数加1
+        if cnt[s[right] as usize] == 1 {
+            count += 1;
+        }
+        // 如果字符数量大于2，就需要移动左指针来缩小窗口
+        while count == 3 {
+            // 扣减计数
+            cnt[s[left] as usize] -= 1;
+            // 如果字符未出现，计数减1
+            if cnt[s[left] as usize] == 0 {
+                count -= 1;
+            }
+            // 右移动左指针
+            left += 1;
+        }
+        // 更新最大长度
+        max_len = max_len.max(right - left + 1);
+    }
+    max_len as i32
+}
+
+/// 340. 至多包含 K 个不同字符的最长子串
+///
+/// 给你一个字符串 s 和一个整数 k ，请你找出 至多 包含 k 个 不同 字符的最长子串，并返回该子串的长度。
+///
+/// 示例 1：
+///
+/// 输入：s = "eceba", k = 2
+///
+/// 输出：3
+///
+/// 解释：满足题目要求的子串是 "ece" ，长度为 3 。
+///
+/// 示例 2：
+///
+/// 输入：s = "aa", k = 1
+///
+/// 输出：2
+///
+/// 解释：满足题目要求的子串是 "aa" ，长度为 2 。
+///
+/// 提示：
+///
+/// 1 <= s.length <= 5 * 104
+///
+/// 0 <= k <= 50
+pub fn length_of_longest_substring_k_distinct(s: String, k: i32) -> i32 {
+    if k == 0 {
+        return 0;
+    }
+
+    // 转换为字节数组
+    let s = s.as_bytes();
+    // 定义hash表来统计s中字符出现的次数
+    let mut cnt = vec![0; 128];
+    // 计数
+    let mut count = 0;
+    // 定义最大长度
+    let mut max_len = 0;
+    // 定义左指针
+    let mut left = 0;
+    for right in 0..s.len() {
+        // 字符计数
+        cnt[s[right] as usize] += 1;
+        // 如果是第一次出现的字符，计数加1
+        if cnt[s[right] as usize] == 1 {
+            count += 1;
+        }
+        // 如果字符数量大于2，就需要移动左指针来缩小窗口
+        while count == k + 1 {
+            // 扣减计数
+            cnt[s[left] as usize] -= 1;
+            // 如果字符未出现，计数减1
+            if cnt[s[left] as usize] == 0 {
+                count -= 1;
+            }
+            // 右移动左指针
+            left += 1;
+        }
+        // 更新最大长度
+        max_len = max_len.max(right - left + 1);
+    }
+    max_len as i32
+}
+
 #[cfg(test)]
 mod tests {
+
     use super::*;
 
     #[test]
@@ -1826,5 +1956,20 @@ mod tests {
         let arr = vec![9, 4, 2, 10, 7, 8, 8, 1, 9];
         let max_turbulence_size = max_turbulence_size(arr);
         println!("{:?}", max_turbulence_size)
+    }
+
+    #[test]
+    fn test_length_of_longest_substring_two_distinct() {
+        let s = "eceba".to_string();
+        let num = length_of_longest_substring_two_distinct(s);
+        println!("{:?}", num)
+    }
+
+    #[test]
+    fn test_length_of_longest_substring_k_distinct() {
+        let s = "ab".to_string();
+        let k = 1;
+        let num = length_of_longest_substring_k_distinct(s, k);
+        println!("{:?}", num)
     }
 }
