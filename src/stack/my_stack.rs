@@ -355,6 +355,221 @@ pub fn eval_rpn(tokens: Vec<String>) -> i32 {
     stack.pop().unwrap()
 }
 
+/// 面试题 03.01. 三合一
+///
+/// 三合一。描述如何只用一个数组来实现三个栈。
+///
+/// 你应该实现push(stackNum, value)、pop(stackNum)、isEmpty(stackNum)、peek(stackNum)方法。stackNum表示栈下标，value表示压入的值。
+///
+/// 构造函数会传入一个stackSize参数，代表每个栈的大小。
+///
+/// ```
+/// 示例1:
+///
+///  输入：
+/// ["TripleInOne", "push", "push", "pop", "pop", "pop", "isEmpty"]
+/// [[1], [0, 1], [0, 2], [0], [0], [0], [0]]
+///  输出：
+/// [null, null, null, 1, -1, -1, true]
+/// 说明：当栈为空时`pop, peek`返回-1，当栈满时`push`不压入元素。
+/// 示例2:
+
+///  输入：
+/// ["TripleInOne", "push", "push", "push", "pop", "pop", "pop", "peek"]
+/// [[2], [0, 1], [0, 2], [0, 3], [0], [0], [0], [0]]
+///  输出：
+/// [null, null, null, null, 2, 1, -1, -1]
+/// ```
+///
+/// 提示：
+///
+/// 0 <= stackNum <= 2
+#[allow(dead_code)]
+struct TripleInOne {
+    d: Vec<i32>,
+    i: [usize; 3],
+}
+
+#[allow(dead_code)]
+impl TripleInOne {
+    fn new(stack_size: i32) -> Self {
+        Self {
+            d: vec![0; 3 * stack_size as usize],
+            i: [0, 1, 2],
+        }
+    }
+
+    fn push(&mut self, stack_num: i32, value: i32) {
+        let n = stack_num as usize;
+        if self.i[n] < self.d.len() {
+            self.d[self.i[n]] = value;
+            self.i[n] += 3;
+        }
+    }
+
+    fn pop(&mut self, stack_num: i32) -> i32 {
+        match stack_num as usize {
+            n if self.i[n] >= 3 => {
+                self.i[n] -= 3;
+                self.d[self.i[n]]
+            }
+            _ => -1,
+        }
+    }
+
+    fn peek(&self, stack_num: i32) -> i32 {
+        if self.i[stack_num as usize] >= 3 {
+            self.d[self.i[stack_num as usize] - 3]
+        } else {
+            -1
+        }
+    }
+
+    fn is_empty(&self, stack_num: i32) -> bool {
+        self.i[stack_num as usize] < 3
+    }
+}
+
+/// 1441. 用栈操作构建数组
+///
+/// 给你一个数组 target 和一个整数 n。每次迭代，需要从  list = { 1 , 2 , 3 ..., n } 中依次读取一个数字。
+///
+/// 请使用下述操作来构建目标数组 target ：
+///
+/// "Push"：从 list 中读取一个新元素， 并将其推入数组中。
+///
+/// "Pop"：删除数组中的最后一个元素。
+///
+/// 如果目标数组构建完成，就停止读取更多元素。
+///
+/// 题目数据保证目标数组严格递增，并且只包含 1 到 n 之间的数字。
+///
+/// 请返回构建目标数组所用的操作序列。如果存在多个可行方案，返回任一即可。
+///
+/// ```
+/// 示例 1：
+///
+/// 输入：target = [1,3], n = 3
+/// 输出：["Push","Push","Pop","Push"]
+/// 解释：
+/// 读取 1 并自动推入数组 -> [1]
+/// 读取 2 并自动推入数组，然后删除它 -> [1]
+/// 读取 3 并自动推入数组 -> [1,3]
+/// 示例 2：
+/// 输入：target = [1,2,3], n = 3
+/// 输出：["Push","Push","Push"]
+/// 示例 3：
+/// 输入：target = [1,2], n = 4
+/// 输出：["Push","Push"]
+/// 解释：只需要读取前 2 个数字就可以停止。
+/// ```
+///
+/// 提示：
+///
+/// 1 <= target.length <= 100
+///
+/// 1 <= n <= 100
+///
+/// 1 <= target[i] <= n
+///
+/// target 严格递增
+pub fn build_array(target: Vec<i32>, n: i32) -> Vec<String> {
+    // 计数器
+    let mut count = 1;
+    // 当前坐标
+    let mut index = 0;
+    // 定义数组
+    let mut res = Vec::new();
+    while index < target.len() && count <= n {
+        // 获取当前数组元素
+        let v = target[index];
+        // 如果当前数组元素等于计数器
+        if v == count {
+            // 入栈
+            res.push("Push".to_string());
+            // 计数器+1
+            count += 1;
+            // 下标+1
+            index += 1;
+        } else {
+            // 如果当前数组元素不等于计数器
+            // 入栈
+            res.push("Push".to_string());
+            // 出栈
+            res.push("Pop".to_string());
+            // 计数器+1
+            count += 1;
+        }
+    }
+    res
+}
+
+/// 155. 栈的最小值
+///
+/// 请设计一个栈，除了常规栈支持的pop与push函数以外，还支持min函数，该函数返回栈元素中的最小值。执行push、pop和min操作的时间复杂度必须为O(1)。
+///
+/// ```
+/// 示例：
+/// MinStack minStack = new MinStack();
+/// minStack.push(-2);
+/// minStack.push(0);
+/// minStack.push(-3);
+/// minStack.getMin();   --> 返回 -3.
+/// minStack.pop();
+/// minStack.top();      --> 返回 0.
+/// minStack.getMin();   --> 返回 -2.
+/// ```
+#[allow(dead_code)]
+struct MinStack {
+    // 数据栈
+    pub vec: Vec<i32>,
+    // 存放各个阶段的最小值
+    pub min: Vec<i32>,
+}
+
+#[allow(dead_code)]
+impl MinStack {
+    fn new() -> Self {
+        MinStack {
+            vec: Vec::new(),
+            min: Vec::new(),
+        }
+    }
+
+    fn push(&mut self, x: i32) {
+        self.vec.push(x);
+        let len = self.min.len();
+        if len > 0 {
+            self.min.push(x.min(self.min[len - 1]));
+        } else {
+            self.min.push(x);
+        }
+    }
+
+    fn pop(&mut self) {
+        self.vec.pop();
+        self.min.pop();
+    }
+
+    fn top(&mut self) -> i32 {
+        let len = self.vec.len();
+        if len > 0 {
+            self.vec[len - 1]
+        } else {
+            -1
+        }
+    }
+
+    fn get_min(&mut self) -> i32 {
+        let len = self.min.len();
+        if len > 0 {
+            self.min[len - 1]
+        } else {
+            -1
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -373,7 +588,28 @@ mod tests {
 
     #[test]
     fn test_eval_rpn() {
-        let tokens = vec!["2".to_string(), "1".to_string(), "+".to_string(), "3".to_string(), "*".to_string()];
+        let tokens = vec![
+            "2".to_string(),
+            "1".to_string(),
+            "+".to_string(),
+            "3".to_string(),
+            "*".to_string(),
+        ];
         assert_eq!(eval_rpn(tokens), 9);
+    }
+
+    #[test]
+    fn test_build_array() {
+        let target = vec![1, 3];
+        let n = 3;
+        assert_eq!(
+            build_array(target, n),
+            vec![
+                "Push".to_string(),
+                "Push".to_string(),
+                "Pop".to_string(),
+                "Push".to_string()
+            ]
+        );
     }
 }
