@@ -548,78 +548,6 @@ pub fn get_averages(nums: Vec<i32>, k: i32) -> Vec<i32> {
     res
 }
 
-/// 强化练习 6：滑动窗口最大值
-///
-/// 给你一个整数数组 nums，有一个大小为 k 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 k 个数字。滑动窗口每次只向右移动一位。
-///
-/// 返回 滑动窗口中的最大值 。
-///
-/// 示例 1：
-///
-/// 输入：nums = [1,3,-1,-3,5,3,6,7], k = 3
-///
-/// 输出：[3,3,5,5,6,7]
-///
-/// 解释：
-///
-/// ```
-/// 滑动窗口的位置                最大值
-/// ---------------               -----
-/// [1  3  -1] -3  5  3  6  7       3
-///  1 [3  -1  -3] 5  3  6  7       3
-///  1  3 [-1  -3  5] 3  6  7       5
-///  1  3  -1 [-3  5  3] 6  7       5
-///  1  3  -1  -3 [5  3  6] 7       6
-///  1  3  -1  -3  5 [3  6  7]      7
-/// ```
-/// 示例 2：
-///
-/// 输入：nums = [1], k = 1
-///
-/// 输出：[1]
-///
-/// 提示：
-///
-/// 1 <= nums.length <= 105
-///
-/// -104 <= nums[i] <= 104
-///
-/// 1 <= k <= nums.length
-///
-/// 单调队列套路
-///
-/// 入（元素进入队尾，同时维护队列单调性）
-///
-/// 出（元素离开队首）
-///
-/// 记录/维护答案（根据队首）
-pub fn max_sliding_window(nums: Vec<i32>, k: i32) -> Vec<i32> {
-    let k = k as usize;
-    let mut ans = Vec::new();
-    // 双端队列
-    let mut q = VecDeque::new();
-    for (i, &x) in nums.iter().enumerate() {
-        // 1. 入
-        while !q.is_empty() && nums[*q.back().unwrap()] <= x {
-            // 维护 q 的单调性
-            q.pop_back();
-        }
-        // 入队
-        q.push_back(i);
-        // 2. 出
-        if i - q[0] >= k {
-            // 队首已经离开窗口了
-            q.pop_front();
-        }
-        // 3. 记录答案
-        if i >= k - 1 {
-            // 由于队首到队尾单调递减，所以窗口最大值就是队首
-            ans.push(nums[q[0]]);
-        }
-    }
-    ans
-}
-
 /// 1438. 绝对差不超过限制的最长连续子数组
 ///
 /// 给你一个整数数组 nums ，和一个表示限制的整数 limit，请你返回最长连续子数组的长度，该子数组中的任意两个元素之间的绝对差必须小于或者等于 limit 。
@@ -1861,14 +1789,6 @@ mod tests {
         let k = 3;
         let get_averages = get_averages(nums, k);
         println!("{:?}", get_averages)
-    }
-
-    #[test]
-    fn test_max_sliding_window() {
-        let nums = vec![1, 3, -1, -3, 5, 3, 6, 7];
-        let k = 3;
-        let max_sliding_window = max_sliding_window(nums, k);
-        println!("{:?}", max_sliding_window)
     }
 
     #[test]
