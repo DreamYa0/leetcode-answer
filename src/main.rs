@@ -9,6 +9,7 @@ pub mod greedy_algorithm;
 pub mod prefix_sum;
 pub mod queue;
 pub mod stack;
+pub mod tree;
 
 fn main() {
     println!("Hello, world!");
