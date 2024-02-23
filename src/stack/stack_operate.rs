@@ -998,6 +998,26 @@ pub fn longest_valid_parentheses(s: String) -> i32 {
     max_len as i32
 }
 
+/// 739. 每日温度
+pub fn daily_temperatures(temperatures: Vec<i32>) -> Vec<i32> {
+    let len = temperatures.len();
+    // 定义一个栈来存储 temperatures 下标
+    let mut stack = Vec::with_capacity(len);
+    // 定义一个数组来存放结果
+    let mut ans = vec![0; len];
+    // 遍历temperatures
+    for (idx, t) in temperatures.iter().enumerate() {
+        // 如果栈不为空，且栈顶元素小于当前元素则出栈，否则入栈
+        while !stack.is_empty() && *t > temperatures[*stack.last().unwrap() as usize] {
+            let min_idx = stack.pop().unwrap();
+            // 当前索引 - 栈顶元素索引就能得到他们的间隔
+            ans[min_idx as usize] = idx as i32 - min_idx;
+        }
+        stack.push(idx as i32);
+    }
+    ans
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1086,5 +1106,14 @@ mod tests {
     fn test_longest_valid_parentheses() {
         let s = "()".to_string();
         assert_eq!(longest_valid_parentheses(s), 2);
+    }
+
+    #[test]
+    fn test_daily_temperatures() {
+        let temperatures = vec![73, 74, 75, 71, 69, 72, 76, 73];
+        assert_eq!(
+            daily_temperatures(temperatures),
+            vec![1, 1, 4, 2, 1, 1, 0, 0]
+        );
     }
 }
