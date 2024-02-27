@@ -38,25 +38,25 @@ use std::cmp::{max, min};
 /// 示例 1 [−2,1,−3,4,−1,2,1,−5,4] 的计算流程如下：
 ///
 /// i	前缀和	最小前缀和	前缀和-最小前缀和
-/// 
+///
 /// 0	−2	0	−2
-/// 
+///
 /// 1	−1	−2	1
-/// 
+///
 /// 2	−4	−2	−2
-/// 
+///
 /// 3	0	−4	4
-/// 
+///
 /// 4	−1	−4	3
-/// 
+///
 /// 5	1	−4	5
-/// 
+///
 /// 6	2	−4	6
-/// 
+///
 /// 7	−3	−4	1
-/// 
+///
 /// 8	1	−4	5
-/// 
+///
 /// 前缀和-最小前缀和的最大值等于 6，即为答案。
 pub fn max_sub_array(nums: Vec<i32>) -> i32 {
     // 定义结果
@@ -77,6 +77,78 @@ pub fn max_sub_array(nums: Vec<i32>) -> i32 {
     res
 }
 
+/// 1480. 一维数组的动态和
+pub fn running_sum(nums: Vec<i32>) -> Vec<i32> {
+    let mut ans: Vec<i32> = vec![0; nums.len()];
+    for (idx, v) in nums.iter().enumerate() {
+        if idx > 0 {
+            ans[idx] = ans[idx - 1] + *v;
+        } else {
+            ans[idx] = *v;
+        }
+    }
+    ans
+}
+
+/// 1588. 所有奇数长度子数组的和
+pub fn sum_odd_length_subarrays(arr: Vec<i32>) -> i32 {
+    // 定义前缀和数组
+    let mut prefix = vec![0; arr.len() + 1];
+    // 计算前缀和
+    for i in 0..arr.len() {
+        prefix[i + 1] = prefix[i] + arr[i];
+    }
+    // 定义结果
+    let mut ans = 0;
+    for i in 0..arr.len() {
+        let mut j = 1;
+        while i + j <= arr.len() {
+            ans += prefix[i + j] - prefix[i];
+            j += 2;
+        }
+    }
+    ans
+}
+
+/// 2485. 找出中枢整数
+pub fn pivot_integer(n: i32) -> i32 {
+    let t = (n * n + n) / 2;
+    let x = (t as f64).sqrt() as i32;
+    if x.pow(2) == t {
+        x
+    } else {
+        -1
+    }
+}
+
+/// 1732. 找到最高海拔
+pub fn largest_altitude(gain: Vec<i32>) -> i32 {
+    // 定义结果数组
+    let mut res = vec![0; gain.len() + 1];
+    // 遍历数组
+    for i in 1..res.len() {
+        res[i] = res[i - 1] + gain[i - 1];
+    }
+    res.iter().max().unwrap().clone()
+}
+
+/// 1893. 检查是否区域内所有整数都被覆盖
+pub fn is_covered(ranges: Vec<Vec<i32>>, left: i32, right: i32) -> bool {
+    let mut flags = vec![false; 51];
+    for range in ranges {
+        let l = range[0].max(left) as usize;
+        let r = range[1].min(right) as usize;
+        for i in l..=r {
+            flags[i] = true;
+        }
+    }
+    for i in (left as usize)..=(right as usize) {
+        if flags[i] == false {
+            return false;
+        }
+    }
+    true
+}
 
 #[cfg(test)]
 mod tests {
@@ -86,5 +158,37 @@ mod tests {
     fn test_max_sub_array() {
         let nums = vec![-2, 1, -3, 4, -1, 2, 1, -5, 4];
         assert_eq!(max_sub_array(nums), 6);
+    }
+
+    #[test]
+    fn test_running_sum() {
+        let nums = vec![1, 2, 3, 4];
+        assert_eq!(running_sum(nums), vec![1, 3, 6, 10]);
+    }
+
+    #[test]
+    fn test_sum_odd_length_subarrays() {
+        let arr = vec![1, 4, 2, 5, 3];
+        assert_eq!(sum_odd_length_subarrays(arr), 58);
+    }
+
+    #[test]
+    fn test_pivot_integer() {
+        let n = 8;
+        assert_eq!(pivot_integer(n), 6);
+    }
+
+    #[test]
+    fn test_largest_altitude() {
+        let gain = vec![-5, 1, 5, 0, -7];
+        assert_eq!(largest_altitude(gain), 1);
+    }
+
+    #[test]
+    fn test_is_covered() {
+        let ranges = vec![vec![1, 10], vec![10, 20]];
+        let left = 21;
+        let right = 21;
+        assert_eq!(is_covered(ranges, left, right), false);
     }
 }
