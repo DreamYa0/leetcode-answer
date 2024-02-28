@@ -309,6 +309,31 @@ pub fn is_palindrome(x: i32) -> bool {
     s == x.to_string()
 }
 
+/// 125. 验证回文串
+pub fn is_palindrome_ii(s: String) -> bool {
+    let mut chars = s
+        .chars()
+        .filter(|c| c.is_ascii_alphanumeric())
+        .map(|c| c.to_ascii_lowercase())
+        .collect::<Vec<char>>();
+    // 定义有指针
+    let mut right = chars.len() - 1;
+    // 左右指针往中间 bys.len() / 2 位置移动
+    for left in 0..chars.len() / 2 {
+        // 交换左右指针的值
+        let temp = chars[left];
+        chars[left] = chars[right];
+        chars[right] = temp;
+        // 右指针左移
+        right -= 1;
+    }
+    chars.iter().collect::<String>()
+        == s.chars()
+            .filter(|c| c.is_ascii_alphanumeric())
+            .map(|c| c.to_ascii_lowercase())
+            .collect::<String>()
+}
+
 /// 三数之和
 /// 给定一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a ，b ，c ，使得 a + b + c = 0 ？请找出所有和为 0 且 不重复 的三元组。
 ///
@@ -902,6 +927,310 @@ fn partition(arr: &mut [i32], start: i32, end: i32) -> i32 {
     le
 }
 
+/// 88. 合并两个有序数组
+pub fn merge(nums1: &mut Vec<i32>, m: i32, nums2: &mut Vec<i32>, n: i32) {
+    // 为num1数组定义p1指针，指向 m-1 元素位置
+    let mut p1 = m - 1;
+    // 为num2数组定义p2指针，指向 n-1 元素位置
+    let mut p2 = n - 1;
+    // 定义tail指针，指向num1数组的末尾位置
+    let mut tail = m + n - 1;
+    // 定义当前元素
+    let mut cur;
+    while p1 >= 0 || p2 >= 0 {
+        if p1 == -1 {
+            // p1为-1说明m为0，说明nums1数组中没有元素，那么就取num2数组中最后一个元素
+            cur = nums2[p2 as usize];
+            // 左移p2指针
+            p2 -= 1;
+        } else if p2 == -1 {
+            // p2为-1说明n为0，说明nums2数组中没有元素，那么就取num1数组中最后一个元素
+            cur = nums1[p1 as usize];
+            // 左移p1指针
+            p1 -= 1;
+        } else if nums1[p1 as usize] > nums2[p2 as usize] {
+            // 说明nums1最后一位元素比nums2最后一位元素大，就取大的
+            cur = nums1[p1 as usize];
+            // 左移p1指针
+            p1 -= 1;
+        } else {
+            // 说明nums2最后一位元素比nums1最后一位元素大，就取大的
+            cur = nums2[p2 as usize];
+            // 左移p2指针
+            p2 -= 1;
+        }
+        // 当获取到元素后就放入nums1数组末尾
+        nums1[tail as usize] = cur;
+        // 左移tail指针
+        tail -= 1;
+    }
+}
+
+/// 1768. 交替合并字符串
+pub fn merge_alternately(word1: String, word2: String) -> String {
+    // 定义p1指针指向word1字符串起始位置
+    let mut p1 = 0;
+    // 定义p2指针指向word2字符串起始位置
+    let mut p2 = 0;
+    // 定义数组存放结果，数组大小为word1.len() + word2.len()
+    let mut res = vec![' '; word1.len() + word2.len()];
+    // 遍历res数组，i%2==0时取word1字符串中的字符，否则取word2字符串中的字符
+    for i in 0..res.len() {
+        if i % 2 == 0 {
+            //  如果p1小于word1.len()，说明word1字符串还有字符，就取word1字符串中的字符，否则取word2字符串中的字符
+            if p1 < word1.len() {
+                res[i] = word1.chars().nth(p1).unwrap();
+                p1 += 1;
+            } else {
+                res[i] = word2.chars().nth(p2).unwrap();
+                p2 += 1;
+            }
+        } else {
+            // 如果p2小于word2.len()，说明word2字符串还有字符，就取word2字符串中的字符，否则取word1字符串中的字符
+            if p2 < word2.len() {
+                res[i] = word2.chars().nth(p2).unwrap();
+                p2 += 1;
+            } else {
+                res[i] = word1.chars().nth(p1).unwrap();
+                p1 += 1;
+            }
+        }
+    }
+    // 将数组转换为字符串
+    res.iter().collect()
+}
+
+/// 面试题 01.06. 字符串压缩
+pub fn compress_string(s: String) -> String {
+    // 定义结果字符串
+    let mut res = String::new();
+    // 定义字符数组
+    let chars: Vec<char> = s.chars().collect();
+    // 定义字符计数
+    let mut count = 1;
+    // 遍历字符数组
+    for i in 0..chars.len() {
+        // 如果当前字符和下一个字符相等，计数加1
+        if i < chars.len() - 1 && chars[i] == chars[i + 1] {
+            count += 1;
+        } else {
+            // 如果当前字符和下一个字符不相等，将当前字符和计数加入结果字符串
+            res.push(chars[i]);
+            res.push_str(&count.to_string());
+            // 重置计数
+            count = 1;
+        }
+    }
+    // 如果结果字符串长度小于原字符串长度，返回结果字符串，否则返回原字符串
+    if res.len() < s.len() {
+        res
+    } else {
+        s
+    }
+}
+
+/// 392. 判断子序列
+pub fn is_subsequence(s: String, t: String) -> bool {
+    if s.is_empty() && t.is_empty() {
+        return true;
+    } else if s.is_empty() {
+        return true;
+    } else if t.is_empty() {
+        return false;
+    }
+    // 把t,s转换为字符数组
+    let t = t.chars().collect::<Vec<char>>();
+    let s = s.chars().collect::<Vec<char>>();
+    // s长度
+    let len = s.len();
+    // 定义s_p 指针指向s的开始位置
+    let mut s_p = 0;
+    // 遍历t
+    for i in 0..t.len() {
+        if (s_p < len) && (t[i] == s[s_p]) {
+            s_p += 1;
+        }
+        if s_p == len {
+            return true;
+        }
+    }
+    false
+}
+
+/// 2562. 找出数组的串联值
+pub fn find_the_array_conc_val(nums: Vec<i32>) -> i64 {
+    // 定义左指针
+    let mut left = 0;
+    // 定义右指针
+    let mut right = nums.len() - 1;
+    // 定义串联值
+    let mut sum = 0;
+    // 遍历数组
+    while left < right {
+        // 取左指针的值
+        let top = nums[left];
+        // 取右指针的值
+        let last = nums[right];
+        // 将左指针的值和右指针的值拼接成字符串，然后转换为i64类型
+        let parse = (top.to_string() + &last.to_string())
+            .parse::<i64>()
+            .unwrap();
+        // 然后累加到sum中
+        sum += parse;
+        // 左指针右移
+        left += 1;
+        // 右指针左移
+        right -= 1;
+    }
+    // 如果左指针等于右指针，说明数组长度为奇数，那么就取中间值
+    if left == right {
+        sum += nums[left] as i64;
+    }
+    sum
+}
+
+/// 2511. 最多可以摧毁的敌人城堡数目
+pub fn capture_forts(forts: Vec<i32>) -> i32 {
+    // 定义慢指针
+    let mut slow = 0;
+    // 定义最大值
+    let mut max = 0;
+    for fast in 0..forts.len() {
+        if forts[fast] == 1 || forts[fast] == -1 {
+            // 当前0个数
+            let mut cur = 0;
+            // 判断不相等是因为 如果 slow指向的是1 那么 fast就需要指向-1 ，或 slow指向的是-1 那么 fast就需要指向1
+            if forts[slow] != forts[fast] && forts[slow] != 0 && forts[fast] != 0 {
+                // 统计slow指针和fast指针之间的0的个数
+                forts[slow..fast].iter().for_each(|&x| {
+                    if x == 0 {
+                        cur += 1;
+                    }
+                });
+                max = max.max(cur);
+                // 计算完长度之后需要把slow指针移动到fast指针处，等待计算下一段满足条件的长度值
+                slow = fast;
+            } else if forts[slow] == forts[fast] && forts[slow] != 0 && forts[fast] != 0 {
+                // 如果遇到 slow==1 fast==1 或 slow==-1 fast==-1 需要把slow指针移动到fast指针处，等待计算下一段满足条件的长度值
+                slow = fast;
+            } else if forts[slow] != forts[fast] && forts[slow] == 0 && forts[fast] == 1 {
+                // 如果遇到 slow==0 fast==1 需要把slow指针移动到fast指针处，等待计算下一段满足条件的长度值
+                slow = fast;
+            }
+        }
+    }
+    max as i32
+}
+
+/// LCR 139. 训练计划 I
+/// [1, 2, 3, 4, 5, 6, 7, 8, 9] -> [1, 3, 5, 7, 9, 2, 4, 6, 8]
+pub fn training_plan(actions: Vec<i32>) -> Vec<i32> {
+    let mut actions = actions;
+    // 定义慢指针
+    let mut slow = 0;
+    for fast in 0..actions.len() {
+        // 如果发现fast指针指向的是奇数则向左移动这些奇数
+        if actions[fast] % 2 != 0 {
+            // 交换slow指针和fast指针指向的元素
+            let temp = actions[slow];
+            actions[slow] = actions[fast];
+            actions[fast] = temp;
+            slow += 1;
+        }
+    }
+    actions
+}
+
+/// 350. 两个数组的交集 II
+pub fn intersect(nums1: Vec<i32>, nums2: Vec<i32>) -> Vec<i32> {
+    let mut nums1 = nums1;
+    let mut nums2 = nums2;
+    // 对nums1数组进行排序
+    nums1.sort();
+    // 对nums2数组进行排序
+    nums2.sort();
+    // 定义nums1的p1指针，定义nums2的p2指针
+    let mut p1 = 0;
+    let mut p2 = 0;
+    // 定义结果数组
+    let mut ans = Vec::new();
+    // 遍历nums1和nums2
+    while p1 < nums1.len() && p2 < nums2.len() {
+        if nums1[p1] < nums2[p2] {
+            p1 += 1;
+        } else if nums1[p1] > nums2[p2] {
+            p2 += 1;
+        } else {
+            ans.push(nums1[p1]);
+            p1 += 1;
+            p2 += 1;
+        }
+    }
+    ans
+}
+
+/// 面试题 10.01. 合并排序的数组
+pub fn merge_ii(a: &mut Vec<i32>, m: i32, b: &mut Vec<i32>, n: i32) {
+    // 为num1数组定义p1指针，指向 m-1 元素位置
+    let mut p1 = m - 1;
+    // 为num2数组定义p2指针，指向 n-1 元素位置
+    let mut p2 = n - 1;
+    // 定义tail指针，指向num1数组的末尾位置
+    let mut tail = m + n - 1;
+    // 定义当前元素
+    let mut cur;
+    while p1 >= 0 || p2 >= 0 {
+        if p1 == -1 {
+            // p1为-1说明m为0，说明nums1数组中没有元素，那么就取num2数组中最后一个元素
+            cur = b[p2 as usize];
+            // 左移p2指针
+            p2 -= 1;
+        } else if p2 == -1 {
+            // p2为-1说明n为0，说明nums2数组中没有元素，那么就取num1数组中最后一个元素
+            cur = a[p1 as usize];
+            // 左移p1指针
+            p1 -= 1;
+        } else if a[p1 as usize] > b[p2 as usize] {
+            // 说明nums1最后一位元素比nums2最后一位元素大，就取大的
+            cur = a[p1 as usize];
+            // 左移p1指针
+            p1 -= 1;
+        } else {
+            // 说明nums2最后一位元素比nums1最后一位元素大，就取大的
+            cur = b[p2 as usize];
+            // 左移p2指针
+            p2 -= 1;
+        }
+        // 当获取到元素后就放入nums1数组末尾
+        a[tail as usize] = cur;
+        // 左移tail指针
+        tail -= 1;
+    }
+}
+
+/// 1089. 复写零
+pub fn duplicate_zeros(arr: &mut Vec<i32>) {
+    let (mut offset, mut i) = (0, 0);
+    // 计算需要偏移多少为0的元素，以及数组需要保留多少个元素
+    while i + offset < arr.len() {
+        if arr[i] == 0 {
+            offset += 1
+        }
+        i += 1;
+    }
+    while offset > 0 {
+        i -= 1;
+        if i + offset < arr.len() {
+            // 把需要保留元素的最末尾元素复制到数组末尾的位置，i-1就是需要保留元素的最末尾元素 i+offset就是数组末尾的位置
+            arr[i + offset] = arr[i];
+        }
+        if arr[i] == 0 {
+            offset -= 1;
+            arr[i + offset] = arr[i];
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::list::ListNode;
@@ -1004,5 +1333,74 @@ mod tests {
         let mut nums = vec![2, 0, 2, 1, 1, 0];
         sort_colors(&mut nums);
         println!("{:?}", nums)
+    }
+
+    #[test]
+    fn test_merge() {
+        let mut nums1 = vec![1, 2, 3, 0, 0, 0];
+        let m = 3;
+        let mut nums2 = vec![2, 5, 6];
+        let n = 3;
+        merge(&mut nums1, m, &mut nums2, n);
+        println!("{:?}", nums1)
+    }
+
+    #[test]
+    fn test_merge_alternately() {
+        let word1 = "abc".to_string();
+        let word2 = "pqr".to_string();
+        let res = merge_alternately(word1, word2);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_is_palindrome_ii() {
+        let s = "A man, a plan, a canal: Panama".to_string();
+        let res = is_palindrome_ii(s);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_is_subsequence() {
+        let s = "b".to_string();
+        let t = "abc".to_string();
+        let res = is_subsequence(s, t);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_find_the_array_conc_val() {
+        let nums = vec![1, 2, 3, 4, 5];
+        let res = find_the_array_conc_val(nums);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_capture_forts() {
+        let forts = vec![0, 0, 1, -1];
+        let res = capture_forts(forts);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_training_plan() {
+        let actions = vec![1, 2, 3, 4, 5, 6, 7, 8, 9];
+        let res = training_plan(actions);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_intersect() {
+        let nums1 = vec![1, 2, 2, 1];
+        let nums2 = vec![2, 2];
+        let res = intersect(nums1, nums2);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_duplicate_zeros() {
+        let mut arr = vec![1, 0, 2, 3, 0, 4, 5, 0];
+        duplicate_zeros(&mut arr);
+        println!("{:?}", arr)
     }
 }

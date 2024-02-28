@@ -150,6 +150,49 @@ pub fn is_covered(ranges: Vec<Vec<i32>>, left: i32, right: i32) -> bool {
     true
 }
 
+/// 1422. 分割字符串的最大得分
+pub fn max_score(s: String) -> i32 {
+    // 定义得分
+    let mut score = 0;
+    let len = s.len();
+    let s = s.chars().collect::<Vec<char>>();
+    if s[0] == '0' {
+        score += 1;
+    }
+    for i in 1..len {
+        if s[i] == '1' {
+            score += 1;
+        }
+    }
+    // 定义结果
+    let mut ans = score;
+    for i in 1..len - 1 {
+        if s[i] == '0' {
+            score += 1;
+        } else {
+            score -= 1;
+        }
+        ans = ans.max(score);
+    }
+    ans
+}
+
+/// LCR 012. 寻找数组的中心下标
+pub fn pivot_index(nums: Vec<i32>) -> i32 {
+    // 计算整个数组的总和
+    let total = nums.iter().sum();
+    // 当前和
+    let mut sum = 0;
+    // 设其左侧元素之和为 sum，则其右侧元素之和为 total−numsi−sum。左右侧元素相等即为 sum=total−numsi−sum，即 2×sum+numsi=total
+    for i in 0..nums.len() {
+        if 2 * sum + nums[i] == total {
+            return i as i32;
+        }
+        sum += nums[i]
+    }
+    return -1;
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -190,5 +233,17 @@ mod tests {
         let left = 21;
         let right = 21;
         assert_eq!(is_covered(ranges, left, right), false);
+    }
+
+    #[test]
+    fn test_max_score() {
+        let s = "011101".to_string();
+        assert_eq!(max_score(s), 5);
+    }
+
+    #[test]
+    fn test_pivot_index() {
+        let nums = vec![1, 7, 3, 6, 5, 6];
+        assert_eq!(pivot_index(nums), 3);
     }
 }
