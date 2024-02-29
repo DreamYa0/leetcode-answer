@@ -322,6 +322,31 @@ pub fn reverse_message(message: String) -> String {
     s.iter().collect()
 }
 
+/// 345. 反转字符串中的元音字母
+pub fn reverse_vowels(s: String) -> String {
+    // 定义元音字母
+    let vowels = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
+    let mut s = s.chars().collect::<Vec<char>>();
+    // 定义左指针
+    let mut left = 0;
+    // 定义右指针
+    let mut right = s.len() - 1;
+    while left < right {
+        if !vowels.contains(&s[left]) {
+            left += 1;
+        } else if !vowels.contains(&s[right]) {
+            right -= 1;
+        } else {
+            let temp = s[left];
+            s[left] = s[right];
+            s[right] = temp;
+            left += 1;
+            right -= 1;
+        }
+    }
+    s.iter().collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -358,6 +383,13 @@ mod tests {
     fn test_reverse_message() {
         let message = "a good   example".to_string();
         let res = reverse_message(message);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_reverse_vowels() {
+        let s = "hello".to_string();
+        let res = reverse_vowels(s);
         println!("{:?}", res)
     }
 }

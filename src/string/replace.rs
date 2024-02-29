@@ -83,6 +83,62 @@ pub fn repeated_substring_pattern(_s: String) -> bool {
     true
 }
 
+/// 680. 验证回文串 II
+pub fn valid_palindrome(s: String) -> bool {
+    let s = s.chars().collect::<Vec<char>>();
+    // 定义左指针
+    let mut left = 0;
+    // 定义右指针
+    let mut right = s.len() - 1;
+    // 遍历字符串数组
+    while left <= right {
+        if s[left] == s[right] {
+            left += 1;
+            right -= 1;
+        } else {
+            return is_palindrome(s[left + 1..right + 1].to_vec())
+                || is_palindrome(s[left..right].to_vec());
+        }
+    }
+    true
+}
+
+fn is_palindrome(s: Vec<char>) -> bool {
+    let mut left = 0;
+    let mut right = s.len() - 1;
+    while left < right {
+        if s[left] != s[right] {
+            return false;
+        }
+        left += 1;
+        right -= 1;
+    }
+    true
+}
+
+/// LCR 018. 验证回文串
+pub fn is_palindrome_ii(s: String) -> bool {
+    let s = s.chars().collect::<Vec<char>>();
+    let mut left = 0;
+    let mut right = s.len() - 1;
+    while left < right {
+        // 如果不是字母或者数字就跳过
+        if !(s[left].is_ascii_alphabetic() || s[left].is_numeric()) {
+            left += 1;
+        } else if !(s[right].is_ascii_alphabetic() || s[right].is_numeric()) {
+            // 如果不是字母或者数字就跳过
+            right -= 1;
+        } else if s[left].to_ascii_lowercase() == s[right].to_ascii_lowercase() {
+            // 左右指针移动
+            left += 1;
+            right -= 1;
+        } else {
+            return false;
+        }
+    }
+    true
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -92,5 +148,19 @@ mod tests {
         let s = "a1b2c3".to_string();
         let replace = replace(s);
         println!("{:?}", replace)
+    }
+
+    #[test]
+    fn test_valid_palindrome() {
+        let s = "abc".to_string();
+        let valid_palindrome = valid_palindrome(s);
+        println!("{:?}", valid_palindrome)
+    }
+
+    #[test]
+    fn test_is_palindrome_ii() {
+        let s = "0P".to_string();
+        let is_palindrome_ii = is_palindrome_ii(s);
+        println!("{:?}", is_palindrome_ii)
     }
 }

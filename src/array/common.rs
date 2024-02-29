@@ -1,7 +1,4 @@
 /// 238. 除自身以外数组的乘积
-/// 中等
-/// 相关标签
-/// 相关企业
 /// 给你一个整数数组 nums，返回 数组 answer ，其中 answer[i] 等于 nums 中除 nums[i] 之外其余各元素的乘积 。
 ///
 /// 题目数据 保证 数组 nums之中任意元素的全部前缀元素和后缀的乘积都在  32 位 整数范围内。
@@ -96,13 +93,41 @@ pub fn product_except_self(nums: Vec<i32>) -> Vec<i32> {
     res
 }
 
+pub fn merge_arrays(nums1: Vec<Vec<i32>>, nums2: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
+    let mut res: Vec<Vec<i32>> = vec![];
+    let (n1, n2) = (nums1.len(), nums2.len());
+    let (mut index1, mut index2) = (0__usize, 0__usize);
+    while index1 != n1 && index2 != n2 {
+        if nums1[index1][0] == nums2[index2][0] {
+            res.push(vec![nums1[index1][0], nums1[index1][1] + nums2[index2][1]]);
+            index1 += 1;
+            index2 += 1;
+        } else if nums1[index1][0] < nums2[index2][0] {
+            res.push(vec![nums1[index1][0], nums1[index1][1]]);
+            index1 += 1;
+        } else {
+            res.push(vec![nums2[index2][0], nums2[index2][1]]);
+            index2 += 1;
+        }
+    }
+    while index1 != n1 {
+        res.push(vec![nums1[index1][0], nums1[index1][1]]);
+        index1 += 1;
+    }
+    while index2 != n2 {
+        res.push(vec![nums2[index2][0], nums2[index2][1]]);
+        index2 += 1;
+    }
+    res
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn test_product_except_self() {
-        let nums = [-1,1,0,-3,3].to_vec();
+        let nums = [-1, 1, 0, -3, 3].to_vec();
         let product_except_self = product_except_self(nums);
         println!("{:?}", product_except_self)
     }

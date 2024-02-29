@@ -109,6 +109,25 @@ pub fn remove_outer_parentheses(s: String) -> String {
     cns.iter().collect()
 }
 
+/// 1332. 删除回文子序列
+pub fn remove_palindrome_sub(s: String) -> i32 {
+    let len = s.len();
+    let s = s.chars().collect::<Vec<char>>();
+    // 定义左指针
+    let mut left = 0;
+    // 定义右指针
+    let mut right = len - 1;
+    while left < right {
+        // 如果不相等说明字符串自身不是回文字符串，则需要删除两次，否则只需要删除一次
+        if s[left] != s[right] {
+            return 2;
+        }
+        left += 1;
+        right -= 1;
+    }
+    1
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -129,5 +148,11 @@ mod tests {
     fn test_remove_outer_parentheses() {
         let s = "(()())(())".to_string();
         assert_eq!(remove_outer_parentheses(s), "()()()");
+    }
+
+    #[test]
+    fn test_remove_palindrome_sub() {
+        let s = "ababa".to_string();
+        assert_eq!(remove_palindrome_sub(s), 1);
     }
 }

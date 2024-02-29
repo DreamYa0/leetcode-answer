@@ -285,25 +285,25 @@ pub fn find_pairs(nums: Vec<i32>, k: i32) -> i32 {
 /// t.length == s.length
 ///
 /// s 和 t 由任意有效的 ASCII 字符组成
-/// 
+///
 /// 解题思路
-/// 
+///
 /// 首先复习一下数学中映射的相关概念定义。设集合 s , t 中的某字符为 x , y ，
 ///
 /// 单射：对于任意 x ，都有唯一的 y 与之对应。
-/// 
+///
 /// 满射：对于任意 y ，至少存在一个 x 与之对应。
-/// 
+///
 /// 双射：既是单射又是满射，又称为一一对应。
-/// 
+///
 /// <img src="https://pic.leetcode-cn.com/1656945936-BsSBMu-Slide1.png" />
 ///
 /// 接下来，抽象理解题目给定条件，
 ///
 /// “每个出现的字符都应当映射到另一个字符”。代表字符集合 s , t 之间是「满射」。
-/// 
+///
 /// “相同字符只能映射到同一个字符上，不同字符不能映射到同一个字符上”。代表字符集合 s , t 之间是「单射」。
-/// 
+///
 /// 因此， s 和 t 之间是「双射」，满足一一对应。考虑遍历字符串，使用哈希表 s2t , t2s 分别记录 s→t t→s 的映射，
 /// 当发现任意「一对多」的关系时返回 false 即可。
 pub fn is_isomorphic(s: String, t: String) -> bool {
@@ -320,8 +320,7 @@ pub fn is_isomorphic(s: String, t: String) -> bool {
     // 遍历字符串s
     for i in 0..s.len() {
         if s2t.get(&s_array[i]).unwrap_or(&t_array[i]) != &t_array[i]
-            || t2s.get(&t_array[i]).unwrap_or(&s_array[i])
-                != &s.chars().nth(i).unwrap()
+            || t2s.get(&t_array[i]).unwrap_or(&s_array[i]) != &s.chars().nth(i).unwrap()
         {
             return false;
         }

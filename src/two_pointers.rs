@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use crate::list::ListNode;
 
 /// 给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
@@ -1271,6 +1273,104 @@ pub fn make_smallest_palindrome(s: String) -> String {
     String::from_utf8(bytes).unwrap()
 }
 
+/// 2465. 不同的平均值数目
+pub fn distinct_averages(nums: Vec<i32>) -> i32 {
+    let mut nums = nums;
+    // 定义左指针
+    let mut left = 0;
+    // 定义右指针
+    let mut right = nums.len() - 1;
+    // 对数组进行排序
+    nums.sort();
+    // 定义Set
+    let mut hash_set = HashSet::<i32>::with_capacity(nums.len());
+    // 遍历数组
+    while left < right {
+        hash_set.insert(nums[left] + nums[right]);
+        left += 1;
+        right -= 1;
+    }
+    hash_set.len() as i32
+}
+
+/// 925. 长按键入
+pub fn is_long_pressed_name(name: String, typed: String) -> bool {
+    if name.is_empty() && typed.is_empty() {
+        return true;
+    }
+    if name.is_empty() || typed.is_empty() {
+        return false;
+    }
+    if typed.len() < name.len() {
+        return false;
+    }
+    let name = name.chars().collect::<Vec<char>>();
+    let typed = typed.chars().collect::<Vec<char>>();
+    // 定义p1指针指向typed的起始位置
+    let mut p1 = 0;
+    // 定义p2指针指向name的起始位置
+    let mut p2 = 0;
+    while p1 < typed.len() {
+        if p2 < name.len() && typed[p1] == name[p2] {
+            p2 += 1;
+            p1 += 1;
+        } else if p1 > 0 && p1 < typed.len() && typed[p1] == typed[p1 - 1] {
+            p1 += 1;
+        } else {
+            return false;
+        }
+    }
+    p2 == name.len()
+}
+
+/// 2824. 统计和小于目标的下标对数目
+pub fn count_pairs(nums: Vec<i32>, target: i32) -> i32 {
+    let mut nums = nums;
+    // 排序数组
+    nums.sort();
+    // 统计
+    let mut cnt = 0;
+    // 遍历数组
+    for i in 1..nums.len() {
+        // 定义左指针
+        let mut left = 0;
+        // 定义右指针
+        let mut right = i - 1;
+        while left < right {
+            let mid = left + right + 1 >> 1;
+            if nums[i] + nums[mid] < target {
+                // 右移左指针
+                left = mid;
+            } else {
+                // 左移右指针
+                right = mid - 1;
+            }
+        }
+        if nums[i] + nums[right] < target {
+            cnt += right + 1;
+        }
+    }
+    cnt as i32
+}
+
+/// 922. 按奇偶排序数组 II
+pub fn sort_array_by_parity_ii(nums: Vec<i32>) -> Vec<i32> {
+    let mut nums = nums;
+    let mut j = 1;
+    for (i, _) in nums.clone().iter().enumerate().step_by(2) {
+        // 如果nums[i]为基数
+        if nums[i] % 2 == 1 {
+            while nums[j] % 2 == 1 {
+                j += 2;
+            }
+            let temp = nums[i];
+            nums[i] = nums[j];
+            nums[j] = temp;
+        }
+    }
+    nums
+}
+
 #[cfg(test)]
 mod tests {
     use crate::list::ListNode;
@@ -1455,6 +1555,35 @@ mod tests {
     fn test_make_smallest_palindrome() {
         let s = "egcfe".to_string();
         let res = make_smallest_palindrome(s);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_distinct_averages() {
+        let nums = vec![2, 1, 3, 4];
+        let res = distinct_averages(nums);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_is_long_pressed_name() {
+        let name = "leelee".to_string();
+        let typed = "lleeelee".to_string();
+        assert_eq!(is_long_pressed_name(name, typed), true);
+    }
+
+    #[test]
+    fn test_count_pairs() {
+        let nums = vec![1, 1, 1, 1, 1];
+        let target = 2;
+        let res = count_pairs(nums, target);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_sort_array_by_parity_ii() {
+        let nums = vec![4, 2, 5, 7];
+        let res = sort_array_by_parity_ii(nums);
         println!("{:?}", res)
     }
 }
