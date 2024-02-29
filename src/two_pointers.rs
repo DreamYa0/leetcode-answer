@@ -1231,6 +1231,46 @@ pub fn duplicate_zeros(arr: &mut Vec<i32>) {
     }
 }
 
+/// 905. 按奇偶排序数组
+pub fn sort_array_by_parity(nums: Vec<i32>) -> Vec<i32> {
+    let mut nums = nums;
+    // 定义慢指针
+    let mut slow = 0;
+    for fast in 0..nums.len() {
+        // 如果nums[fast]为偶数就和nums[slow]交换元素位置
+        if nums[fast] % 2 == 0 {
+            let temp = nums[slow];
+            nums[slow] = nums[fast];
+            nums[fast] = temp;
+            slow += 1;
+        }
+    }
+    nums
+}
+
+/// 2697. 字典序最小回文串
+pub fn make_smallest_palindrome(s: String) -> String {
+    // 把字符串转为字节数组
+    let mut bytes = s.into_bytes();
+    // 定义左指针
+    let mut left = 0;
+    // 定义右指针
+    let mut right = bytes.len() - 1;
+    // 遍历字节数组
+    while left < right {
+        if bytes[left] != bytes[right] {
+            // 如果左右指针指向的元素不相等，则使用两个元素中最小的
+            bytes[left] = bytes[left].min(bytes[right]);
+            bytes[right] = bytes[left].min(bytes[right]);
+        }
+        // 右移左指针
+        left += 1;
+        // 左移右指针
+        right -= 1;
+    }
+    String::from_utf8(bytes).unwrap()
+}
+
 #[cfg(test)]
 mod tests {
     use crate::list::ListNode;
@@ -1402,5 +1442,19 @@ mod tests {
         let mut arr = vec![1, 0, 2, 3, 0, 4, 5, 0];
         duplicate_zeros(&mut arr);
         println!("{:?}", arr)
+    }
+
+    #[test]
+    fn test_sort_array_by_parity() {
+        let nums = vec![3, 1, 2, 4];
+        let res = sort_array_by_parity(nums);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_make_smallest_palindrome() {
+        let s = "egcfe".to_string();
+        let res = make_smallest_palindrome(s);
+        println!("{:?}", res)
     }
 }

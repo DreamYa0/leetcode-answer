@@ -40,9 +40,6 @@ fn reverse(s: &mut Vec<char>, mut begin: usize, mut end: usize) {
 }
 
 /// 151. 反转字符串中的单词
-/// 中等
-/// 相关标签
-/// 相关企业
 /// 给你一个字符串 s ，请你反转字符串中 单词 的顺序。
 ///
 /// 单词 是由非空格字符组成的字符串。s 中使用至少一个空格将字符串中的 单词 分隔开。
@@ -156,7 +153,6 @@ fn remove_extra_spaces(s: &mut Vec<char>) {
 }
 
 /// 右旋字符串
-/// 卡码网题目链接(opens new window)
 ///
 /// 字符串的右旋转操作是把字符串尾部的若干个字符转移到字符串的前面。给定一个字符串 s 和一个正整数 k，请编写一个函数，将字符串中的后面 k 个字符移到字符串的前面，实现字符串的右旋转操作。
 ///
@@ -274,6 +270,58 @@ pub fn rotate_right(s: String, k: i32) -> String {
     s.iter().collect::<String>()
 }
 
+/// LCR 182. 动态口令
+pub fn dynamic_password(password: String, target: i32) -> String {
+    let len = password.len();
+    let k = target as usize;
+    let mut s = password.chars().collect::<Vec<_>>();
+    // 先翻转整个字符数组
+    reverse(&mut s, 0, len - 1);
+    // 再翻转 0 -- (len - target - 1)
+    reverse(&mut s, 0, len - k - 1);
+    // 再翻转 (len - target) -- len - 1
+    reverse(&mut s, len - k, len - 1);
+    s.iter().collect()
+}
+
+/// 557. 反转字符串中的单词 III
+pub fn reverse_words_iii(s: String) -> String {
+    let mut s = s.chars().collect::<Vec<_>>();
+    let len = s.len();
+    // 定义起始位置
+    let mut start = 0;
+    for i in 0..=len {
+        if i == len || s[i].is_ascii_whitespace() {
+            // 如果遇到空格或者字符串末尾，就反转 start -- i - 1
+            reverse(&mut s, start, i - 1);
+            start = i + 1;
+        }
+    }
+    s.iter().collect::<String>()
+}
+
+/// LCR 181. 字符串中的单词反转
+pub fn reverse_message(message: String) -> String {
+    let mut s = message.chars().collect::<Vec<char>>();
+    // 去除空格
+    remove_extra_spaces(s.as_mut());
+    if s.is_empty() {
+        return "".to_string();
+    }
+    let len = s.len();
+    // 先反转整个字符串
+    reverse(&mut s, 0, len - 1);
+    let mut start = 0;
+    for i in 0..=len {
+        if (i == len || s[i].is_ascii_whitespace()) && i > 0 {
+            // 再反转每个单词
+            reverse(&mut s, start, i - 1);
+            start = i + 1;
+        }
+    }
+    s.iter().collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -289,5 +337,27 @@ mod tests {
     fn test_rotate_right() {
         let rotate_right = rotate_right("abcdefg".to_string(), 2);
         println!("{:?}", rotate_right)
+    }
+
+    #[test]
+    fn test_dynamic_password() {
+        let password = "s3cur1tyC0d3".to_string();
+        let target = 4;
+        let res = dynamic_password(password, target);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_reverse_words_iii() {
+        let s = "Let's take LeetCode contest".to_string();
+        let res = reverse_words_iii(s);
+        println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_reverse_message() {
+        let message = "a good   example".to_string();
+        let res = reverse_message(message);
+        println!("{:?}", res)
     }
 }
