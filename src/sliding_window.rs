@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, VecDeque},
-    vec,
-};
+use std::collections::{HashMap, VecDeque};
 
 /// LCR 016. 无重复字符的最长子串
 ///
@@ -1732,6 +1729,467 @@ pub fn length_of_longest_substring_k_distinct(s: String, k: i32) -> i32 {
     max_len as i32
 }
 
+/// 2760. 最长奇偶子数组
+///
+/// 题意解读
+///
+/// 选一个最长连续子数组，满足子数组元素依次是偶数，奇数，偶数，奇数，……，且元素值均不超过 threshold\textit{threshold}threshold。
+///
+/// 例如 nums=[2,1,1,4,3,4,2,8],threshold=5，数组可以分成 [2,1],1,[4,3,4],[2],8，
+/// 其中 [⋯ ] 是子数组，其余数字不满足要求。所以最长连续子数组的长度是 3。
+///
+/// 分组循环
+///
+/// 适用场景：按照题目要求，数组会被分割成若干组，且每一组的判断/处理逻辑是一样的。
+///
+/// 核心思想：
+///
+/// 外层循环负责遍历组之前的准备工作（记录开始位置），和遍历组之后的统计工作（更新答案最大值）。
+///
+/// 内层循环负责遍历组，找出这一组最远在哪结束。
+///
+/// 这个写法的好处是，各个逻辑块分工明确，也不需要特判最后一组（易错点）。以我的经验，这个写法是所有写法中最不容易出 bug 的，推荐大家记住。
+///
+/// 时间复杂度乍一看是 O(n^2)，但注意变量 iii 只会增加，不会重置也不会减少。所以二重循环总共循环 O(n) 次，所以时间复杂度是 O(n)。
+///
+/// 练习
+/// 一般来说，分组循环的模板如下（可根据题目调整）：
+///
+/// ```
+/// n = len(nums)
+/// i = 0
+/// while i < n:
+///     start = i
+///     while i < n and ...:
+///         i += 1
+///     # 从 start 到 i-1 是一组
+///     # 下一组从 i 开始，无需 i += 1
+/// ```
+/// https://leetcode.cn/problems/longest-even-odd-subarray-with-threshold/solutions/2528771/jiao-ni-yi-ci-xing-ba-dai-ma-xie-dui-on-zuspx/
+pub fn longest_alternating_subarray(nums: Vec<i32>, threshold: i32) -> i32 {
+    let n = nums.len();
+    let mut ans = 0;
+    let mut i = 0;
+    while i < n {
+        // 这里的目的是让i指针停留在一个小于threshold偶数的位置
+        if nums[i] > threshold || nums[i] % 2 != 0 {
+            i += 1; // 直接跳过
+            continue;
+        }
+        // 记录这一组的开始位置
+        let start = i;
+        // 开始位置已经满足要求，从下一个位置开始判断
+        i += 1;
+        while i < n && nums[i] <= threshold && nums[i] % 2 != nums[i - 1] % 2 {
+            i += 1;
+        }
+        // 从 start 到 i-1 是满足题目要求的（并且无法再延长的）子数组
+        ans = ans.max(i - start);
+    }
+    ans as i32
+}
+
+/// 1456. 定长子串中元音的最大数目
+pub fn max_vowels_ii(s: String, k: i32) -> i32 {
+    let s = s.chars().collect::<Vec<char>>();
+    // 定义元音字符数组
+    let v = ['a', 'e', 'i', 'o', 'u'];
+    // 定义k区间最大元音数
+    let mut max = 0;
+    // 计算第一个区间元音数
+    for i in 0..k {
+        if v.contains(&s[i as usize]) {
+            max += 1;
+        }
+    }
+    // 定义当前长度
+    let mut cur = max;
+    // 滑动定长窗口进行后续统计
+    for i in k as usize..s.len() {
+        if v.contains(&s[i - k as usize]) {
+            // 左边窗口滑出的元素刚好为元音字符
+            cur -= 1;
+        }
+        if v.contains(&s[i]) {
+            // 右边滑入的为元音字符
+            cur += 1;
+        }
+        // 滑动一次就对最大值进行统计
+        max = max.max(cur);
+    }
+    max
+}
+
+/// 2269. 找到一个数字的 K 美丽值
+pub fn divisor_substrings(num: i32, k: i32) -> i32 {
+    // 把数字转换为字符数组
+    let nums = num.to_string().chars().collect::<Vec<char>>();
+    // 统计美丽值的数量
+    let mut cnt = 0;
+    // 定义一个队列来存储区间的数字
+    let mut queue = Vec::new();
+    // 处理第一个窗口
+    for i in 0..k {
+        // 先把第一个窗口的数字放入队列
+        queue.push(nums[i as usize]);
+    }
+    if is_divisible(queue.clone(), num) {
+        cnt += 1;
+    }
+    // 开始滑动窗口，处理后续的区间
+    for i in k as usize..nums.len() {
+        // 窗口右边的字符入队
+        queue.push(nums[i]);
+        // 窗口左边的字符出队
+        queue.remove(0);
+        // 判断是否是美丽值
+        if is_divisible(queue.clone(), num) {
+            cnt += 1;
+        }
+    }
+    cnt
+}
+
+fn is_divisible(mut queue: Vec<char>, num: i32) -> bool {
+    // 如果队首是0就把0弹出来
+    while let Some(v) = queue.first() {
+        if *v == '0' {
+            queue.remove(0);
+        } else {
+            break;
+        }
+    }
+    // 如果队列中全为零的时候会被全部弹出，这个时候返回false
+    if queue.is_empty() {
+        return false;
+    }
+    // 把队列中的字符转为数字
+    let parse = queue.iter().collect::<String>().parse::<i32>().unwrap();
+    // 是否整除
+    num % parse == 0
+}
+
+/// 1984. 学生分数的最小差值
+pub fn minimum_difference(nums: Vec<i32>, k: i32) -> i32 {
+    let mut nums = nums;
+    nums.sort_unstable();
+    let mut ans = i32::MAX;
+    for i in 0..nums.len() - k as usize + 1 {
+        // i + k - 1是滑动窗口的右边界，i 是滑动窗口的左边界
+        ans = ans.min(nums[i + k as usize - 1] - nums[i]);
+    }
+    ans
+}
+
+/// 1343. 大小为 K 且平均值大于等于阈值的子数组数目
+pub fn num_of_subarrays(arr: Vec<i32>, k: i32, threshold: i32) -> i32 {
+    // 定义结果
+    let mut ans = 0;
+    // 定义和，并处理第一个窗口
+    let mut sum = arr[..k as usize].iter().sum::<i32>();
+    // 计算第一个窗口的平均值
+    if sum / k >= threshold {
+        ans += 1;
+    }
+    // 滑动窗口处理后续值
+    for i in k as usize..arr.len() {
+        sum += arr[i] - arr[i - k as usize];
+        if sum / k >= threshold {
+            ans += 1;
+        }
+    }
+    ans
+}
+
+/// 2379. 得到 K 个黑块的最少涂色次数
+pub fn minimum_recolors(blocks: String, k: i32) -> i32 {
+    let b = blocks.chars().collect::<Vec<char>>();
+    // 连续 k 个黑色块的 最少 操作次数,处理第一个窗口，统计白块的个数
+    let mut min = b[..k as usize].iter().filter(|c| **c == 'W').count();
+    // 定义滑动窗口中当前白块数量
+    let mut cur = min;
+    // 滑动窗口
+    for i in k as usize..b.len() {
+        if b[i - k as usize] == 'W' {
+            cur -= 1;
+        }
+        if b[i] == 'W' {
+            cur += 1;
+        }
+        min = min.min(cur);
+    }
+    min as i32
+}
+
+/// 2841. 几乎唯一子数组的最大和
+pub fn max_sum(nums: Vec<i32>, m: i32, k: i32) -> i64 {
+    // 定义一个hash表来存储窗口中的元素，哈希表的 K表示数组中的数，V表示出现的次数
+    let mut hash = HashMap::<i64, i64>::new();
+    // 定义结果
+    let mut ans: i64 = 0;
+    // 定义窗口元素的和
+    let mut cur_sum: i64 = 0;
+    // 处理第一个窗口
+    for i in 0..k as usize {
+        // 把元素加入到哈希表中，相同的k v加一
+        hash.insert(
+            nums[i] as i64,
+            hash.get(&(nums[i] as i64)).or(Some(&0)).unwrap() + 1,
+        );
+        // 累加和
+        cur_sum += nums[i] as i64;
+    }
+    if hash.keys().len() >= m as usize {
+        // 如果哈希表中的key数量大于等于m
+        ans = ans.max(cur_sum);
+    }
+    // 滑动窗口处理后续元素
+    for i in k as usize..nums.len() {
+        // 窗口右边滑入的元素，在哈希表中的计数应该增加一
+        hash.insert(
+            nums[i] as i64,
+            hash.get(&(nums[i] as i64)).or(Some(&0)).unwrap() + 1,
+        );
+        // 滑出窗口的元素
+        if hash.get(&(nums[i - k as usize] as i64)).unwrap() - 1 == 0 {
+            // 如果哈希表中的元素只有一个当从左边被划出窗口后就应该从哈希表中移除
+            hash.remove(&(nums[i - k as usize] as i64));
+        } else {
+            // 如果哈希表中的元素大于1个当从左边被划出窗口后就应该从哈希表中的计数就应该减一
+            hash.insert(
+                nums[i - k as usize] as i64,
+                hash.get(&(nums[i - k as usize] as i64)).unwrap() - 1,
+            );
+        }
+        // 滑出窗口的数应该从和中减掉
+        cur_sum -= nums[i - k as usize] as i64;
+        // 滑入窗口的数应该加入和中
+        cur_sum += nums[i] as i64;
+        if hash.keys().len() >= m as usize {
+            // 如果哈希表中的key数量大于等于m
+            ans = ans.max(cur_sum);
+        }
+    }
+    ans
+}
+
+/// 2461. 长度为 K 子数组中的最大和
+pub fn maximum_subarray_sum(nums: Vec<i32>, k: i32) -> i64 {
+    // 定义一个hash表来存储窗口中的元素，哈希表的 K表示数组中的数，V表示出现的次数
+    let mut hash = HashMap::<i64, i64>::new();
+    // 定义结果
+    let mut ans: i64 = 0;
+    // 定义窗口元素的和
+    let mut cur_sum: i64 = 0;
+    // 处理第一个窗口
+    for i in 0..k as usize {
+        // 把元素加入到哈希表中，相同的k v加一
+        hash.insert(
+            nums[i] as i64,
+            hash.get(&(nums[i] as i64)).or(Some(&0)).unwrap() + 1,
+        );
+        // 累加和
+        cur_sum += nums[i] as i64;
+    }
+    if hash.keys().len() == k as usize {
+        // 如果哈希表中的key数量等于窗口大小
+        ans = ans.max(cur_sum);
+    }
+    // 滑动窗口处理后续元素
+    for i in k as usize..nums.len() {
+        // 窗口右边滑入的元素，在哈希表中的计数应该增加一
+        hash.insert(
+            nums[i] as i64,
+            hash.get(&(nums[i] as i64)).or(Some(&0)).unwrap() + 1,
+        );
+        // 滑出窗口的元素
+        if hash.get(&(nums[i - k as usize] as i64)).unwrap() - 1 == 0 {
+            // 如果哈希表中的元素只有一个当从左边被划出窗口后就应该从哈希表中移除
+            hash.remove(&(nums[i - k as usize] as i64));
+        } else {
+            // 如果哈希表中的元素大于1个当从左边被划出窗口后就应该从哈希表中的计数就应该减一
+            hash.insert(
+                nums[i - k as usize] as i64,
+                hash.get(&(nums[i - k as usize] as i64)).unwrap() - 1,
+            );
+        }
+        // 滑出窗口的数应该从和中减掉
+        cur_sum -= nums[i - k as usize] as i64;
+        // 滑入窗口的数应该加入和中
+        cur_sum += nums[i] as i64;
+        if hash.keys().len() == k as usize {
+            // 如果哈希表中的key数量大于等于m
+            ans = ans.max(cur_sum);
+        }
+    }
+    ans
+}
+
+/// 2134. 最少交换次数来组合所有的 1 II
+///
+/// 根据题意： 最终所有的 1 都会聚集在一起 ， 那么我们以 1 的个数作为滑动窗口的大小
+///
+/// 具体操作如下：
+///
+/// 因为是任意两个位置交换，那么最优解一定是跟 若干个 1 中间的 0 交换
+///
+/// 结论：如果在定长的窗口内0的个数最小 则一定最优
+///
+/// 举个栗子：
+///
+/// 0101100 0101100 窗口长度：3 最优解： 1
+///
+/// 11001 11001 窗口长度：3 最优解： 0
+pub fn min_swaps(nums: Vec<i32>) -> i32 {
+    // 统计数组nums中1的个数，用1的个数作为滑动窗口的大小
+    let cnt = nums.iter().filter(|n| **n == 1).count();
+    // 定义结果
+    let mut ans = i32::MAX;
+    // 处理第一个窗口,统计出第一个窗口0的个数
+    let mut cur = nums[..cnt].iter().filter(|n| **n == 0).count();
+    ans = ans.min(cur as i32);
+    // 把数组中的数据复制一份
+    let nums = nums.repeat(2);
+    // 滑动窗口处理后续元素
+    for i in cnt..nums.len() {
+        if nums[i - cnt] == 0 {
+            cur -= 1;
+        }
+        if nums[i] == 0 {
+            cur += 1;
+        }
+        ans = ans.min(cur as i32);
+    }
+    ans
+}
+
+/// 2653. 滑动子数组的美丽值
+pub fn get_subarray_beauty(nums: Vec<i32>, k: i32, x: i32) -> Vec<i32> {
+    // 定义结果
+    let mut ans = Vec::new();
+    // 定义数组存放窗口中的元素
+    let mut windows = Vec::new();
+    // 定义哈希表，idx为nums[i] 值为数字出现的次数
+    let mut hash = vec![0; 101];
+    // 定义基数，由于nums[i] 可能为 最小-50 的数，所以计数定义为50 保证放入哈希表中的位置不为负数
+    let bias = 50;
+    // 处理第一个窗口
+    for i in 0..k as usize {
+        windows.push(nums[i]);
+        hash[(nums[i] + bias) as usize] += 1;
+    }
+    ans.push(get_x_last(&hash, x));
+    // 滑动窗口处理后续元素
+    for i in k as usize..nums.len() {
+        windows.push(nums[i]);
+        windows.remove(0);
+        hash[(nums[i - k as usize] + bias) as usize] -= 1;
+        hash[(nums[i] + bias) as usize] += 1;
+        ans.push(get_x_last(&hash, x))
+    }
+    ans
+}
+
+fn get_x_last(hash: &Vec<i32>, x: i32) -> i32 {
+    // 倒数第x个数的位置，当x递减到0时就表示遍历到了倒数第x个数了
+    let mut x = x;
+    for (idx, v) in hash.iter().enumerate() {
+        if *v > 0 {
+            // 减v是因为当一个数出现多次时也需要减掉，所以可能会减为负数
+            x -= *v;
+        }
+        // 倒数第x个数可能刚好出现在重复数字中，此时x就为负数
+        if x <= 0 {
+            // 此处需要减去 50 的基数
+            if idx as i32 - 50 < 0 {
+                return idx as i32 - 50;
+            }
+        }
+    }
+    0
+}
+
+/// 2730. 找到最长的半重复子字符串
+pub fn longest_semi_repetitive_substring(s: String) -> i32 {
+    let s = s.chars().collect::<Vec<char>>();
+    // 定义慢指针
+    let mut slow = 0;
+    // 字符串 s 中相邻字符是相等的的有多少对
+    let mut k = 0;
+    // 定义结果,初始化为1是因为当只有一个字符串的时候返回1
+    let mut ans = 1;
+    // 遍历字符数组
+    for fast in 1..s.len() {
+        if s[fast] == s[fast - 1] {
+            // 移动右指针 fast，并统计相邻相同的情况出现了多少次
+            k += 1;
+            // 如果k大于1，慢指针右移
+            if k > 1 {
+                // 慢指针右移
+                slow += 1;
+                // 如果 k>1，则不断移动左指针 slow 直到 s[slow]=s[slow-1]，此时将一对相同的字符移到窗口之外。然后将 k 置为 1
+                while s[slow] != s[slow - 1] {
+                    slow += 1;
+                }
+                k = 1;
+            }
+        }
+        // 然后统计子串长度 right−left+1 的最大值
+        ans = ans.max(fast - slow + 1);
+    }
+    ans as i32
+}
+
+/// 904. 水果成篮
+///
+/// 此题的本质其实是求最长的连续子数组，使得子数组中最多包含两个不同的元素。
+///
+/// 最大滑窗模板：给定数组 nums，定义滑窗的左右边界 i, j，求满足某个条件的滑窗的最大长度。
+///
+/// ```
+/// while j < len(nums):
+///    判断[i, j]是否满足条件
+///    while 不满足条件：
+///        i += 1 （最保守的压缩i，一旦满足条件了就退出压缩i的过程，使得滑窗尽可能的大）
+///    不断更新结果（注意在while外更新！）
+///    j += 1
+/// ```
+/// 
+/// 最小滑窗模板：给定数组 nums，定义滑窗的左右边界 i, j，求满足某个条件的滑窗的最小长度。
+/// 
+/// ```
+/// while j < len(nums):
+///    判断[i, j]是否满足条件
+///    while 满足条件：
+///        不断更新结果(注意在while内更新！)
+///        i += 1 （最大程度的压缩i，使得滑窗尽可能的小）
+///    j += 1
+/// ```
+pub fn total_fruit(fruits: Vec<i32>) -> i32 {
+    // 定义哈希表来存储水果种类和出现次数 K为水果种类，V为出现次数
+    let mut hash = HashMap::<i32, i32>::new();
+    // 定义慢指针
+    let mut slow = 0;
+    // 定义结果,初始化为1是因为当fruits的长度为1的时候返回1
+    let mut ans = 1;
+    for fast in 0..fruits.len() {
+        hash.insert(
+            fruits[fast],
+            hash.get(&fruits[fast]).or(Some(&0)).unwrap() + 1,
+        );
+        while hash.keys().len() > 2 {
+            if *hash.get(&fruits[slow]).unwrap() == 1 {
+                hash.remove(&fruits[slow]);
+            } else {
+                hash.insert(fruits[slow], hash.get(&fruits[slow]).unwrap() - 1);
+            }
+            slow += 1;
+        }
+        ans = ans.max(fast - slow + 1);
+    }
+    ans as i32
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -1891,5 +2349,77 @@ mod tests {
         let k = 1;
         let num = length_of_longest_substring_k_distinct(s, k);
         println!("{:?}", num)
+    }
+
+    #[test]
+    fn test_max_vowels_ii() {
+        let s = "abciiidef".to_string();
+        let k = 3;
+        let max_vowels = max_vowels_ii(s, k);
+        println!("{:?}", max_vowels)
+    }
+
+    #[test]
+    fn test_divisor_substrings() {
+        let num = 430043;
+        let k = 2;
+        let divisor_substrings = divisor_substrings(num, k);
+        println!("{:?}", divisor_substrings)
+    }
+
+    #[test]
+    fn test_minimum_difference() {
+        let nums = vec![9, 4, 1, 7];
+        let k = 2;
+        let minimum_difference = minimum_difference(nums, k);
+        println!("{}", minimum_difference)
+    }
+
+    #[test]
+    fn test_minimum_recolors() {
+        let blocks = "WBBWWBBWBW".to_string();
+        let k = 7;
+        let minimum_recolors = minimum_recolors(blocks, k);
+        assert_eq!(minimum_recolors, 3);
+    }
+
+    #[test]
+    fn test_max_sum() {
+        let nums = vec![2, 6, 7, 3, 1, 7];
+        let m = 3;
+        let k = 4;
+        let max_sum = max_sum(nums, m, k);
+        assert_eq!(max_sum, 18);
+    }
+
+    #[test]
+    fn test_maximum_subarray_sum() {
+        let nums = vec![1, 5, 4, 2, 9, 9, 9];
+        let k = 3;
+        let maximum_subarray_sum = maximum_subarray_sum(nums, k);
+        assert_eq!(maximum_subarray_sum, 15);
+    }
+
+    #[test]
+    fn test_get_subarray_beauty() {
+        let nums = vec![-14, 9, 13, -26, 47, -39, -49, -14, 29];
+        let k = 9;
+        let x = 4;
+        let get_subarray_beauty = get_subarray_beauty(nums, k, x);
+        println!("{:?}", get_subarray_beauty);
+    }
+
+    #[test]
+    fn test_longest_semi_repetitive_substring() {
+        let s = "52233".to_string();
+        let longest = longest_semi_repetitive_substring(s);
+        assert_eq!(longest, 4);
+    }
+
+    #[test]
+    fn test_total_fruit() {
+        let fruits = vec![1, 2, 1];
+        let total_fruit = total_fruit(fruits);
+        assert_eq!(total_fruit, 3);
     }
 }

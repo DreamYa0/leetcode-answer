@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 /// 238. 除自身以外数组的乘积
 /// 给你一个整数数组 nums，返回 数组 answer ，其中 answer[i] 等于 nums 中除 nums[i] 之外其余各元素的乘积 。
 ///
@@ -121,6 +123,21 @@ pub fn merge_arrays(nums1: Vec<Vec<i32>>, nums2: Vec<Vec<i32>>) -> Vec<Vec<i32>>
     res
 }
 
+/// 219. 存在重复元素 II
+pub fn contains_nearby_duplicate(nums: Vec<i32>, k: i32) -> bool {
+    // 定义哈希表,k为值，v为值对应的数组下标
+    let mut hash_map = HashMap::new();
+    // 遍历数组
+    for (idx, v) in nums.iter().enumerate() {
+        if (idx as i32).abs_diff(*hash_map.get(v).or(Some(&i32::MAX)).unwrap()) as i32 <= k {
+            return true;
+        } else {
+            hash_map.insert(v, idx as i32);
+        }
+    }
+    false
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -130,5 +147,12 @@ mod tests {
         let nums = [-1, 1, 0, -3, 3].to_vec();
         let product_except_self = product_except_self(nums);
         println!("{:?}", product_except_self)
+    }
+
+    #[test]
+    fn test_contains_nearby_duplicate() {
+        let nums = [1, 2, 3, 1].to_vec();
+        let contains_nearby_duplicate = contains_nearby_duplicate(nums, 3);
+        println!("{:?}", contains_nearby_duplicate)
     }
 }
