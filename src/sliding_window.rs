@@ -2154,9 +2154,9 @@ pub fn longest_semi_repetitive_substring(s: String) -> i32 {
 ///    不断更新结果（注意在while外更新！）
 ///    j += 1
 /// ```
-/// 
+///
 /// 最小滑窗模板：给定数组 nums，定义滑窗的左右边界 i, j，求满足某个条件的滑窗的最小长度。
-/// 
+///
 /// ```
 /// while j < len(nums):
 ///    判断[i, j]是否满足条件
@@ -2183,6 +2183,27 @@ pub fn total_fruit(fruits: Vec<i32>) -> i32 {
             } else {
                 hash.insert(fruits[slow], hash.get(&fruits[slow]).unwrap() - 1);
             }
+            slow += 1;
+        }
+        ans = ans.max(fast - slow + 1);
+    }
+    ans as i32
+}
+
+/// 2958. 最多 K 个重复元素的最长子数组
+pub fn max_subarray_length(nums: Vec<i32>, k: i32) -> i32 {
+    // 定义哈希表来存储某个数和出现次数 K为数，V为出现次数
+    let mut hash = HashMap::<i32, i32>::new();
+    // 定义慢指针
+    let mut slow = 0;
+    // 定义结果,初始化为1是因为当fruits的长度为1的时候返回1
+    let mut ans = 1;
+    for fast in 0..nums.len() {
+        hash.insert(nums[fast], hash.get(&nums[fast]).or(Some(&0)).unwrap() + 1);
+
+        while *hash.get(&nums[fast]).unwrap() > k {
+            // 如果某一数到频次超过了k，则把slow指针位置的数据移除,直到移除到nums[fast]的频次小于等于k为止
+            hash.insert(nums[slow], hash.get(&nums[slow]).unwrap() - 1);
             slow += 1;
         }
         ans = ans.max(fast - slow + 1);
@@ -2421,5 +2442,13 @@ mod tests {
         let fruits = vec![1, 2, 1];
         let total_fruit = total_fruit(fruits);
         assert_eq!(total_fruit, 3);
+    }
+
+    #[test]
+    fn test_max_subarray_length() {
+        let nums = vec![1, 2, 3, 1, 2, 3, 1, 2];
+        let k = 2;
+        let max_subarray_length = max_subarray_length(nums, k);
+        assert_eq!(max_subarray_length, 6);
     }
 }
