@@ -1,98 +1,3 @@
-use std::collections::BTreeMap;
-
-/// 225. 用队列实现栈
-///
-/// 请你仅使用两个队列实现一个后入先出（LIFO）的栈，并支持普通栈的全部四种操作（push、top、pop 和 empty）。
-///
-/// 实现 MyStack 类：
-///
-/// ```
-/// void push(int x) 将元素 x 压入栈顶。
-/// int pop() 移除并返回栈顶元素。
-/// int top() 返回栈顶元素。
-/// boolean empty() 如果栈是空的，返回 true ；否则，返回 false 。
-/// ```
-///
-/// 注意：
-///
-/// 你只能使用队列的基本操作 —— 也就是 push to back、peek/pop from front、size 和 is empty 这些操作。
-///
-/// 你所使用的语言也许不支持队列。 你可以使用 list （列表）或者 deque（双端队列）来模拟一个队列 , 只要是标准的队列操作即可。
-///
-/// 示例：
-/// ```
-/// 输入：
-/// ["MyStack", "push", "push", "top", "pop", "empty"]
-/// [[], [1], [2], [], [], []]
-/// 输出：
-/// [null, null, null, 2, 2, false]
-/// ```
-///
-/// ```
-/// 解释：
-/// MyStack myStack = new MyStack();
-/// myStack.push(1);
-/// myStack.push(2);
-/// myStack.top(); // 返回 2
-/// myStack.pop(); // 返回 2
-/// myStack.empty(); // 返回 False
-/// ```
-///
-/// 提示：
-///
-/// 1 <= x <= 9
-///
-/// 最多调用100 次 push、pop、top 和 empty
-///
-/// 每次调用 pop 和 top 都保证栈不为空
-///
-/// 进阶：你能否仅用一个队列来实现栈。
-///
-/// 思路
-///
-/// 一个队列在模拟栈弹出元素的时候只要将队列头部的元素（除了最后一个元素外） 重新添加到队列尾部，此时再去弹出元素就是栈的顺序了。
-#[allow(dead_code)]
-struct MyStack {
-    pub queue: Vec<i32>,
-}
-
-/**
- * `&self` means the method takes an immutable reference.
- * If you need a mutable reference, change it to `&mut self` instead.
- */
-#[allow(dead_code)]
-impl MyStack {
-    fn new() -> Self {
-        MyStack { queue: Vec::new() }
-    }
-
-    fn push(&mut self, x: i32) {
-        self.queue.push(x)
-    }
-
-    fn pop(&mut self) -> i32 {
-        // 只需要弹出数组长度-1个元素,在重新放回数组中
-        let len = self.queue.len() - 1;
-        for _ in 0..len {
-            // 弹出数组第一个元素,并放入数组最后
-            let remove = self.queue.remove(0);
-            self.queue.push(remove);
-        }
-        // 弹出数组第一个元素
-        self.queue.remove(0)
-    }
-
-    fn top(&mut self) -> i32 {
-        let pop = self.pop();
-        self.queue.push(pop);
-        pop
-    }
-
-    fn empty(&self) -> bool {
-        self.queue.is_empty()
-    }
-}
-
 /// 20. 有效的括号
 ///
 /// 给定一个只包括 '('，')'，'{'，'}'，'['，']' 的字符串 s ，判断字符串是否有效。
@@ -357,81 +262,6 @@ pub fn eval_rpn(tokens: Vec<String>) -> i32 {
     stack.pop().unwrap()
 }
 
-/// 面试题 03.01. 三合一
-///
-/// 三合一。描述如何只用一个数组来实现三个栈。
-///
-/// 你应该实现push(stackNum, value)、pop(stackNum)、isEmpty(stackNum)、peek(stackNum)方法。stackNum表示栈下标，value表示压入的值。
-///
-/// 构造函数会传入一个stackSize参数，代表每个栈的大小。
-///
-/// ```
-/// 示例1:
-///
-///  输入：
-/// ["TripleInOne", "push", "push", "pop", "pop", "pop", "isEmpty"]
-/// [[1], [0, 1], [0, 2], [0], [0], [0], [0]]
-///  输出：
-/// [null, null, null, 1, -1, -1, true]
-/// 说明：当栈为空时`pop, peek`返回-1，当栈满时`push`不压入元素。
-/// 示例2:
-
-///  输入：
-/// ["TripleInOne", "push", "push", "push", "pop", "pop", "pop", "peek"]
-/// [[2], [0, 1], [0, 2], [0, 3], [0], [0], [0], [0]]
-///  输出：
-/// [null, null, null, null, 2, 1, -1, -1]
-/// ```
-///
-/// 提示：
-///
-/// 0 <= stackNum <= 2
-#[allow(dead_code)]
-struct TripleInOne {
-    d: Vec<i32>,
-    i: [usize; 3],
-}
-
-#[allow(dead_code)]
-impl TripleInOne {
-    fn new(stack_size: i32) -> Self {
-        Self {
-            d: vec![0; 3 * stack_size as usize],
-            i: [0, 1, 2],
-        }
-    }
-
-    fn push(&mut self, stack_num: i32, value: i32) {
-        let n = stack_num as usize;
-        if self.i[n] < self.d.len() {
-            self.d[self.i[n]] = value;
-            self.i[n] += 3;
-        }
-    }
-
-    fn pop(&mut self, stack_num: i32) -> i32 {
-        match stack_num as usize {
-            n if self.i[n] >= 3 => {
-                self.i[n] -= 3;
-                self.d[self.i[n]]
-            }
-            _ => -1,
-        }
-    }
-
-    fn peek(&self, stack_num: i32) -> i32 {
-        if self.i[stack_num as usize] >= 3 {
-            self.d[self.i[stack_num as usize] - 3]
-        } else {
-            -1
-        }
-    }
-
-    fn is_empty(&self, stack_num: i32) -> bool {
-        self.i[stack_num as usize] < 3
-    }
-}
-
 /// 1441. 用栈操作构建数组
 ///
 /// 给你一个数组 target 和一个整数 n。每次迭代，需要从  list = { 1 , 2 , 3 ..., n } 中依次读取一个数字。
@@ -504,168 +334,6 @@ pub fn build_array(target: Vec<i32>, n: i32) -> Vec<String> {
         }
     }
     res
-}
-
-/// 155. 栈的最小值
-///
-/// 请设计一个栈，除了常规栈支持的pop与push函数以外，还支持min函数，该函数返回栈元素中的最小值。执行push、pop和min操作的时间复杂度必须为O(1)。
-///
-/// ```
-/// 示例：
-/// MinStack minStack = new MinStack();
-/// minStack.push(-2);
-/// minStack.push(0);
-/// minStack.push(-3);
-/// minStack.getMin();   --> 返回 -3.
-/// minStack.pop();
-/// minStack.top();      --> 返回 0.
-/// minStack.getMin();   --> 返回 -2.
-/// ```
-#[allow(dead_code)]
-struct MinStack {
-    // 数据栈
-    pub vec: Vec<i32>,
-    // 存放各个阶段的最小值
-    pub min: Vec<i32>,
-}
-
-#[allow(dead_code)]
-impl MinStack {
-    fn new() -> Self {
-        MinStack {
-            vec: Vec::new(),
-            min: Vec::new(),
-        }
-    }
-
-    fn push(&mut self, x: i32) {
-        self.vec.push(x);
-        let len = self.min.len();
-        if len > 0 {
-            // 如果数组中有元素，数组中最后的元素和当前值取最小值
-            self.min.push(x.min(self.min[len - 1]));
-        } else {
-            self.min.push(x);
-        }
-    }
-
-    fn pop(&mut self) {
-        self.vec.pop();
-        self.min.pop();
-    }
-
-    fn top(&mut self) -> i32 {
-        let len = self.vec.len();
-        if len > 0 {
-            // 取栈顶元素
-            self.vec[len - 1]
-        } else {
-            -1
-        }
-    }
-
-    fn get_min(&mut self) -> i32 {
-        let len = self.min.len();
-        if len > 0 {
-            self.min[len - 1]
-        } else {
-            -1
-        }
-    }
-}
-
-/// 716. 最大栈
-///
-/// 设计一个最大栈数据结构，既支持栈操作，又支持查找栈中最大元素。
-///
-/// ```
-/// 实现 MaxStack 类：
-///
-/// MaxStack() 初始化栈对象
-/// void push(int x) 将元素 x 压入栈中。
-/// int pop() 移除栈顶元素并返回这个元素。
-/// int top() 返回栈顶元素，无需移除。
-/// int peekMax() 检索并返回栈中最大元素，无需移除。
-/// int popMax() 检索并返回栈中最大元素，并将其移除。如果有多个最大元素，只要移除 最靠近栈顶 的那个。
-///
-/// 示例：
-///
-/// 输入
-/// ["MaxStack", "push", "push", "push", "top", "popMax", "top", "peekMax", "pop", "top"]
-/// [[], [5], [1], [5], [], [], [], [], [], []]
-/// 输出
-/// [null, null, null, null, 5, 5, 1, 5, 1, 5]
-///
-/// 解释
-/// MaxStack stk = new MaxStack();
-/// stk.push(5);   // [5] - 5 既是栈顶元素，也是最大元素
-/// stk.push(1);   // [5, 1] - 栈顶元素是 1，最大元素是 5
-/// stk.push(5);   // [5, 1, 5] - 5 既是栈顶元素，也是最大元素
-/// stk.top();     // 返回 5，[5, 1, 5] - 栈没有改变
-/// stk.popMax();  // 返回 5，[5, 1] - 栈发生改变，栈顶元素不再是最大元素
-/// stk.top();     // 返回 1，[5, 1] - 栈没有改变
-/// stk.peekMax(); // 返回 5，[5, 1] - 栈没有改变
-/// stk.pop();     // 返回 1，[5] - 此操作后，5 既是栈顶元素，也是最大元素
-/// stk.top();     // 返回 5，[5] - 栈没有改变
-///
-/// ```
-///
-/// 提示：
-///
-/// -107 <= x <= 107
-///
-/// 最多调用 104 次 push、pop、top、peekMax 和 popMax
-///
-/// 调用 pop、top、peekMax 或 popMax 时，栈中 至少存在一个元素
-///
-/// 进阶：
-///
-/// 试着设计解决方案：调用 top 方法的时间复杂度为 O(1) ，调用其他方法的时间复杂度为 O(logn) 。
-#[allow(dead_code)]
-struct MaxStack {
-    stack: BTreeMap<usize, i32>,
-    max: BTreeMap<(i32, usize), usize>,
-}
-
-#[allow(dead_code)]
-impl MaxStack {
-    fn new() -> Self {
-        MaxStack {
-            stack: BTreeMap::new(),
-            max: BTreeMap::new(),
-        }
-    }
-
-    fn push(&mut self, x: i32) {
-        let last = self.stack.iter().next_back();
-        let new_index = if let Some((&i, _)) = last { i + 1 } else { 0 };
-        self.stack.insert(new_index, x);
-        self.max.insert((x, new_index), new_index);
-    }
-
-    fn pop(&mut self) -> i32 {
-        let (&i, &v) = self.stack.iter().next_back().unwrap();
-        self.stack.remove(&i);
-        self.max.remove(&(v, i));
-        v
-    }
-
-    fn top(&self) -> i32 {
-        let (_, &v) = self.stack.iter().next_back().unwrap();
-        v
-    }
-
-    fn peek_max(&self) -> i32 {
-        let (&(v, _), _) = self.max.iter().next_back().unwrap();
-        v
-    }
-
-    fn pop_max(&mut self) -> i32 {
-        let (&(v, _), &i) = self.max.iter().next_back().unwrap();
-        self.stack.remove(&i);
-        self.max.remove(&(v, i));
-        v
-    }
 }
 
 /// 316. 去除重复字母
@@ -809,8 +477,36 @@ pub fn remove_duplicates_ii(s: String, k: i32) -> String {
     .unwrap()
 }
 
-/// 402. 移掉 K 位数字
-/// https://leetcode.cn/problems/remove-k-digits/solutions/290203/yi-zhao-chi-bian-li-kou-si-dao-ti-ma-ma-zai-ye-b-5/
+/**
+402. 移掉 K 位数字
+
+给你一个以字符串表示的非负整数 num 和一个整数 k ，移除这个数中的 k 位数字，使得剩下的数字最小。请你以字符串形式返回这个最小的数字。
+
+```
+示例 1 ：
+
+输入：num = "1432219", k = 3
+输出："1219"
+解释：移除掉三个数字 4, 3, 和 2 形成一个新的最小的数字 1219 。
+示例 2 ：
+
+输入：num = "10200", k = 1
+输出："200"
+解释：移掉首位的 1 剩下的数字为 200. 注意输出不能有任何前导零。
+示例 3 ：
+
+输入：num = "10", k = 2
+输出："0"
+解释：从原数字移除所有的数字，剩余为空就是 0 。
+
+
+提示：
+
+1 <= k <= num.length <= 105
+num 仅由若干位数字（0 - 9）组成
+除了 0 本身之外，num 不含任何前导零
+```
+ */
 pub fn remove_kdigits(num: String, k: i32) -> String {
     // 需要保留字符串长度
     let remain = num.len() as i32 - k;
@@ -846,6 +542,45 @@ pub fn remove_kdigits(num: String, k: i32) -> String {
 }
 
 /// 321. 拼接最大数
+///
+/// 给定长度分别为 m 和 n 的两个数组，其元素由 0-9 构成，表示两个自然数各位上的数字。现在从这两个数组中选出 k (k <= m + n) 个数字拼接成一个新的数，要求从同一个数组中取出的数字保持其在原数组中的相对顺序。
+///
+/// 求满足该条件的最大数。结果返回一个表示该最大数的长度为 k 的数组。
+///
+/// 说明: 请尽可能地优化你算法的时间和空间复杂度。
+/// ```
+/// 示例 1:
+
+/// 输入:
+/// nums1 = [3, 4, 6, 5]
+/// nums2 = [9, 1, 2, 5, 8, 3]
+/// k = 5
+/// 输出:
+/// [9, 8, 6, 5, 3]
+/// 示例 2:
+
+/// 输入:
+/// nums1 = [6, 7]
+/// nums2 = [6, 0, 4]
+/// k = 5
+/// 输出:
+/// [6, 7, 6, 0, 4]
+/// 示例 3:
+
+/// 输入:
+/// nums1 = [3, 9]
+/// nums2 = [8, 9]
+/// k = 3
+/// 输出:
+/// [9, 8, 9]
+/// 提示：
+
+/// m == nums1.length
+/// n == nums2.length
+/// 1 <= m, n <= 500
+/// 0 <= nums1[i], nums2[i] <= 9
+/// 1 <= k <= m + n
+/// ```
 pub fn max_number(nums1: Vec<i32>, nums2: Vec<i32>, k: i32) -> Vec<i32> {
     let (m, n) = (nums1.len(), nums2.len());
     ((k - n as i32).max(0)..k.min(m as i32) + 1)
@@ -892,6 +627,26 @@ fn select_max(nums: &[i32], k: i32) -> Vec<i32> {
 }
 
 /// 1081. 不同字符的最小子序列
+
+/// 返回 s 字典序最小的子序列，该子序列包含 s 的所有不同字符，且只包含一次。
+
+/// ```
+/// 示例 1：
+
+/// 输入：s = "bcabc"
+/// 输出："abc"
+/// 示例 2：
+
+/// 输入：s = "cbacdcbc"
+/// 输出："acdb"
+
+/// 提示：
+
+/// 1 <= s.length <= 1000
+/// s 由小写英文字母组成
+/// ```
+
+/// 注意：该题与 316 https://leetcode.cn/problems/remove-duplicate-letters/ 相同
 pub fn smallest_subsequence(s: String) -> String {
     // 定义一个栈
     let mut stack = Vec::new();
@@ -930,6 +685,68 @@ pub fn smallest_subsequence(s: String) -> String {
 }
 
 /// 636. 函数的独占时间
+
+/// 有一个 单线程 CPU 正在运行一个含有 n 道函数的程序。每道函数都有一个位于  0 和 n-1 之间的唯一标识符。
+
+/// 函数调用 存储在一个 调用栈 上 ：当一个函数调用开始时，它的标识符将会推入栈中。而当一个函数调用结束时，它的标识符将会从栈中弹出。标识符位于栈顶的函数是 当前正在执行的函数 。每当一个函数开始或者结束时，将会记录一条日志，包括函数标识符、是开始还是结束、以及相应的时间戳。
+
+/// 给你一个由日志组成的列表 logs ，其中 logs[i] 表示第 i 条日志消息，该消息是一个按 "{function_id}:{"start" | "end"}:{timestamp}" 进行格式化的字符串。例如，"0:start:3" 意味着标识符为 0 的函数调用在时间戳 3 的 起始开始执行 ；而 "1:end:2" 意味着标识符为 1 的函数调用在时间戳 2 的 末尾结束执行。注意，函数可以 调用多次，可能存在递归调用 。
+
+/// 函数的 独占时间 定义是在这个函数在程序所有函数调用中执行时间的总和，调用其他函数花费的时间不算该函数的独占时间。例如，如果一个函数被调用两次，一次调用执行 2 单位时间，另一次调用执行 1 单位时间，那么该函数的 独占时间 为 2 + 1 = 3 。
+
+/// 以数组形式返回每个函数的 独占时间 ，其中第 i 个下标对应的值表示标识符 i 的函数的独占时间。
+
+/// ```
+/// 示例 1：
+
+/// 输入：n = 2, logs = ["0:start:0","1:start:2","1:end:5","0:end:6"]
+/// 输出：[3,4]
+/// 解释：
+/// 函数 0 在时间戳 0 的起始开始执行，执行 2 个单位时间，于时间戳 1 的末尾结束执行。
+/// 函数 1 在时间戳 2 的起始开始执行，执行 4 个单位时间，于时间戳 5 的末尾结束执行。
+/// 函数 0 在时间戳 6 的开始恢复执行，执行 1 个单位时间。
+/// 所以函数 0 总共执行 2 + 1 = 3 个单位时间，函数 1 总共执行 4 个单位时间。
+/// 示例 2：
+
+/// 输入：n = 1, logs = ["0:start:0","0:start:2","0:end:5","0:start:6","0:end:6","0:end:7"]
+/// 输出：[8]
+/// 解释：
+/// 函数 0 在时间戳 0 的起始开始执行，执行 2 个单位时间，并递归调用它自身。
+/// 函数 0（递归调用）在时间戳 2 的起始开始执行，执行 4 个单位时间。
+/// 函数 0（初始调用）恢复执行，并立刻再次调用它自身。
+/// 函数 0（第二次递归调用）在时间戳 6 的起始开始执行，执行 1 个单位时间。
+/// 函数 0（初始调用）在时间戳 7 的起始恢复执行，执行 1 个单位时间。
+/// 所以函数 0 总共执行 2 + 4 + 1 + 1 = 8 个单位时间。
+/// 示例 3：
+
+/// 输入：n = 2, logs = ["0:start:0","0:start:2","0:end:5","1:start:6","1:end:6","0:end:7"]
+/// 输出：[7,1]
+/// 解释：
+/// 函数 0 在时间戳 0 的起始开始执行，执行 2 个单位时间，并递归调用它自身。
+/// 函数 0（递归调用）在时间戳 2 的起始开始执行，执行 4 个单位时间。
+/// 函数 0（初始调用）恢复执行，并立刻调用函数 1 。
+/// 函数 1在时间戳 6 的起始开始执行，执行 1 个单位时间，于时间戳 6 的末尾结束执行。
+/// 函数 0（初始调用）在时间戳 7 的起始恢复执行，执行 1 个单位时间，于时间戳 7 的末尾结束执行。
+/// 所以函数 0 总共执行 2 + 4 + 1 = 7 个单位时间，函数 1 总共执行 1 个单位时间。
+/// 示例 4：
+
+/// 输入：n = 2, logs = ["0:start:0","0:start:2","0:end:5","1:start:7","1:end:7","0:end:8"]
+/// 输出：[8,1]
+/// 示例 5：
+
+/// 输入：n = 1, logs = ["0:start:0","0:end:0"]
+/// 输出：[1]
+
+/// 提示：
+
+/// 1 <= n <= 100
+/// 1 <= logs.length <= 500
+/// 0 <= function_id < n
+/// 0 <= timestamp <= 109
+/// 两个开始事件不会在同一时间戳发生
+/// 两个结束事件不会在同一时间戳发生
+/// 每道函数都有一个对应 "start" 日志的 "end" 日志
+/// ```
 pub fn exclusive_time(n: i32, logs: Vec<String>) -> Vec<i32> {
     // 记录结果
     let mut ans = vec![0; n as usize];
@@ -971,6 +788,32 @@ pub fn exclusive_time(n: i32, logs: Vec<String>) -> Vec<i32> {
 }
 
 /// 32. 最长有效括号
+///
+/// 给你一个只包含 '(' 和 ')' 的字符串，找出最长有效（格式正确且连续）括号子串的长度。
+///
+/// ```
+/// 示例 1：
+///
+/// 输入：s = "(()"
+/// 输出：2
+/// 解释：最长有效括号子串是 "()"
+///
+/// 示例 2：
+///
+/// 输入：s = ")()())"
+/// 输出：4
+/// 解释：最长有效括号子串是 "()()"
+///
+/// 示例 3：
+///
+/// 输入：s = ""
+/// 输出：0
+///
+/// 提示：
+///
+/// 0 <= s.length <= 3 * 104
+/// s[i] 为 '(' 或 ')'
+/// ```
 pub fn longest_valid_parentheses(s: String) -> i32 {
     // 定义一个栈
     //放入-1可以防止当第一个char是')'的时候发生越界异常
@@ -998,24 +841,193 @@ pub fn longest_valid_parentheses(s: String) -> i32 {
     max_len as i32
 }
 
-/// 739. 每日温度
-pub fn daily_temperatures(temperatures: Vec<i32>) -> Vec<i32> {
-    let len = temperatures.len();
-    // 定义一个栈来存储 temperatures 下标
-    let mut stack = Vec::with_capacity(len);
-    // 定义一个数组来存放结果
-    let mut ans = vec![0; len];
-    // 遍历temperatures
-    for (idx, t) in temperatures.iter().enumerate() {
-        // 如果栈不为空，且栈顶元素小于当前元素则出栈，否则入栈
-        while !stack.is_empty() && *t > temperatures[*stack.last().unwrap() as usize] {
-            let min_idx = stack.pop().unwrap();
-            // 当前索引 - 栈顶元素索引就能得到他们的间隔
-            ans[min_idx as usize] = idx as i32 - min_idx;
+/// 2696. 删除子串后的字符串最小长度
+///
+/// 给你一个仅由 大写 英文字符组成的字符串 s 。
+///
+/// 你可以对此字符串执行一些操作，在每一步操作中，你可以从 s 中删除 任一个 "AB" 或 "CD" 子字符串。
+///
+/// 通过执行操作，删除所有 "AB" 和 "CD" 子串，返回可获得的最终字符串的 最小 可能长度。
+///
+/// 注意，删除子串后，重新连接出的字符串可能会产生新的 "AB" 或 "CD" 子串。
+///
+/// ```
+/// 示例 1：
+///
+/// 输入：s = "ABFCACDB"
+/// 输出：2
+/// 解释：你可以执行下述操作：
+/// - 从 "ABFCACDB" 中删除子串 "AB"，得到 s = "FCACDB" 。
+/// - 从 "FCACDB" 中删除子串 "CD"，得到 s = "FCAB" 。
+/// - 从 "FCAB" 中删除子串 "AB"，得到 s = "FC" 。
+/// 最终字符串的长度为 2 。
+/// 可以证明 2 是可获得的最小长度。
+///
+/// 示例 2：
+///
+/// 输入：s = "ACBBD"
+/// 输出：5
+/// 解释：无法执行操作，字符串长度不变。
+///
+/// 提示：
+///
+/// 1 <= s.length <= 100
+/// s 仅由大写英文字母组成
+/// ```
+pub fn min_length(s: String) -> i32 {
+    let s = s.chars().collect::<Vec<char>>();
+    // 定义一个栈
+    let mut stack = Vec::with_capacity(s.len());
+    for c in s {
+        if !stack.is_empty()
+            && ((*stack.last().unwrap() == 'A' && c == 'B')
+                || (*stack.last().unwrap() == 'C' && c == 'D'))
+        {
+            stack.pop();
+        } else {
+            stack.push(c);
         }
-        stack.push(idx as i32);
     }
-    ans
+    stack.len() as i32
+}
+
+/// 682. 棒球比赛
+///
+/// 你现在是一场采用特殊赛制棒球比赛的记录员。这场比赛由若干回合组成，过去几回合的得分可能会影响以后几回合的得分。
+///
+/// 比赛开始时，记录是空白的。你会得到一个记录操作的字符串列表 ops，其中 ops[i] 是你需要记录的第 i 项操作，ops 遵循下述规则：
+///
+/// 整数 x - 表示本回合新获得分数 x
+///
+/// "+" - 表示本回合新获得的得分是前两次得分的总和。题目数据保证记录此操作时前面总是存在两个有效的分数。
+///
+/// "D" - 表示本回合新获得的得分是前一次得分的两倍。题目数据保证记录此操作时前面总是存在一个有效的分数。
+///
+/// "C" - 表示前一次得分无效，将其从记录中移除。题目数据保证记录此操作时前面总是存在一个有效的分数。
+///
+/// 请你返回记录中所有得分的总和。
+///
+/// ```
+/// 示例 1：
+/// 输入：ops = ["5","2","C","D","+"]
+/// 输出：30
+/// 解释：
+/// "5" - 记录加 5 ，记录现在是 [5]
+/// "2" - 记录加 2 ，记录现在是 [5, 2]
+/// "C" - 使前一次得分的记录无效并将其移除，记录现在是 [5].
+/// "D" - 记录加 2 * 5 = 10 ，记录现在是 [5, 10].
+/// "+" - 记录加 5 + 10 = 15 ，记录现在是 [5, 10, 15].
+/// 所有得分的总和 5 + 10 + 15 = 30
+///
+/// 示例 2：
+/// 输入：ops = ["5","-2","4","C","D","9","+","+"]
+/// 输出：27
+/// 解释：
+/// "5" - 记录加 5 ，记录现在是 [5]
+/// "-2" - 记录加 -2 ，记录现在是 [5, -2]
+/// "4" - 记录加 4 ，记录现在是 [5, -2, 4]
+/// "C" - 使前一次得分的记录无效并将其移除，记录现在是 [5, -2]
+/// "D" - 记录加 2 * -2 = -4 ，记录现在是 [5, -2, -4]
+/// "9" - 记录加 9 ，记录现在是 [5, -2, -4, 9]
+/// "+" - 记录加 -4 + 9 = 5 ，记录现在是 [5, -2, -4, 9, 5]
+/// "+" - 记录加 9 + 5 = 14 ，记录现在是 [5, -2, -4, 9, 5, 14]
+/// 所有得分的总和 5 + -2 + -4 + 9 + 5 + 14 = 27
+/// 示例 3：
+/// 输入：ops = ["1"]
+/// 输出：1
+/// ```
+///
+/// 提示：
+///
+/// 1 <= ops.length <= 1000
+///
+/// ops[i] 为 "C"、"D"、"+"，或者一个表示整数的字符串。整数范围是 [-3 * 104, 3 * 104]
+///
+/// 对于 "+" 操作，题目数据保证记录此操作时前面总是存在两个有效的分数
+///
+/// 对于 "C" 和 "D" 操作，题目数据保证记录此操作时前面总是存在一个有效的分数
+pub fn cal_points(operations: Vec<String>) -> i32 {
+    // 定义栈
+    let mut stack = Vec::with_capacity(operations.len());
+    for v in operations {
+        match v.as_str() {
+            "C" => {
+                stack.pop();
+            }
+            "D" => {
+                stack.push(stack.last().unwrap() * 2);
+            }
+            "+" => {
+                let one = stack.pop().unwrap();
+                let two = stack.pop().unwrap();
+                stack.push(two);
+                stack.push(one);
+                stack.push(one + two);
+            }
+            _ => stack.push(v.parse::<i32>().unwrap()),
+        }
+    }
+    stack.iter().sum()
+}
+
+/// 1700. 无法吃午餐的学生数量
+///
+/// 学校的自助午餐提供圆形和方形的三明治，分别用数字 0 和 1 表示。所有学生站在一个队列里，每个学生要么喜欢圆形的要么喜欢方形的。
+///
+/// 餐厅里三明治的数量与学生的数量相同。所有三明治都放在一个 栈 里，每一轮：
+///
+/// 如果队列最前面的学生 喜欢 栈顶的三明治，那么会 拿走它 并离开队列。
+///
+/// 否则，这名学生会 放弃这个三明治 并回到队列的尾部。
+///
+/// 这个过程会一直持续到队列里所有学生都不喜欢栈顶的三明治为止。
+///
+/// 给你两个整数数组 students 和 sandwiches ，其中 sandwiches[i] 是栈里面第 i​​​​​​ 个三明治的类型（i = 0 是栈的顶部）， students[j] 是初始队列里第 j​​​​​​ 名学生对三明治的喜好（j = 0 是队列的最开始位置）。请你返回无法吃午餐的学生数量。
+///
+/// ```
+/// 示例 1：
+/// 输入：students = [1,1,0,0], sandwiches = [0,1,0,1]
+/// 输出：0
+/// 解释：
+/// - 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students = [1,0,0,1]。
+/// - 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students = [0,0,1,1]。
+/// - 最前面的学生拿走最顶上的三明治，剩余学生队列为 students = [0,1,1]，三明治栈为 sandwiches = [1,0,1]。
+/// - 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students = [1,1,0]。
+/// - 最前面的学生拿走最顶上的三明治，剩余学生队列为 students = [1,0]，三明治栈为 sandwiches = [0,1]。
+/// - 最前面的学生放弃最顶上的三明治，并回到队列的末尾，学生队列变为 students = [0,1]。
+/// - 最前面的学生拿走最顶上的三明治，剩余学生队列为 students = [1]，三明治栈为 sandwiches = [1]。
+/// - 最前面的学生拿走最顶上的三明治，剩余学生队列为 students = []，三明治栈为 sandwiches = []。
+/// 所以所有学生都有三明治吃。
+///
+/// 示例 2：
+/// 输入：students = [1,1,1,0,0,1], sandwiches = [1,0,0,0,1,1]
+/// 输出：3
+/// ```
+/// ```
+/// 提示：
+/// 1 <= students.length, sandwiches.length <= 100
+/// students.length == sandwiches.length
+/// sandwiches[i] 要么是 0 ，要么是 1 。
+/// students[i] 要么是 0 ，要么是 1 。
+/// ```
+pub fn count_students(students: Vec<i32>, sandwiches: Vec<i32>) -> i32 {
+    // 统计students 1 的个数
+    let mut one = students.iter().filter(|s| **s == 1).count();
+    // students 0 的个数
+    let mut zero = students.len() - one;
+    // 循环弹出sandwiches栈中的数据
+    for v in sandwiches {
+        if v == 0 && zero > 0 {
+            zero -= 1;
+        } else if v == 1 && one > 0 {
+            one -= 1;
+        } else {
+            // 当 one 和 zero 都减为0之后退出循环
+            break;
+        }
+    }
+    // 如果三明治消耗完了，剩下的学生总和
+    (one + zero) as i32
 }
 
 #[cfg(test)]
@@ -1109,11 +1121,23 @@ mod tests {
     }
 
     #[test]
-    fn test_daily_temperatures() {
-        let temperatures = vec![73, 74, 75, 71, 69, 72, 76, 73];
-        assert_eq!(
-            daily_temperatures(temperatures),
-            vec![1, 1, 4, 2, 1, 1, 0, 0]
-        );
+    fn test_min_length() {
+        let s = "ABFCACDB".to_string();
+        assert_eq!(min_length(s), 2);
+    }
+
+    #[test]
+    fn test_cal_points() {
+        let operations = vec![
+            "5".to_string(),
+            "-2".to_string(),
+            "4".to_string(),
+            "C".to_string(),
+            "D".to_string(),
+            "9".to_string(),
+            "+".to_string(),
+            "+".to_string(),
+        ];
+        assert_eq!(cal_points(operations), 27);
     }
 }
