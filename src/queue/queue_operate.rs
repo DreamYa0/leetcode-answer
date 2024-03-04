@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 
 /// 239.滑动窗口最大值
 ///
@@ -88,7 +88,7 @@ pub fn max_sliding_window(nums: Vec<i32>, k: i32) -> Vec<i32> {
 ///
 /// 输入：tickets = [2,3,2], k = 2
 /// 输出：6
-/// 解释： 
+/// 解释：
 /// - 第一轮，队伍中的每个人都买到一张票，队伍变为 [1, 2, 1] 。
 /// - 第二轮，队伍中的每个都又都买到一张票，队伍变为 [0, 1, 0] 。
 /// 位置 2 的人成功买到 2 张票，用掉 3 + 3 = 6 秒。
@@ -151,7 +151,7 @@ pub fn time_required_to_buy(tickets: Vec<i32>, k: i32) -> i32 {
 ///
 /// 输入：tickets = [2,3,2], k = 2
 /// 输出：6
-/// 解释： 
+/// 解释：
 /// - 第一轮，队伍中的每个人都买到一张票，队伍变为 [1, 2, 1] 。
 /// - 第二轮，队伍中的每个都又都买到一张票，队伍变为 [0, 1, 0] 。
 /// 位置 2 的人成功买到 2 张票，用掉 3 + 3 = 6 秒。
@@ -188,6 +188,110 @@ pub fn time_required_to_buy_ii(tickets: Vec<i32>, k: i32) -> i32 {
     timer
 }
 
+/**
+387. 字符串中的第一个唯一字符
+
+给定一个字符串 s ，找到 它的第一个不重复的字符，并返回它的索引 。如果不存在，则返回 -1 。
+
+
+```
+示例 1：
+
+输入: s = "leetcode"
+输出: 0
+示例 2:
+
+输入: s = "loveleetcode"
+输出: 2
+示例 3:
+
+输入: s = "aabb"
+输出: -1
+
+
+提示:
+
+1 <= s.length <= 105
+s 只包含小写字母
+```
+ */
+pub fn first_uniq_char(s: String) -> i32 {
+    let s = s.into_bytes();
+    // 定义哈希表
+    let mut cnt = vec![-2; 130];
+    // 定义队列
+    let mut queue = VecDeque::with_capacity(s.len());
+    for (i, v) in s.iter().enumerate() {
+        if cnt[*v as usize] == -2 {
+            // 说明哈希表中还不存在 v，则把坐标放入哈希表中
+            cnt[*v as usize] = i as i32;
+            queue.push_back((*v, i));
+        } else {
+            // 如果v出现重复，则把哈希表值设值为-1
+            cnt[*v as usize] = -1;
+            while !queue.is_empty() && cnt[queue.front().unwrap().0 as usize] == -1 {
+                // 把重复数据从队头全部弹出
+                queue.pop_front();
+            }
+        }
+    }
+    if queue.is_empty() {
+        -1
+    } else {
+        queue.pop_front().unwrap().1 as i32
+    }
+}
+
+/**
+LCR 169. 招式拆解 II
+
+某套连招动作记作仅由小写字母组成的序列 arr，其中 arr[i] 第 i 个招式的名字。请返回第一个只出现一次的招式名称，如不存在请返回空格。
+
+```
+示例 1：
+
+输入：arr = "abbccdeff"
+输出：'a'
+示例 2：
+
+输入：arr = "ccdd"
+输出：' '
+
+
+限制：
+
+0 <= arr.length <= 50000
+```
+ */
+pub fn dismantling_action(arr: String) -> char {
+    let s = arr.chars().collect::<Vec<char>>();
+    // 定义哈希表来统计字符出现的次数
+    let mut hash = HashMap::with_capacity(s.len());
+    // 定义队列
+    let mut queue = VecDeque::with_capacity(s.len());
+    for c in s {
+        if !hash.contains_key(&c) {
+            // false 表示未重复
+            hash.insert(c, false);
+            // 入队
+            queue.push_back(c);
+        } else {
+            // true 表示重复
+            hash.insert(c, true);
+            // 把队列中重复的数据全部弹出
+            while !queue.is_empty() && *hash.get(&queue.front().unwrap()).unwrap() {
+                // 从队首弹出
+                queue.pop_front();
+            }
+        }
+    }
+    if queue.is_empty() {
+        ' '
+    } else {
+        queue.pop_front().unwrap()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -214,5 +318,19 @@ mod tests {
         let k = 2;
         let time_required_to_buy = time_required_to_buy_ii(tickets, k);
         println!("{:?}", time_required_to_buy)
+    }
+
+    #[test]
+    fn test_first_uniq_char() {
+        let s = "leetcode".to_string();
+        let first_uniq_char = first_uniq_char(s);
+        assert_eq!(first_uniq_char, 0);
+    }
+
+    #[test]
+    fn test_dismantling_action() {
+        let arr = "abbccdeff".to_string();
+        let dismantling_action = dismantling_action(arr);
+        assert_eq!(dismantling_action, 'a');
     }
 }

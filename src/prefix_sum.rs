@@ -77,6 +77,77 @@ pub fn max_sub_array(nums: Vec<i32>) -> i32 {
     res
 }
 
+/**
+918. 环形子数组的最大和
+
+给定一个长度为 n 的环形整数数组 nums ，返回 nums 的非空 子数组 的最大可能和 。
+
+环形数组 意味着数组的末端将会与开头相连呈环状。形式上， nums[i] 的下一个元素是 nums[(i + 1) % n] ， nums[i] 的前一个元素是 nums[(i - 1 + n) % n] 。
+
+子数组 最多只能包含固定缓冲区 nums 中的每个元素一次。形式上，对于子数组 nums[i], nums[i + 1], ..., nums[j] ，不存在 i <= k1, k2 <= j 其中 k1 % n == k2 % n 。
+
+ 
+```
+示例 1：
+
+输入：nums = [1,-2,3,-2]
+输出：3
+解释：从子数组 [3] 得到最大和 3
+示例 2：
+
+输入：nums = [5,-3,5]
+输出：10
+解释：从子数组 [5,5] 得到最大和 5 + 5 = 10
+示例 3：
+
+输入：nums = [3,-2,2,-3]
+输出：3
+解释：从子数组 [3] 和 [3,-2,2] 都可以得到最大和 3
+ 
+
+提示：
+
+n == nums.length
+1 <= n <= 3 * 104
+-3 * 104 <= nums[i] <= 3 * 104
+```
+
+解题思路
+
+前置题目：53. 最大子数组和
+
+<img src="https://pic.leetcode.cn/1689750394-drKSAI-lc918-c.png" alt="image.png" style="zoom:50%;" />
+
+答疑
+问：为什么当 minS=sum(nums) 时，最小子数组可以是整个数组？
+
+答：用反证法证明。假设最小子数组一定不是整个数组，这意味着 nums 的某个前缀或者后缀是大于 000 的（包含这个前缀/后缀会让 minS 变大），
+所以 minS<sum(nums)，矛盾。所以当 minS=sum(nums) 时，最小子数组可以是整个数组。
+
+注：对于 nums=[−1,1,−1]，最小子数组可以取 [−1]，也可以取整个数组 [−1,1,−1]。对于这样的 nums，
+最大子数组一定不会跨过边界，只返回 maxS 仍然是正确的。
+​​​​​​​
+ */
+pub fn max_subarray_sum_circular(nums: Vec<i32>) -> i32 {
+    let mut max_sum = nums[0];
+    let mut min_sum = nums[0];
+    let mut cur_max = 0;
+    let mut cur_min = 0;
+    let mut total = 0;
+    for num in nums {
+        cur_max = max(cur_max + num, num);
+        max_sum = max(max_sum, cur_max);
+        cur_min = min(cur_min + num, num);
+        min_sum = min(min_sum, cur_min);
+        total += num;
+    }
+    if max_sum > 0 {
+        max(max_sum, total - min_sum)
+    } else {
+        max_sum
+    }
+}
+
 /// 1480. 一维数组的动态和
 pub fn running_sum(nums: Vec<i32>) -> Vec<i32> {
     let mut ans: Vec<i32> = vec![0; nums.len()];
@@ -245,5 +316,11 @@ mod tests {
     fn test_pivot_index() {
         let nums = vec![1, 7, 3, 6, 5, 6];
         assert_eq!(pivot_index(nums), 3);
+    }
+
+    #[test]
+    fn test_max_subarray_sum_circular() {
+        let nums = vec![1, -2, 3, -2];
+        assert_eq!(max_subarray_sum_circular(nums), 3);
     }
 }

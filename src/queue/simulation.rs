@@ -141,7 +141,7 @@ impl MyQueue {
 /// isFull(): 检查循环队列是否已满。
 ///
 /// 示例：
-/// 
+///
 /// MyCircularQueue circularQueue = new MyCircularQueue(3); // 设置长度为 3
 /// circularQueue.enQueue(1);  // 返回 true
 /// circularQueue.enQueue(2);  // 返回 true
@@ -268,6 +268,144 @@ impl MyCircularQueue {
     fn reduce(&mut self) {}
 }
 
+/**
+641. 设计循环双端队列
+
+设计实现双端队列。
+
+```
+实现 MyCircularDeque 类:
+
+MyCircularDeque(int k) ：构造函数,双端队列最大为 k 。
+boolean insertFront()：将一个元素添加到双端队列头部。 如果操作成功返回 true ，否则返回 false 。
+boolean insertLast() ：将一个元素添加到双端队列尾部。如果操作成功返回 true ，否则返回 false 。
+boolean deleteFront() ：从双端队列头部删除一个元素。 如果操作成功返回 true ，否则返回 false 。
+boolean deleteLast() ：从双端队列尾部删除一个元素。如果操作成功返回 true ，否则返回 false 。
+int getFront() )：从双端队列头部获得一个元素。如果双端队列为空，返回 -1 。
+int getRear() ：获得双端队列的最后一个元素。 如果双端队列为空，返回 -1 。
+boolean isEmpty() ：若双端队列为空，则返回 true ，否则返回 false  。
+boolean isFull() ：若双端队列满了，则返回 true ，否则返回 false 。
+
+
+示例 1：
+
+输入
+["MyCircularDeque", "insertLast", "insertLast", "insertFront", "insertFront", "getRear", "isFull", "deleteLast", "insertFront", "getFront"]
+[[3], [1], [2], [3], [4], [], [], [], [4], []]
+输出
+[null, true, true, true, false, 2, true, true, true, 4]
+
+解释
+MyCircularDeque circularDeque = new MycircularDeque(3); // 设置容量大小为3
+circularDeque.insertLast(1);			        // 返回 true
+circularDeque.insertLast(2);			        // 返回 true
+circularDeque.insertFront(3);			        // 返回 true
+circularDeque.insertFront(4);			        // 已经满了，返回 false
+circularDeque.getRear();  				// 返回 2
+circularDeque.isFull();				        // 返回 true
+circularDeque.deleteLast();			        // 返回 true
+circularDeque.insertFront(4);			        // 返回 true
+circularDeque.getFront();				// 返回 4
+
+
+
+提示：
+
+1 <= k <= 1000
+0 <= value <= 1000
+insertFront, insertLast, deleteFront, deleteLast, getFront, getRear, isEmpty, isFull  调用次数不大于 2000 次
+```
+ */
+#[allow(dead_code)]
+struct MyCircularDeque {
+    // 定义数组用来存放数据
+    data: Vec<i32>,
+    // 队尾
+    rear: i32,
+    // 队首
+    front: i32,
+    // 队列大小
+    size: i32,
+    // 队列长度
+    len: i32,
+}
+
+#[allow(dead_code)]
+impl MyCircularDeque {
+    fn new(k: i32) -> Self {
+        MyCircularDeque {
+            data: vec![0; k as usize],
+            rear: 1,
+            front: 0,
+            size: 0,
+            len: k,
+        }
+    }
+
+    fn insert_front(&mut self, value: i32) -> bool {
+        if self.is_full() {
+            // 如果队列满了就返回false
+            return false;
+        }
+        self.front = (self.front + 1) % self.len;
+        self.data[self.front as usize] = value;
+        self.size += 1;
+        return true;
+    }
+
+    fn insert_last(&mut self, value: i32) -> bool {
+        if self.is_full() {
+            // 如果队列满了就返回false
+            return false;
+        }
+        self.rear = (self.rear - 1 + self.len) % self.len;
+        self.data[self.rear as usize] = value;
+        self.size += 1;
+        return true;
+    }
+
+    fn delete_front(&mut self) -> bool {
+        if self.is_empty() {
+            return false;
+        }
+        self.front = (self.front - 1 + self.len) % self.len;
+        self.size -= 1;
+        return true;
+    }
+
+    fn delete_last(&mut self) -> bool {
+        if self.is_empty() {
+            return false;
+        }
+        self.rear = (self.rear + 1) % self.len;
+        self.size -= 1;
+        return true;
+    }
+
+    fn get_front(&mut self) -> i32 {
+        if self.is_empty() {
+            return -1;
+        }
+        self.data[self.front as usize]
+    }
+
+    fn get_rear(&self) -> i32 {
+        if self.is_empty() {
+            return -1;
+        }
+        self.data[self.rear as usize]
+    }
+
+    fn is_empty(&self) -> bool {
+        self.size == 0
+    }
+
+    fn is_full(&self) -> bool {
+        // 判断队列是否已满
+        self.size == self.len
+    }
+}
+
 /// 933. 最近的请求次数
 ///
 /// 写一个 RecentCounter 类来计算特定时间范围内最近的请求。
@@ -323,6 +461,88 @@ impl RecentCounter {
             self.timer.remove(0);
         }
         self.timer.len() as i32
+    }
+}
+
+/**
+面试题 03.06. 动物收容所
+
+动物收容所。有家动物收容所只收容狗与猫，且严格遵守“先进先出”的原则。在收养该收容所的动物时，收养人只能收养所有动物中“最老”（由其进入收容所的时间长短而定）的动物，或者可以挑选猫或狗（同时必须收养此类动物中“最老”的）。换言之，收养人不能自由挑选想收养的对象。请创建适用于这个系统的数据结构，实现各种操作方法，比如enqueue、dequeueAny、dequeueDog和dequeueCat。允许使用Java内置的LinkedList数据结构。
+
+enqueue方法有一个animal参数，animal[0]代表动物编号，animal[1]代表动物种类，其中 0 代表猫，1 代表狗。
+
+dequeue*方法返回一个列表[动物编号, 动物种类]，若没有可以收养的动物，则返回[-1,-1]。
+
+```
+示例1:
+
+ 输入：
+["AnimalShelf", "enqueue", "enqueue", "dequeueCat", "dequeueDog", "dequeueAny"]
+[[], [[0, 0]], [[1, 0]], [], [], []]
+ 输出：
+[null,null,null,[0,0],[-1,-1],[1,0]]
+示例2:
+
+ 输入：
+["AnimalShelf", "enqueue", "enqueue", "enqueue", "dequeueDog", "dequeueCat", "dequeueAny"]
+[[], [[0, 0]], [[1, 0]], [[2, 1]], [], [], []]
+ 输出：
+[null,null,null,null,[2,1],[0,0],[1,0]]
+说明:
+
+收纳所的最大容量为20000
+```
+ */
+#[allow(dead_code)]
+struct AnimalShelf {
+    // 1 代表狗 数组中存储的是动物编号
+    dog: Vec<i32>,
+    // 其中 0 代表猫 数组中存储的是动物编号
+    cat: Vec<i32>,
+}
+
+#[allow(dead_code)]
+impl AnimalShelf {
+    fn new() -> Self {
+        Self {
+            dog: Vec::new(),
+            cat: Vec::new(),
+        }
+    }
+
+    fn enqueue(&mut self, animal: Vec<i32>) {
+        if animal[1] == 0 {
+            // 猫
+            self.cat.push(animal[0]);
+        } else {
+            // 狗
+            self.dog.push(animal[0]);
+        }
+    }
+
+    fn dequeue_any(&mut self) -> Vec<i32> {
+        if self.dog.is_empty() && self.cat.is_empty() {
+            return [-1, -1].to_vec();
+        }
+        if self.cat.first().or(Some(&999999999)) < self.dog.first().or(Some(&999999999)) {
+            return vec![self.cat.remove(0), 0];
+        } else {
+            return vec![self.dog.remove(0), 1];
+        }
+    }
+
+    fn dequeue_dog(&mut self) -> Vec<i32> {
+        if self.dog.is_empty() {
+            return [-1, -1].to_vec();
+        }
+        vec![self.dog.remove(0), 1]
+    }
+
+    fn dequeue_cat(&mut self) -> Vec<i32> {
+        if self.cat.is_empty() {
+            return [-1, -1].to_vec();
+        }
+        vec![self.cat.remove(0), 0]
     }
 }
 
