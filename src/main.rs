@@ -9,6 +9,8 @@ pub mod queue;
 pub mod stack;
 pub mod sliding_windows;
 pub mod two_pointers;
+pub mod search;
+pub mod sort;
 
 fn main() {
     println!("Hello, world!");

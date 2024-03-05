@@ -1,6 +1,3 @@
-pub mod array_search;
-pub mod array_sort;
-
 use std::collections::HashMap;
 
 /// 238. 除自身以外数组的乘积
