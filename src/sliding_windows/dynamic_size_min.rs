@@ -73,22 +73,22 @@
 /// 可以发现滑动窗口的精妙之处在于根据当前子序列和大小的情况，不断调节子序列的起始位置。从而将O(n^2)暴力解法降为O(n)。
 pub fn min_sub_array_len(target: i32, nums: Vec<i32>) -> i32 {
     // 定义起始指针
-    let mut left = 0;
+    let mut slow = 0;
     // 定义和
     let mut sum = 0;
     // 定义结果
     let mut res = std::i32::MAX;
-    for right in 0..nums.len() {
+    for fast in 0..nums.len() {
         // 累加
-        sum += nums[right];
+        sum += nums[fast];
         // 循环的条件，当和大于等于目标值时，就要开始缩小窗口了
         while sum >= target {
             // (right - left + 1) 子序列的长度
-            res = res.min((right - left + 1) as i32);
+            res = res.min((fast - slow + 1) as i32);
             // 调整窗口，滑出窗口的需要减掉
-            sum -= nums[left];
+            sum -= nums[slow];
             // 左指针右移
-            left += 1;
+            slow += 1;
         }
     }
     // 如果res没有被赋值，就返回0

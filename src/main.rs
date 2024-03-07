@@ -11,6 +11,7 @@ pub mod sliding_windows;
 pub mod two_pointers;
 pub mod search;
 pub mod sort;
+pub mod backtracking;
 
 fn main() {
     println!("Hello, world!");

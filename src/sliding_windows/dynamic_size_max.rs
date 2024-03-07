@@ -45,22 +45,22 @@ pub fn length_of_longest_substring(st: String) -> i32 {
     // 最长子串长度
     let mut ans = 0;
     // 起点指针
-    let mut left = 0;
+    let mut slow = 0;
     // 用来标记窗口内是否存在重复元素，也可以用 HashSet，这里为了效率用的 Vec，数组长度定义128是因为u8的范围是0-127
     let mut window = vec![false; 128];
-    for (right, &c) in s.iter().enumerate() {
+    for (fast, &c) in s.iter().enumerate() {
         let c = c as usize;
         // 缩小窗口的条件是，窗口内存在重复元素
         while window[c] {
             // 把起点指针右移一位，并且把起点指针所在的元素从窗口中移除
-            window[s[left] as usize] = false;
-            left += 1;
+            window[s[slow] as usize] = false;
+            slow += 1;
         }
 
         // 往窗口中添加元素
         window[c] = true;
         // 更新窗口长度最大值
-        ans = ans.max(right - left + 1);
+        ans = ans.max(fast - slow + 1);
     }
 
     ans as i32
@@ -160,27 +160,27 @@ pub fn find_max_consecutive_ones(nums: Vec<i32>) -> i32 {
 pub fn longest_subarray(nums: Vec<i32>, limit: i32) -> i32 {
     let mut max_q = VecDeque::new();
     let mut min_q = VecDeque::new();
-    let mut left = 0;
-    let mut right = 0;
+    let mut slow = 0;
+    let mut fast = 0;
     let mut res = 0;
-    while right < nums.len() {
-        while !max_q.is_empty() && nums[right] > nums[*max_q.back().unwrap()] {
+    while fast < nums.len() {
+        while !max_q.is_empty() && nums[fast] > nums[*max_q.back().unwrap()] {
             max_q.pop_back();
         }
-        while !min_q.is_empty() && nums[right] < nums[*min_q.back().unwrap()] {
+        while !min_q.is_empty() && nums[fast] < nums[*min_q.back().unwrap()] {
             min_q.pop_back();
         }
-        max_q.push_back(right);
-        min_q.push_back(right);
+        max_q.push_back(fast);
+        min_q.push_back(fast);
         while nums[*max_q.front().unwrap()] - nums[*min_q.front().unwrap()] > limit {
             if *max_q.front().unwrap() < *min_q.front().unwrap() {
-                left = max_q.pop_front().unwrap() + 1;
+                slow = max_q.pop_front().unwrap() + 1;
             } else {
-                left = min_q.pop_front().unwrap() + 1;
+                slow = min_q.pop_front().unwrap() + 1;
             }
         }
-        res = res.max(right - left + 1);
-        right += 1;
+        res = res.max(fast - slow + 1);
+        fast += 1;
     }
     res as i32
 }
@@ -268,29 +268,29 @@ pub fn character_replacement(s: String, k: i32) -> i32 {
     // 如果可以，更新最长子字符串的长度。如果不可以，则向右移动左指针 left 来缩小窗口，直到窗口满足条件为止。
     //
     // 终止：当右指针遍历完字符串 s 时，算法结束。此时，我们已经考察了所有可能的子字符串，并找到了满足条件的最长子字符串。
-    let mut left = 0;
-    let mut right = 0;
+    let mut slow = 0;
+    let mut fast = 0;
     // 记录窗口内最大字符的数量
     let mut max_count = 0;
     // 定义字符频次哈希表
     let mut char_freq = vec![0; 26];
     let s = s.chars().collect::<Vec<char>>();
-    while right < s.len() {
+    while fast < s.len() {
         // 计数
-        char_freq[(s[right] as u8 - 'A' as u8) as usize] += 1;
+        char_freq[(s[fast] as u8 - 'A' as u8) as usize] += 1;
         // 更新最大字符数量
-        max_count = max_count.max(char_freq[(s[right] as u8 - 'A' as u8) as usize]);
+        max_count = max_count.max(char_freq[(s[fast] as u8 - 'A' as u8) as usize]);
         // 如果窗口内的字符数量加上 k 小于窗口的大小，说明窗口内的字符数量加上 k 无法满足窗口的大小
-        if right - left + 1 - max_count > k as usize {
+        if fast - slow + 1 - max_count > k as usize {
             // 减掉即将移出的字符计数
-            char_freq[(s[left] as u8 - 'A' as u8) as usize] -= 1;
+            char_freq[(s[slow] as u8 - 'A' as u8) as usize] -= 1;
             // 移动左指针
-            left += 1;
+            slow += 1;
         }
         // 移动右指针
-        right += 1;
+        fast += 1;
     }
-    (right - left) as i32
+    (fast - slow) as i32
 }
 
 /// 删除子数组的最大得分
@@ -332,7 +332,7 @@ pub fn character_replacement(s: String, k: i32) -> i32 {
 /// 然后通过比较这些得分来找到最优解。
 pub fn maximum_unique_subarray(nums: Vec<i32>) -> i32 {
     // 定义左指针
-    let mut left = 0;
+    let mut slow = 0;
     // 统计数组内元素的频次
     let mut counter = HashMap::new();
     // 当前和
@@ -340,19 +340,19 @@ pub fn maximum_unique_subarray(nums: Vec<i32>) -> i32 {
     // 定义最大得分
     let mut max_sum = 0;
 
-    for right in 0..nums.len() {
+    for fast in 0..nums.len() {
         // 统计元素出现的频次
-        *counter.entry(nums[right]).or_insert(0) += 1;
+        *counter.entry(nums[fast]).or_insert(0) += 1;
         // 计算和
-        cur_sum += nums[right];
+        cur_sum += nums[fast];
         // 当大于1说明窗口内出现重复元素，就需要移动left指针来缩小窗口
-        while *counter.get(&nums[right]).unwrap() > 1 {
+        while *counter.get(&nums[fast]).unwrap() > 1 {
             // 移动left指针之前需要把即将移出窗口的元素出现的频次减掉
-            *counter.get_mut(&nums[left]).unwrap() -= 1;
+            *counter.get_mut(&nums[slow]).unwrap() -= 1;
             // 移动left指针之前需要把即将移出窗口的元素和减掉
-            cur_sum -= nums[left];
+            cur_sum -= nums[slow];
             // 右移动左指针
-            left += 1;
+            slow += 1;
         }
         // 更新最大得分
         max_sum = max_sum.max(cur_sum);
@@ -405,24 +405,24 @@ pub fn find_max_consecutive_ones_ii(nums: Vec<i32>) -> i32 {
     //
     // 结果计算：通过维护窗口的最大长度来记录并最终返回数组中连续 1 的最大个数（包括最多翻转一个 0 的情况）。
     // 定义滑动窗口左边界指针
-    let mut left = 0;
+    let mut slow = 0;
     // 可反转次数
     let mut k = 1;
     // 定义最大长度
     let mut max_len = 0;
-    for right in 0..nums.len() {
+    for fast in 0..nums.len() {
         // 如果是0，就减少可反转次数
-        if nums[right] == 0 {
+        if nums[fast] == 0 {
             k -= 1;
         }
         while k < 0 {
-            if nums[left] == 0 {
+            if nums[slow] == 0 {
                 // 如果窗口中的0滑出了窗口，这可反转计数需要加1
                 k += 1;
             }
-            left += 1;
+            slow += 1;
         }
-        max_len = max_len.max(right - left + 1);
+        max_len = max_len.max(fast - slow + 1);
     }
     max_len as i32
 }
@@ -459,24 +459,24 @@ pub fn find_max_consecutive_ones_ii(nums: Vec<i32>) -> i32 {
 ///
 /// 0 <= k <= nums.length
 pub fn longest_ones(nums: Vec<i32>, k: i32) -> i32 {
-    let mut left = 0;
+    let mut slow = 0;
     // 可反转次数
     let mut k = k;
     // 定义最大长度
     let mut max_len = 0;
-    for right in 0..nums.len() {
+    for fast in 0..nums.len() {
         // 如果是0，就减少可反转次数
-        if nums[right] == 0 {
+        if nums[fast] == 0 {
             k -= 1;
         }
         while k < 0 {
-            if nums[left] == 0 {
+            if nums[slow] == 0 {
                 // 如果窗口中的0滑出了窗口，这可反转计数需要加1
                 k += 1;
             }
-            left += 1;
+            slow += 1;
         }
-        max_len = max_len.max(right - left + 1);
+        max_len = max_len.max(fast - slow + 1);
     }
     max_len as i32
 }
@@ -519,25 +519,25 @@ pub fn longest_ones(nums: Vec<i32>, k: i32) -> i32 {
 ///
 /// nums[i] 要么是 0 要么是 1 。
 pub fn longest_subarray_ii(nums: Vec<i32>) -> i32 {
-    let mut left = 0;
+    let mut slow = 0;
     // 窗口中能包含0的最大个数
     let mut k = 1;
     // 定义最大长度
     let mut max_len = 0;
-    for right in 0..nums.len() {
+    for fast in 0..nums.len() {
         // 如果是0，就减少可反转次数
-        if nums[right] == 0 {
+        if nums[fast] == 0 {
             k -= 1;
         }
         while k < 0 {
-            if nums[left] == 0 {
+            if nums[slow] == 0 {
                 // 如果窗口中的0滑出了窗口，这可反转计数需要加1
                 k += 1;
             }
-            left += 1;
+            slow += 1;
         }
         // 因为0是需要被删除的的，所以长度为right - left 而不是 right - left + 1
-        max_len = max_len.max(right - left);
+        max_len = max_len.max(fast - slow);
     }
     max_len as i32
 }
@@ -662,18 +662,18 @@ pub fn equal_substring(s: String, t: String, max_cost: i32) -> i32 {
         .zip(t.bytes())
         .map(|(a, b)| (a as i32 - b as i32).abs())
         .collect::<Vec<_>>();
-    let (mut l, mut r) = (0, 0);
+    let (mut slow, mut fast) = (0, 0);
     let mut cost = 0;
     let mut res = 0;
-    while r < n {
-        cost += diff[r];
+    while fast < n {
+        cost += diff[fast];
         if cost > max_cost {
-            cost -= diff[l];
-            l += 1;
+            cost -= diff[slow];
+            slow += 1;
         } else {
-            res = res.max(r - l + 1);
+            res = res.max(fast - slow + 1);
         }
-        r += 1;
+        fast += 1;
     }
     res as i32
 }
@@ -825,27 +825,27 @@ pub fn length_of_longest_substring_two_distinct(s: String) -> i32 {
     // 定义最大长度
     let mut max_len = 2;
     // 定义左指针
-    let mut left = 0;
-    for right in 0..s.len() {
+    let mut slow = 0;
+    for fast in 0..s.len() {
         // 字符计数
-        cnt[s[right] as usize] += 1;
+        cnt[s[fast] as usize] += 1;
         // 如果是第一次出现的字符，计数加1
-        if cnt[s[right] as usize] == 1 {
+        if cnt[s[fast] as usize] == 1 {
             count += 1;
         }
         // 如果字符数量大于2，就需要移动左指针来缩小窗口
         while count == 3 {
             // 扣减计数
-            cnt[s[left] as usize] -= 1;
+            cnt[s[slow] as usize] -= 1;
             // 如果字符未出现，计数减1
-            if cnt[s[left] as usize] == 0 {
+            if cnt[s[slow] as usize] == 0 {
                 count -= 1;
             }
             // 右移动左指针
-            left += 1;
+            slow += 1;
         }
         // 更新最大长度
-        max_len = max_len.max(right - left + 1);
+        max_len = max_len.max(fast - slow + 1);
     }
     max_len as i32
 }
@@ -889,27 +889,27 @@ pub fn length_of_longest_substring_k_distinct(s: String, k: i32) -> i32 {
     // 定义最大长度
     let mut max_len = 0;
     // 定义左指针
-    let mut left = 0;
-    for right in 0..s.len() {
+    let mut slow = 0;
+    for fast in 0..s.len() {
         // 字符计数
-        cnt[s[right] as usize] += 1;
+        cnt[s[fast] as usize] += 1;
         // 如果是第一次出现的字符，计数加1
-        if cnt[s[right] as usize] == 1 {
+        if cnt[s[fast] as usize] == 1 {
             count += 1;
         }
         // 如果字符数量大于2，就需要移动左指针来缩小窗口
         while count == k + 1 {
             // 扣减计数
-            cnt[s[left] as usize] -= 1;
+            cnt[s[slow] as usize] -= 1;
             // 如果字符未出现，计数减1
-            if cnt[s[left] as usize] == 0 {
+            if cnt[s[slow] as usize] == 0 {
                 count -= 1;
             }
             // 右移动左指针
-            left += 1;
+            slow += 1;
         }
         // 更新最大长度
-        max_len = max_len.max(right - left + 1);
+        max_len = max_len.max(fast - slow + 1);
     }
     max_len as i32
 }
