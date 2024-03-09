@@ -363,6 +363,120 @@ fn do_combination_sum2(
     }
 }
 
+/**
+ * 22. 括号生成
+
+数字 n 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 有效的 括号组合。
+
+
+```
+示例 1：
+
+输入：n = 3
+输出：["((()))","(()())","(())()","()(())","()()()"]
+示例 2：
+
+输入：n = 1
+输出：["()"]
+
+
+提示：
+
+1 <= n <= 8
+```
+ */
+pub fn generate_parenthesis(n: i32) -> Vec<String> {
+    if n <= 0 {
+        return vec![];
+    }
+    let mut path = Vec::new();
+    let mut res = Vec::new();
+    do_generate_parenthesis(n as usize, n as usize, &mut path, &mut res);
+    res
+}
+
+fn do_generate_parenthesis(left: usize, right: usize, path: &mut Vec<char>, res: &mut Vec<String>) {
+    // 因为每一次尝试，都使用新的字符串变量，所以无需回溯
+    if left == 0 && right == 0 {
+        // 左括号数和右括号数都为0了，就可以收集结果了
+        res.push(path.clone().iter().collect::<String>());
+        return;
+    }
+    // 剪枝（如图，左括号可以使用的个数严格大于右括号可以使用的个数，才剪枝，注意这个细节）
+    if left > right {
+        return;
+    }
+    if left > 0 {
+        path.push('(');
+        do_generate_parenthesis(left - 1, right, path, res);
+        // 回溯
+        path.pop();
+    }
+    if right > 0 {
+        path.push(')');
+        do_generate_parenthesis(left, right - 1, path, res);
+        // 回溯
+        path.pop();
+    }
+}
+
+/**
+ * 494. 目标和
+中等
+相关标签
+相关企业
+给你一个非负整数数组 nums 和一个整数 target 。
+
+向数组中的每个整数前添加 '+' 或 '-' ，然后串联起所有整数，可以构造一个 表达式 ：
+
+例如，nums = [2, 1] ，可以在 2 之前添加 '+' ，在 1 之前添加 '-' ，然后串联起来得到表达式 "+2-1" 。
+返回可以通过上述方法构造的、运算结果等于 target 的不同 表达式 的数目。
+
+
+```
+示例 1：
+
+输入：nums = [1,1,1,1,1], target = 3
+输出：5
+解释：一共有 5 种方法让最终目标和为 3 。
+-1 + 1 + 1 + 1 + 1 = 3
++1 - 1 + 1 + 1 + 1 = 3
++1 + 1 - 1 + 1 + 1 = 3
++1 + 1 + 1 - 1 + 1 = 3
++1 + 1 + 1 + 1 - 1 = 3
+示例 2：
+
+输入：nums = [1], target = 1
+输出：1
+
+
+提示：
+
+1 <= nums.length <= 20
+0 <= nums[i] <= 1000
+0 <= sum(nums[i]) <= 1000
+-1000 <= target <= 1000
+```
+ */
+pub fn find_target_sum_ways(nums: Vec<i32>, target: i32) -> i32 {
+    let mut  res=Vec::new();
+    do_find_target_sum_ways(&nums, target, 0, 0, &mut res);
+    res.iter().count() as i32
+}
+
+fn do_find_target_sum_ways(nums: &Vec<i32>, target: i32, start: usize, sum: i32, res:&mut Vec<i32>) {
+    if start == nums.len() {
+        if target == sum {
+            // 遍历到数组末尾后开始收集结果
+            res.push(1);
+        }
+        return;
+    }
+    // 回溯隐藏在 sum + nums[start] 和 sum - nums[start] 中
+    do_find_target_sum_ways(nums, target, start + 1, sum + nums[start], res);
+    do_find_target_sum_ways(nums, target, start + 1, sum - nums[start], res);
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -420,5 +534,20 @@ mod tests {
             res,
             vec![vec![1, 1, 6], vec![1, 2, 5], vec![1, 7], vec![2, 6]]
         );
+    }
+
+    #[test]
+    fn test_generate_parenthesis() {
+        let n = 3;
+        let res = generate_parenthesis(n);
+        assert_eq!(res, vec!["((()))", "(()())", "(())()", "()(())", "()()()"]);
+    }
+
+    #[test]
+    fn test_find_target_sum_ways() {
+        let nums = vec![1, 1, 1, 1, 1];
+        let target = 3;
+        let res = find_target_sum_ways(nums, target);
+        assert_eq!(res, 5);
     }
 }

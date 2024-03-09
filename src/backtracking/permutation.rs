@@ -125,6 +125,120 @@ fn do_permute_unique(
     }
 }
 
+/**
+ * 面试题 08.08. 有重复字符串的排列组合
+
+有重复字符串的排列组合。编写一种方法，计算某字符串的所有排列组合。
+
+```
+示例1:
+
+ 输入：S = "qqe"
+ 输出：["eqq","qeq","qqe"]
+示例2:
+
+ 输入：S = "ab"
+ 输出：["ab", "ba"]
+提示:
+
+字符都是英文字母。
+字符串长度在[1, 9]之间。
+```
+ */
+pub fn permutation(s: String) -> Vec<String> {
+    let mut path = Vec::new();
+    let mut res = Vec::new();
+    let mut used = vec![false; s.len()];
+    let mut s = s.chars().collect::<Vec<char>>();
+    s.sort();
+    do_permutation(&s, &mut path, &mut res, &mut used);
+    res
+}
+
+fn do_permutation(
+    s: &Vec<char>,
+    path: &mut Vec<char>,
+    res: &mut Vec<String>,
+    used: &mut Vec<bool>,
+) {
+    if path.len() == s.len() {
+        res.push(path.iter().collect::<String>());
+        return;
+    }
+    for i in 0..s.len() {
+        if i > 0 && s[i] == s[i - 1] && used[i - 1] == false {
+            continue;
+        }
+        if used[i] == true {
+            continue;
+        }
+        used[i] = true;
+        path.push(s[i]);
+        do_permutation(s, path, res, used);
+        // 回溯
+        used[i] = false;
+        path.pop();
+    }
+}
+
+/**
+ * LCR 157. 套餐内商品的排列顺序
+
+某店铺将用于组成套餐的商品记作字符串 goods，其中 goods[i] 表示对应商品。请返回该套餐内所含商品的 全部排列方式 。
+
+返回结果 无顺序要求，但不能含有重复的元素。
+
+
+```
+示例 1:
+
+输入：goods = "agew"
+输出：["aegw","aewg","agew","agwe","aweg","awge","eagw","eawg",
+"egaw","egwa","ewag","ewga","gaew","gawe","geaw","gewa","gwae",
+"gwea","waeg","wage","weag","wega","wgae","wgea"]
+
+
+提示：
+
+1 <= goods.length <= 8
+```
+ */
+pub fn goods_order(goods: String) -> Vec<String> {
+    let mut path = Vec::new();
+    let mut res = Vec::new();
+    let mut used = vec![false; goods.len()];
+    let mut goods = goods.chars().collect::<Vec<char>>();
+    goods.sort();
+    do_goods_order(&goods, &mut path, &mut res, &mut used);
+    res
+}
+
+fn do_goods_order(
+    goods: &Vec<char>,
+    path: &mut Vec<char>,
+    res: &mut Vec<String>,
+    used: &mut Vec<bool>,
+) {
+    if path.len() == goods.len() {
+        res.push(path.iter().collect::<String>());
+        return;
+    }
+    for i in 0..goods.len() {
+        if i > 0 && goods[i] == goods[i - 1] && used[i - 1] == false {
+            continue;
+        }
+        if used[i] == true {
+            continue;
+        }
+        used[i] = true;
+        path.push(goods[i]);
+        do_goods_order(goods, path, res, used);
+        // 回溯
+        used[i] = false;
+        path.pop();
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -150,12 +264,26 @@ mod tests {
     fn test_permute_unique() {
         let nums = vec![1, 1, 2];
         let res = permute_unique(nums);
+        assert_eq!(res, vec![vec![1, 1, 2], vec![1, 2, 1], vec![2, 1, 1],]);
+    }
+
+    #[test]
+    fn test_permutation() {
+        let s = "qqe".to_string();
+        let res = permutation(s);
+        assert_eq!(res, vec!["eqq", "qeq", "qqe"]);
+    }
+
+    #[test]
+    fn test_goods_order() {
+        let goods = "agew".to_string();
+        let res = goods_order(goods);
         assert_eq!(
             res,
             vec![
-                vec![1, 1, 2],
-                vec![1, 2, 1],
-                vec![2, 1, 1],
+                "aegw", "aewg", "agew", "agwe", "aweg", "awge", "eagw", "eawg", "egaw", "egwa",
+                "ewag", "ewga", "gaew", "gawe", "geaw", "gewa", "gwae", "gwea", "waeg", "wage",
+                "weag", "wega", "wgae", "wgea"
             ]
         );
     }

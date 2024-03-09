@@ -202,7 +202,7 @@ fn do_find_subsequences(
 
 数组 a 是数组 b 的一个 子集 的前提条件是：从 b 删除几个（也可能不删除）元素能够得到 a 。
 
- 
+
 ```
 示例 1：
 
@@ -233,7 +233,7 @@ fn do_find_subsequences(
 输入：nums = [3,4,5,6,7,8]
 输出：480
 解释：每个子集的全部异或总和值之和为 480 。
- 
+
 
 提示：
 
@@ -269,6 +269,130 @@ fn do_subset_xor_sum(nums: &Vec<i32>, start: usize, path: &mut Vec<i32>, res: &m
         // 回溯
         path.pop();
     }
+}
+
+/**
+ * 698. 划分为k个相等的子集
+
+给定一个整数数组  nums 和一个正整数 k，找出是否有可能把这个数组分成 k 个非空子集，其总和都相等。
+
+
+```
+示例 1：
+
+输入： nums = [4, 3, 2, 3, 5, 2, 1], k = 4
+输出： True
+说明： 有可能将其分成 4 个子集（5），（1,4），（2,3），（2,3）等于总和。
+示例 2:
+
+输入: nums = [1,2,3,4], k = 3
+输出: false
+
+
+提示：
+
+1 <= k <= len(nums) <= 16
+0 < nums[i] < 10000
+每个元素的频率在 [1,4] 范围内
+```
+ */
+pub fn can_partition_k_subsets(nums: Vec<i32>, k: i32) -> bool {
+    let sum = nums.iter().sum::<i32>();
+    if sum % k != 0 {
+        return false;
+    }
+    let target = sum / k;
+    let mut bucket = vec![0; k as usize];
+    do_can_partition_k_subsets(&nums, k, 0, target, &mut bucket)
+}
+
+fn do_can_partition_k_subsets(
+    nums: &Vec<i32>,
+    k: i32,
+    start: usize,
+    target: i32,
+    bucket: &mut Vec<i32>,
+) -> bool {
+    // 结束条件：已经处理完所有球
+    if start == nums.len() {
+        // 判断现在桶中的球是否符合要求 -> 路径是否满足要求
+        for i in 0..k {
+            if bucket[i as usize] != target {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    for i in 0..k {
+        // 剪枝：放入球后超过 target 的值，选择一下桶
+        if bucket[i as usize] + nums[start] > target {
+            continue;
+        }
+        // 做选择：放入 i 号桶
+        bucket[i as usize] += nums[start];
+        // 处理下一个球，即 nums[start + 1]
+        if do_can_partition_k_subsets(nums, k, start + 1, target, bucket) {
+            return true;
+        }
+        // 回溯，撤销选择：挪出 i 号桶
+        bucket[i as usize] -= nums[start];
+    }
+    // k 个桶都不满足要求
+    return false;
+}
+
+pub fn can_partition_k_subsets_ii(mut nums: Vec<i32>, k: i32) -> bool {
+    let (sum, n) = (nums.iter().sum::<i32>(), nums.len() as i32);
+    nums.sort();
+    if sum % k != 0 || sum / k < nums[0] || sum / k < nums[n as usize - 1] {
+        return false;
+    }
+    back_trace(
+        &mut nums,
+        &mut vec![false; n as usize],
+        n - 1,
+        k,
+        0,
+        sum / k,
+    )
+}
+
+fn back_trace(
+    nums: &mut Vec<i32>,
+    used: &mut Vec<bool>,
+    start: i32,
+    k: i32,
+    sum: i32,
+    target: i32,
+) -> bool {
+    if sum > target {
+        return false;
+    }
+    if k == 0 {
+        return true;
+    }
+    if sum == target {
+        return back_trace(nums, used, nums.len() as i32 - 1, k - 1, 0, target);
+    }
+
+    for i in (0..=start).rev() {
+        if used[i as usize]
+            || (i + 1 < nums.len() as i32
+                && nums[i as usize] == nums[i as usize + 1]
+                && !used[i as usize + 1])
+            || nums[i as usize] > target
+            || sum + nums[i as usize] > target
+        {
+            continue;
+        }
+        used[i as usize] = true;
+        if back_trace(nums, used, i - 1, k, sum + nums[i as usize], target) {
+            return true;
+        }
+        used[i as usize] = false;
+    }
+    false
 }
 
 #[cfg(test)]
@@ -335,5 +459,13 @@ mod tests {
         let nums = vec![1, 3];
         let res = subset_xor_sum(nums);
         assert_eq!(res, 6);
+    }
+
+    #[test]
+    fn test_can_partition_k_subsets() {
+        let nums = vec![4, 3, 2, 3, 5, 2, 1];
+        let k = 4;
+        let res = can_partition_k_subsets(nums, k);
+        assert_eq!(res, true);
     }
 }
