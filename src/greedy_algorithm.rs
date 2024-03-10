@@ -1,5 +1,3 @@
-use std::{cell::RefCell, rc::Rc};
-
 /// 【变量说明】
 /// 数组长度为 n ，最小操作次数为 k ，操作前数组的最小值为 min ，操作前数组的最大值为 max ，操作前数组的第二大值为 max2 ，操作前数组所有数和为 sum 。
 ///
@@ -916,6 +914,441 @@ pub fn monotone_increasing_digits(n: i32) -> i32 {
         .fold(0, |acc, x| acc * 10 + x as i32 - 48)
 }
 
+/**
+ * 2578. 最小和分割
+简单
+相关标签
+相关企业
+提示
+给你一个正整数 num ，请你将它分割成两个非负整数 num1 和 num2 ，满足：
+
+num1 和 num2 直接连起来，得到 num 各数位的一个排列。
+换句话说，num1 和 num2 中所有数字出现的次数之和等于 num 中所有数字出现的次数。
+num1 和 num2 可以包含前导 0 。
+请你返回 num1 和 num2 可以得到的和的 最小 值。
+
+注意：
+
+num 保证没有前导 0 。
+num1 和 num2 中数位顺序可以与 num 中数位顺序不同。
+
+
+示例 1：
+
+输入：num = 4325
+输出：59
+解释：我们可以将 4325 分割成 num1 = 24 和 num2 = 35 ，和为 59 ，59 是最小和。
+示例 2：
+
+输入：num = 687
+输出：75
+解释：我们可以将 687 分割成 num1 = 68 和 num2 = 7 ，和为最优值 75 。
+
+
+提示：
+
+10 <= num <= 109
+ */
+pub fn split_num(num: i32) -> i32 {
+    // 排序加奇偶分组，把数字小的放在高位
+    let mut s: Vec<u8> = num.to_string().bytes().collect();
+    s.sort_unstable();
+    let mut a = [0, 0];
+    for (i, &c) in s.iter().enumerate() {
+        a[i % 2] = a[i % 2] * 10 + c as i32 - '0' as i32;
+    }
+    a[0] + a[1]
+}
+
+/**
+ * 409. 最长回文串
+简单
+相关标签
+相关企业
+给定一个包含大写字母和小写字母的字符串 s ，返回 通过这些字母构造成的 最长的回文串 。
+
+在构造过程中，请注意 区分大小写 。比如 "Aa" 不能当做一个回文字符串。
+
+
+
+示例 1:
+
+输入:s = "abccccdd"
+输出:7
+解释:
+我们可以构造的最长的回文串是"dccaccd", 它的长度是 7。
+示例 2:
+
+输入:s = "a"
+输出:1
+示例 3：
+
+输入:s = "aaaaaccc"
+输出:7
+
+
+提示:
+
+1 <= s.length <= 2000
+s 只由小写 和/或 大写英文字母组成
+ */
+pub fn longest_palindrome(s: String) -> i32 {
+    let mut res = 0;
+    let mut add = 0;
+    let bytes = s.into_bytes();
+    // 定义哈希表来统计字符出现的个数
+    let mut cnt = vec![0; 130];
+    for b in bytes {
+        cnt[b as usize] += 1;
+    }
+    for c in cnt {
+        let rem = c % 2;
+        res += c - rem;
+        if rem == 1 {
+            add = 1;
+        }
+    }
+    res + add
+}
+
+/**
+ * 976. 三角形的最大周长
+简单
+相关标签
+相关企业
+给定由一些正数（代表长度）组成的数组 nums ，返回 由其中三个长度组成的、面积不为零的三角形的最大周长 。
+如果不能形成任何面积不为零的三角形，返回 0。
+
+
+
+示例 1：
+
+输入：nums = [2,1,2]
+输出：5
+解释：你可以用三个边长组成一个三角形:1 2 2。
+示例 2：
+
+输入：nums = [1,2,1,10]
+输出：0
+解释：
+你不能用边长 1,1,2 来组成三角形。
+不能用边长 1,1,10 来构成三角形。
+不能用边长 1、2 和 10 来构成三角形。
+因为我们不能用任何三条边长来构成一个非零面积的三角形，所以我们返回 0。
+
+
+提示：
+
+3 <= nums.length <= 104
+1 <= nums[i] <= 106
+ */
+pub fn largest_perimeter(nums: Vec<i32>) -> i32 {
+    let mut nums = nums;
+    nums.sort_unstable();
+    for i in (0..nums.len() - 2).rev() {
+        if nums[i] + nums[i + 1] > nums[i + 2] {
+            return nums[i] + nums[i + 1] + nums[i + 2];
+        }
+    }
+    0
+}
+
+/**
+ * 605. 种花问题
+简单
+相关标签
+相关企业
+假设有一个很长的花坛，一部分地块种植了花，另一部分却没有。可是，花不能种植在相邻的地块上，它们会争夺水源，两者都会死去。
+
+给你一个整数数组 flowerbed 表示花坛，由若干 0 和 1 组成，其中 0 表示没种植花，1 表示种植了花。另有一个数 n ，
+能否在不打破种植规则的情况下种入 n 朵花？能则返回 true ，不能则返回 false 。
+
+
+
+示例 1：
+
+输入：flowerbed = [1,0,0,0,1], n = 1
+输出：true
+示例 2：
+
+输入：flowerbed = [1,0,0,0,1], n = 2
+输出：false
+
+
+提示：
+
+1 <= flowerbed.length <= 2 * 104
+flowerbed[i] 为 0 或 1
+flowerbed 中不存在相邻的两朵花
+0 <= n <= flowerbed.length
+ */
+pub fn can_place_flowers(flowerbed: Vec<i32>, n: i32) -> bool {
+    let mut n = n;
+    let mut left = 0;
+    while left < flowerbed.len() - 1 {
+        if flowerbed[left] == 0 && flowerbed[left + 1] == 0 {
+            n -= 1;
+            left += 2;
+        } else if flowerbed[left] == 1 {
+            left += 2;
+        } else {
+            // 如果不满足上面两个条件，说明flowerbed[left] == 0 && flowerbed[left + 1] == 1
+            left += 1;
+        }
+    }
+    // 处理最后一个位置
+    if left == flowerbed.len() - 1 && flowerbed[left] == 0 {
+        n -= 1;
+    }
+    n <= 0
+}
+
+/**
+ * 2591. 将钱分给最多的儿童
+简单
+相关标签
+提示
+给你一个整数 money ，表示你总共有的钱数（单位为美元）和另一个整数 children ，表示你要将钱分配给多少个儿童。
+
+你需要按照如下规则分配：
+
+所有的钱都必须被分配。
+每个儿童至少获得 1 美元。
+没有人获得 4 美元。
+请你按照上述规则分配金钱，并返回 最多 有多少个儿童获得 恰好 8 美元。如果没有任何分配方案，返回 -1 。
+
+
+
+示例 1：
+
+输入：money = 20, children = 3
+输出：1
+解释：
+最多获得 8 美元的儿童数为 1 。一种分配方案为：
+- 给第一个儿童分配 8 美元。
+- 给第二个儿童分配 9 美元。
+- 给第三个儿童分配 3 美元。
+没有分配方案能让获得 8 美元的儿童数超过 1 。
+示例 2：
+
+输入：money = 16, children = 2
+输出：2
+解释：每个儿童都可以获得 8 美元。
+
+
+提示：
+
+1 <= money <= 200
+2 <= children <= 30
+ */
+pub fn dist_money(money: i32, children: i32) -> i32 {
+    if money < children {
+        return -1;
+    }
+    if money == children {
+        // 如果钱数和儿童数相等，那么每个儿童都可以获得1美元
+        return 0;
+    }
+
+    let mut money = money;
+    // 先给每个儿童分配1美元
+    money -= children;
+    // 贪心策略是尽可能多的儿童分配7美元，如果cnt大于children，说明有小孩一定会分配到多余8元
+    let mut cnt = (money / 7).min(children);
+    // 从剩下的钱中分配
+    money -= cnt * 7;
+    let mut children = children;
+    // 到目前为止已经有cnt个小孩已经分配完成了，剩下的小孩数
+    children -= cnt;
+    // 若剩余 0 个人，并且 money>0，那么将所有的美元分配给一个已经分到 8 美元的人，令 cnt 减去 1
+    // 若剩余 1 个人，并且 money=3，为了避免分到 4 美元，并注意到题目输入中的 children>=2，因此将这 3 美元拆成两部分，
+    // 将其中的一部分分配给已经分到 8 美元的人，令 cnt 减去 1。
+    if (children == 0 && money > 0) || (children == 1 && money == 3) {
+        cnt -= 1;
+    }
+    cnt
+}
+
+/**
+ * 1221. 分割平衡字符串
+简单
+相关标签
+相关企业
+提示
+平衡字符串 中，'L' 和 'R' 字符的数量是相同的。
+
+给你一个平衡字符串 s，请你将它分割成尽可能多的子字符串，并满足：
+
+每个子字符串都是平衡字符串。
+返回可以通过分割得到的平衡字符串的 最大数量 。
+
+
+
+示例 1：
+
+输入：s = "RLRRLLRLRL"
+输出：4
+解释：s 可以分割为 "RL"、"RRLL"、"RL"、"RL" ，每个子字符串中都包含相同数量的 'L' 和 'R' 。
+示例 2：
+
+输入：s = "RLRRRLLRLL"
+输出：2
+解释：s 可以分割为 "RL"、"RRRLLRLL"，每个子字符串中都包含相同数量的 'L' 和 'R' 。
+注意，s 无法分割为 "RL"、"RR"、"RL"、"LR"、"LL" 因为第 2 个和第 5 个子字符串不是平衡字符串。
+示例 3：
+
+输入：s = "LLLLRRRR"
+输出：1
+解释：s 只能保持原样 "LLLLRRRR" 。
+
+
+提示：
+
+2 <= s.length <= 1000
+s[i] = 'L' 或 'R'
+s 是一个 平衡 字符串
+
+解题思路：
+
+一个合法的 LR 子串满足 L 字符和 R 字符数量相等，常规检查一个字符串是否为合格的 LR 子串可以使用 O(n)O(n)O(n) 的遍历方式，
+可以使用记录前缀信息的数据结构，而对于成对结构的元素统计，更好的方式是转换为数学判定，使用 1 来代指 L 得分，使用 -1 来代指 R 得分。
+
+那么一个子串为合格 LR 子串的充要条件为 整个 LR 子串的总得分为 0。
+
+这种方式最早应该在 (题解) 301. 删除无效的括号 详细讲过，可延伸到任意的成对结构元素统计题目里去。
+ */
+pub fn balanced_string_split(s: String) -> i32 {
+    let mut res = 0;
+    let s = s.chars().collect::<Vec<char>>();
+    // R用1替代，L用-1替代
+    let mut cnt = 0;
+    // 定义左指针
+    let mut left = 0;
+    while left < s.len() {
+        if s[left] == 'R' {
+            cnt += 1;
+        } else {
+            cnt -= 1;
+        }
+        if cnt == 0 {
+            res += 1;
+        }
+        left += 1;
+    }
+    res
+}
+
+/**
+ * 2656. K 个元素的最大和
+简单
+相关标签
+给你一个下标从 0 开始的整数数组 nums 和一个整数 k 。你需要执行以下操作 恰好 k 次，最大化你的得分：
+
+从 nums 中选择一个元素 m 。
+将选中的元素 m 从数组中删除。
+将新元素 m + 1 添加到数组中。
+你的得分增加 m 。
+请你返回执行以上操作恰好 k 次后的最大得分。
+
+
+
+示例 1：
+
+输入：nums = [1,2,3,4,5], k = 3
+输出：18
+解释：我们需要从 nums 中恰好选择 3 个元素并最大化得分。
+第一次选择 5 。和为 5 ，nums = [1,2,3,4,6] 。
+第二次选择 6 。和为 6 ，nums = [1,2,3,4,7] 。
+第三次选择 7 。和为 5 + 6 + 7 = 18 ，nums = [1,2,3,4,8] 。
+所以我们返回 18 。
+18 是可以得到的最大答案。
+示例 2：
+
+输入：nums = [5,5,5], k = 2
+输出：11
+解释：我们需要从 nums 中恰好选择 2 个元素并最大化得分。
+第一次选择 5 。和为 5 ，nums = [5,5,6] 。
+第二次选择 6 。和为 6 ，nums = [5,5,7] 。
+所以我们返回 11 。
+11 是可以得到的最大答案。
+
+
+提示：
+
+1 <= nums.length <= 100
+1 <= nums[i] <= 100
+1 <= k <= 100
+ */
+pub fn maximize_sum(nums: Vec<i32>, k: i32) -> i32 {
+    let mut nums = nums;
+    nums.sort_unstable();
+    let mut res = Vec::new();
+    let pop = nums.pop().unwrap();
+    for _ in 0..k as usize {
+        if res.is_empty() {
+            res.push(pop);
+        } else {
+            res.push(res.last().unwrap() + 1);
+        }
+    }
+    res.iter().sum()
+}
+
+/**
+ * LCP 40. 心算挑战
+简单
+相关标签
+相关企业
+「力扣挑战赛」心算项目的挑战比赛中，要求选手从 N 张卡牌中选出 cnt 张卡牌，若这 cnt 张卡牌数字总和为偶数，则选手成绩「有效」且得分为 cnt 张卡牌数字总和。 给定数组 cards 和 cnt，其中 cards[i] 表示第 i 张卡牌上的数字。 请帮参赛选手计算最大的有效得分。若不存在获取有效得分的卡牌方案，则返回 0。
+
+示例 1：
+
+输入：cards = [1,2,8,9], cnt = 3
+
+输出：18
+
+解释：选择数字为 1、8、9 的这三张卡牌，此时可获得最大的有效得分 1+8+9=18。
+
+示例 2：
+
+输入：cards = [3,3,1], cnt = 1
+
+输出：0
+
+解释：不存在获取有效得分的卡牌方案。
+
+提示：
+
+1 <= cnt <= cards.length <= 10^5
+1 <= cards[i] <= 1000
+ */
+pub fn maxmium_score(cards: Vec<i32>, cnt: i32) -> i32 {
+    let mut cards = cards;
+    cards.sort_by(|a, b| b.cmp(&a));
+    let cnt = cnt as usize;
+    // 奇数和
+    let mut odd = vec![0];
+    // 偶数和
+    let mut even = vec![0];
+    for card in cards {
+        // 如果是奇数
+        if card & 1 != 0 {
+            let v = odd[odd.len() - 1];
+            odd.push(v + card);
+        } else {
+            // 如果是偶数
+            let v = even[even.len() - 1];
+            even.push(v + card);
+        }
+    }
+    let mut ans = 0;
+    for i in (0..odd.len()).step_by(2) {
+        if cnt >= i && cnt < even.len() + i {
+            ans = ans.max(odd[i] + even[cnt - i]);
+        }
+    }
+    ans
+}
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1015,5 +1448,44 @@ mod tests {
             merge(intervals),
             vec![vec![1, 6], vec![8, 10], vec![15, 18]]
         );
+    }
+
+    #[test]
+    fn test_longest_palindrome() {
+        let s = "abccccdd".to_string();
+        let res = longest_palindrome(s);
+        assert_eq!(res, 7);
+    }
+
+    #[test]
+    fn test_can_place_flowers() {
+        let flowerbed = vec![1, 0, 0, 0, 1];
+        let n = 1;
+        let res = can_place_flowers(flowerbed, n);
+        assert_eq!(res, true);
+    }
+
+    #[test]
+    fn test_dist_money() {
+        let money = 20;
+        let children = 3;
+        let res = dist_money(money, children);
+        assert_eq!(res, 1);
+    }
+
+    #[test]
+    fn test_maximize_sum() {
+        let nums = vec![1, 2, 3, 4, 5];
+        let k = 3;
+        let res = maximize_sum(nums, k);
+        assert_eq!(res, 18);
+    }
+
+    #[test]
+    fn test_maxmium_score() {
+        let cards = vec![10, 3];
+        let cnt = 1;
+        let res = maxmium_score(cards, cnt);
+        assert_eq!(res, 10);
     }
 }

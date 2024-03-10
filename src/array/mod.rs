@@ -471,6 +471,52 @@ pub fn max_profit(prices: Vec<i32>) -> i32 {
     res
 }
 
+/**
+ * 169. 多数元素
+简单
+相关标签
+相关企业
+给定一个大小为 n 的数组 nums ，返回其中的多数元素。多数元素是指在数组中出现次数 大于 ⌊ n/2 ⌋ 的元素。
+
+你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+
+
+```
+示例 1：
+
+输入：nums = [3,2,3]
+输出：3
+示例 2：
+
+输入：nums = [2,2,1,1,1,2,2]
+输出：2
+
+
+提示：
+n == nums.length
+1 <= n <= 5 * 104
+-109 <= nums[i] <= 109
+
+
+进阶：尝试设计时间复杂度为 O(n)、空间复杂度为 O(1) 的算法解决此问题。
+```
+ */
+pub fn majority_element(nums: Vec<i32>) -> i32 {
+    // 定义哈希表统计元素出现的次数
+    let mut map: HashMap<i32, u32> = HashMap::new();
+    let mut res = 0;
+    let mut max_count = 0;
+    for num in nums {
+        let count = map.entry(num).or_insert(0);
+        *count += 1;
+        if *count > max_count {
+            max_count = *count;
+            res = num;
+        }
+    }
+    res
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -522,5 +568,12 @@ mod tests {
         let prices = vec![7, 1, 5, 3, 6, 4];
         let max_profit = max_profit(prices);
         assert_eq!(max_profit, 5);
+    }
+
+    #[test]
+    fn test_majority_element() {
+        let nums = vec![3, 2, 3];
+        let majority_element = majority_element(nums);
+        assert_eq!(majority_element, 3);
     }
 }
