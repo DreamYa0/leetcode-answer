@@ -66,6 +66,7 @@ pub fn sorted_squares(nums: Vec<i32>) -> Vec<i32> {
     res
 }
 
+/// 125. 验证回文串
 /// 给你一个整数 x ，如果 x 是一个回文整数，返回 true ；否则，返回 false 。
 /// 回文数是指正序（从左向右）和倒序（从右向左）读都是一样的整数。
 /// 例如，121 是回文，而 123 不是。
@@ -106,7 +107,6 @@ pub fn is_palindrome(x: i32) -> bool {
     s == x.to_string()
 }
 
-/// 125. 验证回文串
 pub fn is_palindrome_ii(s: String) -> bool {
     let mut chars = s
         .chars()
@@ -131,7 +131,7 @@ pub fn is_palindrome_ii(s: String) -> bool {
             .collect::<String>()
 }
 
-/// 三数之和
+/// 15. 三数之和
 /// 给定一个包含 n 个整数的数组 nums，判断 nums 中是否存在三个元素 a ，b ，c ，使得 a + b + c = 0 ？请找出所有和为 0 且 不重复 的三元组。
 ///
 /// 示例 1：
@@ -180,31 +180,31 @@ pub fn three_sum(nums: Vec<i32>) -> Vec<Vec<i32>> {
             continue;
         }
 
-        // 固定i，寻找first和last，使用双指针法
-        let mut first = i + 1;
+        // 固定i，寻找left和right，使用双指针法
+        let mut left = i + 1;
         // 尾指针
-        let mut last = len - 1;
-        while first < last {
-            if nums[first] + nums[last] + nums[i] < 0 {
+        let mut right = len - 1;
+        while left < right {
+            if nums[left] + nums[right] + nums[i] < 0 {
                 // 小于0，first右移
-                first += 1;
-            } else if nums[first] + nums[last] + nums[i] > 0 {
+                left += 1;
+            } else if nums[left] + nums[right] + nums[i] > 0 {
                 // 大于0，last左移
-                last -= 1;
+                right -= 1;
             } else {
                 // 等于0，加入结果集
-                res.push(vec![nums[i], nums[first], nums[last]]);
+                res.push(vec![nums[i], nums[left], nums[right]]);
                 // first和last去重
-                while first < last && nums[first] == nums[first + 1] {
-                    first += 1;
+                while left < right && nums[left] == nums[left + 1] {
+                    left += 1;
                 }
-                while first < last && nums[last] == nums[last - 1] {
-                    last -= 1;
+                while left < right && nums[right] == nums[right - 1] {
+                    right -= 1;
                 }
 
                 // first和last继续移动
-                first += 1;
-                last -= 1;
+                left += 1;
+                right -= 1;
             }
         }
     }
@@ -212,6 +212,7 @@ pub fn three_sum(nums: Vec<i32>) -> Vec<Vec<i32>> {
     res
 }
 
+/// 16. 最接近的三数之和
 /// 给你一个长度为 n 的整数数组 nums 和 一个目标值 target。请你从 nums 中选出三个整数，使它们的和与 target 最接近。
 ///
 /// 返回这三个数的和。
@@ -302,7 +303,7 @@ pub fn three_sum_closest(nums: Vec<i32>, target: i32) -> i32 {
     ans
 }
 
-/// 四数之和
+/// 18. 四数之和
 /// 给你一个由 n 个整数组成的数组 nums ，和一个目标值 target 。请你找出并返回满足下述全部条件且不重复的四元组 [nums[a], nums[b], nums[c], nums[d]] （若两个四元组元素一一对应，则认为两个四元组重复）：
 ///
 /// 0 <= a, b, c, d < n
@@ -401,8 +402,33 @@ pub fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
     result
 }
 
-/// 反转字符串
-/// https://leetcode.cn/problems/reverse-string/
+/**
+ * 344. 反转字符串
+简单
+相关标签
+相关企业
+提示
+编写一个函数，其作用是将输入的字符串反转过来。输入字符串以字符数组 s 的形式给出。
+
+不要给另外的数组分配额外的空间，你必须原地修改输入数组、使用 O(1) 的额外空间解决这一问题。
+
+ 
+
+示例 1：
+
+输入：s = ["h","e","l","l","o"]
+输出：["o","l","l","e","h"]
+示例 2：
+
+输入：s = ["H","a","n","n","a","h"]
+输出：["h","a","n","n","a","H"]
+ 
+
+提示：
+
+1 <= s.length <= 105
+s[i] 都是 ASCII 码表中的可打印字符
+ */
 pub fn reverse_string(s: &mut Vec<char>) {
     // 定义右指针，指向末尾
     let mut rigth = s.len() - 1;
@@ -415,7 +441,64 @@ pub fn reverse_string(s: &mut Vec<char>) {
     }
 }
 
-/// 2562. 找出数组的串联值
+/**
+ * 2562. 找出数组的串联值
+已解答
+简单
+相关标签
+相关企业
+提示
+给你一个下标从 0 开始的整数数组 nums 。
+
+现定义两个数字的 串联 是由这两个数值串联起来形成的新数字。
+
+例如，15 和 49 的串联是 1549 。
+nums 的 串联值 最初等于 0 。执行下述操作直到 nums 变为空：
+
+如果 nums 中存在不止一个数字，分别选中 nums 中的第一个元素和最后一个元素，将二者串联得到的值加到 nums 的 串联值 上，然后从 nums 中删除第一个和最后一个元素。
+如果仅存在一个元素，则将该元素的值加到 nums 的串联值上，然后删除这个元素。
+返回执行完所有操作后 nums 的串联值。
+
+ 
+
+示例 1：
+
+输入：nums = [7,52,2,4]
+输出：596
+解释：在执行任一步操作前，nums 为 [7,52,2,4] ，串联值为 0 。
+ - 在第一步操作中：
+我们选中第一个元素 7 和最后一个元素 4 。
+二者的串联是 74 ，将其加到串联值上，所以串联值等于 74 。
+接着我们从 nums 中移除这两个元素，所以 nums 变为 [52,2] 。
+ - 在第二步操作中： 
+我们选中第一个元素 52 和最后一个元素 2 。 
+二者的串联是 522 ，将其加到串联值上，所以串联值等于 596 。
+接着我们从 nums 中移除这两个元素，所以 nums 变为空。
+由于串联值等于 596 ，所以答案就是 596 。
+示例 2：
+
+输入：nums = [5,14,13,8,12]
+输出：673
+解释：在执行任一步操作前，nums 为 [5,14,13,8,12] ，串联值为 0 。 
+- 在第一步操作中： 
+我们选中第一个元素 5 和最后一个元素 12 。 
+二者的串联是 512 ，将其加到串联值上，所以串联值等于 512 。 
+接着我们从 nums 中移除这两个元素，所以 nums 变为 [14,13,8] 。
+- 在第二步操作中：
+我们选中第一个元素 14 和最后一个元素 8 。
+二者的串联是 148 ，将其加到串联值上，所以串联值等于 660 。
+接着我们从 nums 中移除这两个元素，所以 nums 变为 [13] 。 
+- 在第三步操作中：
+nums 只有一个元素，所以我们选中 13 并将其加到串联值上，所以串联值等于 673 。
+接着我们从 nums 中移除这个元素，所以 nums 变为空。 
+由于串联值等于 673 ，所以答案就是 673 。
+ 
+
+提示：
+
+1 <= nums.length <= 1000
+1 <= nums[i] <= 104
+ */
 pub fn find_the_array_conc_val(nums: Vec<i32>) -> i64 {
     // 定义左指针
     let mut left = 0;
@@ -447,7 +530,43 @@ pub fn find_the_array_conc_val(nums: Vec<i32>) -> i64 {
     sum
 }
 
-/// 2697. 字典序最小回文串
+/**
+ * 2697. 字典序最小回文串
+简单
+相关标签
+提示
+给你一个由 小写英文字母 组成的字符串 s ，你可以对其执行一些操作。在一步操作中，你可以用其他小写英文字母 替换  s 中的一个字符。
+
+请你执行 尽可能少的操作 ，使 s 变成一个 回文串 。如果执行 最少 操作次数的方案不止一种，则只需选取 字典序最小 的方案。
+
+对于两个长度相同的字符串 a 和 b ，在 a 和 b 出现不同的第一个位置，如果该位置上 a 中对应字母比 b 中对应字母在字母表中出现顺序更早，则认为 a 的字典序比 b 的字典序要小。
+
+返回最终的回文字符串。
+
+ 
+
+示例 1：
+
+输入：s = "egcfe"
+输出："efcfe"
+解释：将 "egcfe" 变成回文字符串的最小操作次数为 1 ，修改 1 次得到的字典序最小回文字符串是 "efcfe"，只需将 'g' 改为 'f' 。
+示例 2：
+
+输入：s = "abcd"
+输出："abba"
+解释：将 "abcd" 变成回文字符串的最小操作次数为 2 ，修改 2 次得到的字典序最小回文字符串是 "abba" 。
+示例 3：
+
+输入：s = "seven"
+输出："neven"
+解释：将 "seven" 变成回文字符串的最小操作次数为 1 ，修改 1 次得到的字典序最小回文字符串是 "neven" 。
+ 
+
+提示：
+
+1 <= s.length <= 1000
+s 仅由小写英文字母组成
+ */
 pub fn make_smallest_palindrome(s: String) -> String {
     // 把字符串转为字节数组
     let mut bytes = s.into_bytes();
@@ -470,7 +589,51 @@ pub fn make_smallest_palindrome(s: String) -> String {
     String::from_utf8(bytes).unwrap()
 }
 
-/// 2465. 不同的平均值数目
+/**
+ * 2465. 不同的平均值数目
+简单
+相关标签
+相关企业
+提示
+给你一个下标从 0 开始长度为 偶数 的整数数组 nums 。
+
+只要 nums 不是 空数组，你就重复执行以下步骤：
+
+找到 nums 中的最小值，并删除它。
+找到 nums 中的最大值，并删除它。
+计算删除两数的平均值。
+两数 a 和 b 的 平均值 为 (a + b) / 2 。
+
+比方说，2 和 3 的平均值是 (2 + 3) / 2 = 2.5 。
+返回上述过程能得到的 不同 平均值的数目。
+
+注意 ，如果最小值或者最大值有重复元素，可以删除任意一个。
+
+ 
+
+示例 1：
+
+输入：nums = [4,1,4,0,3,5]
+输出：2
+解释：
+1. 删除 0 和 5 ，平均值是 (0 + 5) / 2 = 2.5 ，现在 nums = [4,1,4,3] 。
+2. 删除 1 和 4 ，平均值是 (1 + 4) / 2 = 2.5 ，现在 nums = [4,3] 。
+3. 删除 3 和 4 ，平均值是 (3 + 4) / 2 = 3.5 。
+2.5 ，2.5 和 3.5 之中总共有 2 个不同的数，我们返回 2 。
+示例 2：
+
+输入：nums = [1,100]
+输出：1
+解释：
+删除 1 和 100 后只有一个平均值，所以我们返回 1 。
+ 
+
+提示：
+
+2 <= nums.length <= 100
+nums.length 是偶数。
+0 <= nums[i] <= 100
+ */
 pub fn distinct_averages(nums: Vec<i32>) -> i32 {
     let mut nums = nums;
     // 定义左指针
@@ -490,7 +653,46 @@ pub fn distinct_averages(nums: Vec<i32>) -> i32 {
     hash_set.len() as i32
 }
 
-/// 2824. 统计和小于目标的下标对数目
+/**
+ * 2824. 统计和小于目标的下标对数目
+简单
+相关标签
+相关企业
+提示
+给你一个下标从 0 开始长度为 n 的整数数组 nums 和一个整数 target ，请你返回满足 0 <= i < j < n 且 nums[i] + nums[j] < target 的下标对 (i, j) 的数目。
+ 
+
+示例 1：
+
+输入：nums = [-1,1,2,3,1], target = 2
+输出：3
+解释：总共有 3 个下标对满足题目描述：
+- (0, 1) ，0 < 1 且 nums[0] + nums[1] = 0 < target
+- (0, 2) ，0 < 2 且 nums[0] + nums[2] = 1 < target 
+- (0, 4) ，0 < 4 且 nums[0] + nums[4] = 0 < target
+注意 (0, 3) 不计入答案因为 nums[0] + nums[3] 不是严格小于 target 。
+示例 2：
+
+输入：nums = [-6,2,5,-2,-7,-1,3], target = -2
+输出：10
+解释：总共有 10 个下标对满足题目描述：
+- (0, 1) ，0 < 1 且 nums[0] + nums[1] = -4 < target
+- (0, 3) ，0 < 3 且 nums[0] + nums[3] = -8 < target
+- (0, 4) ，0 < 4 且 nums[0] + nums[4] = -13 < target
+- (0, 5) ，0 < 5 且 nums[0] + nums[5] = -7 < target
+- (0, 6) ，0 < 6 且 nums[0] + nums[6] = -3 < target
+- (1, 4) ，1 < 4 且 nums[1] + nums[4] = -5 < target
+- (3, 4) ，3 < 4 且 nums[3] + nums[4] = -9 < target
+- (3, 5) ，3 < 5 且 nums[3] + nums[5] = -3 < target
+- (4, 5) ，4 < 5 且 nums[4] + nums[5] = -8 < target
+- (4, 6) ，4 < 6 且 nums[4] + nums[6] = -4 < target
+ 
+
+提示：
+
+1 <= nums.length == n <= 50
+-50 <= nums[i], target <= 50
+ */
 pub fn count_pairs(nums: Vec<i32>, target: i32) -> i32 {
     let mut nums = nums;
     // 排序数组
@@ -520,7 +722,7 @@ pub fn count_pairs(nums: Vec<i32>, target: i32) -> i32 {
     cnt as i32
 }
 
-/// 数组中的第 K 个最大元素
+/// 215. 数组中的第K个最大元素
 ///
 /// 给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。
 ///

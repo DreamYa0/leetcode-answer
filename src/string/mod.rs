@@ -1,5 +1,6 @@
 pub mod replace;
 pub mod reverse;
+pub mod kmp;
 
 /// 罗马数字包含以下七种字符: I， V， X， L，C，D 和 M。
 ///

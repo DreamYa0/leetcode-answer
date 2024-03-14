@@ -454,6 +454,79 @@ pub fn days_between_dates(date1: String, date2: String) -> i32 {
     (str_to_year(date1) - str_to_year(date2)).abs()
 }
 
+/**
+ * 强化练习 1：回文素数
+给你一个整数 n ，返回大于或等于 n 的最小回文质数。
+
+一个整数如果恰好有两个除数：1 和它本身，那么它是 质数 。注意，1 不是质数。
+
+例如，2、3、5、7、11 和 13 都是质数。
+一个整数如果从左向右读和从右向左读是相同的，那么它是 回文数 。
+
+例如，101 和 12321 都是回文数。
+测试用例保证答案总是存在，并且在 [2, 2 * 108] 范围内。
+
+
+
+示例 1：
+
+输入：n = 6
+输出：7
+示例 2：
+
+输入：n = 8
+输出：11
+示例 3：
+
+输入：n = 13
+输出：101
+
+
+提示：
+
+1 <= n <= 108
+ */
+pub fn prime_palindrome(n: i32) -> i32 {
+    if n == 1 {
+        // 2 是最小的素数
+        return 2;
+    }
+    let mut n = n;
+    loop {
+        // 遍历所有数字，检查是不是回文串。如果是，检查是不是素数
+        if is_palindrome(n) && is_prime(n) {
+            return n;
+        }
+        n += 1;
+        // 如果当前数字长度为 8，可以跳过检查，因为不存在 8 长度的素数
+        if 10_000_000 < n && n < 100_000_000 {
+            n = 100_000_000;
+        }
+    }
+}
+
+/// 判断是否是素数
+fn is_prime(n: i32) -> bool {
+    let sqrtn = (n as f64).sqrt();
+    for i in 2..=sqrtn as i32 {
+        if n % i == 0 {
+            return false;
+        }
+    }
+    true
+}
+
+/// 判断是否是回文数
+fn is_palindrome(n: i32) -> bool {
+    let mut m = 0;
+    let mut t = n;
+    while t > 0 {
+        m = m * 10 + t % 10;
+        t /= 10;
+    }
+    n == m
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -468,5 +541,23 @@ mod tests {
     fn test_consecutive_numbers_sum() {
         let n = 15;
         assert_eq!(consecutive_numbers_sum(n), 4);
+    }
+
+    #[test]
+    fn test_prime_palindrome() {
+        let n = 13;
+        assert_eq!(prime_palindrome(n), 101);
+    }
+
+    #[test]
+    fn test_is_palindrome() {
+        let n = 121;
+        assert_eq!(is_palindrome(n), true);
+    }
+
+    #[test]
+    fn test_is_prime() {
+        let n = 13;
+        assert_eq!(is_prime(n), true);
     }
 }

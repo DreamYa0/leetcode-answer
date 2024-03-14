@@ -1,6 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 pub mod anagram;
+pub mod rolling_hash;
 
 /// 217. 存在重复元素
 ///
@@ -231,6 +232,7 @@ pub fn find_pairs(nums: Vec<i32>, k: i32) -> i32 {
     // 遍历数组
     for i in 0..nums.len() {
         // 如果k为0，只需要统计数组中元素出现次数大于1的元素个数
+        // 重复的不只统计一次，即是出现次数大于2次的元素也只会统计一次
         if k == 0 {
             if *cns.get(&nums[i]).unwrap_or(&0) > 1 {
                 res += 1;
@@ -244,6 +246,36 @@ pub fn find_pairs(nums: Vec<i32>, k: i32) -> i32 {
                 // 更新元素出现的次数, 避免重复统计
                 cns.insert(nums[i] + k, 0);
             }
+        }
+    }
+    res
+}
+
+pub fn find_pairs_ii(nums: Vec<i32>, k: i32) -> i32 {
+    let mut nums = nums;
+    nums.sort_unstable();
+    let mut cns = HashMap::<i32, i32>::new();
+    let mut res = 0;
+    if k == 0 {
+        for i in 0..nums.len() {
+            if i > 0 && nums[i] == nums[i - 1] {
+                if i > 1 && nums[i] == nums[i - 2] {
+                    // 重复的数据忽略掉不重复统计
+                    continue;
+                }
+                res += 1;
+            }
+        }
+    } else {
+        for i in 0..nums.len() {
+            if i > 0 && nums[i] == nums[i - 1] {
+                // 重复的直接跳过
+                continue;
+            }
+            if cns.contains_key(&(nums[i])) {
+                res += 1;
+            }
+            cns.insert(nums[i] + k, 1);
         }
     }
     res
@@ -396,39 +428,39 @@ pub fn get_sum(mut n: i32) -> i32 {
 }
 
 /// 1.两数之和
-/// 
+///
 /// 给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，并返回它们的数组下标。
-/// 
+///
 /// 你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。
-/// 
+///
 /// 你可以按任意顺序返回答案。
-/// 
+///
 /// 示例 1：
-/// 
+///
 /// 输入：nums = [2,7,11,15], target = 9
 /// 输出：[0,1]
 /// 解释：因为 nums[0] + nums[1] == 9 ，返回 [0, 1] 。
-/// 
+///
 /// 示例 2：
-/// 
+///
 /// 输入：nums = [3,2,4], target = 6
 /// 输出：[1,2]
-/// 
+///
 /// 示例 3：
-/// 
+///
 /// 输入：nums = [3,3], target = 6
 /// 输出：[0,1]
-/// 
+///
 /// 提示：
-/// 
+///
 /// 2 <= nums.length <= 104
 /// -109 <= nums[i] <= 109
 /// -109 <= target <= 109
-/// 
+///
 /// 只会存在一个有效答案
-/// 
+///
 /// 进阶：你可以想出一个时间复杂度小于 O(n2) 的算法吗？
-/// 
+///
 /// 思路
 /// 很明显暴力的解法是两层for循环查找，时间复杂度是O(n^2)。
 ///
@@ -514,7 +546,7 @@ pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
 /// 两个元组如下：
 /// 1. (0, 0, 0, 1) -> nums1[0] + nums2[0] + nums3[0] + nums4[1] = 1 + (-2) + (-1) + 2 = 0
 /// 2. (1, 1, 0, 0) -> nums1[1] + nums2[1] + nums3[0] + nums4[0] = 2 + (-1) + (-1) + 0 = 0
-/// 
+///
 /// 示例 2：
 ///
 /// 输入：nums1 = [0], nums2 = [0], nums3 = [0], nums4 = [0]
@@ -528,7 +560,7 @@ pub fn two_sum(nums: Vec<i32>, target: i32) -> Vec<i32> {
 /// n == nums4.length
 /// 1 <= n <= 200
 /// -228 <= nums1[i], nums2[i], nums3[i], nums4[i] <= 228
-/// 
+///
 /// 思路
 /// 本题咋眼一看好像和0015.三数之和，0018.四数之和差不多，其实差很多。
 ///
@@ -564,6 +596,534 @@ pub fn four_sum_count(nums1: Vec<i32>, nums2: Vec<i32>, nums3: Vec<i32>, nums4: 
     }
 
     return count;
+}
+
+/**
+ * 006. 差的绝对值为 K 的数对数目
+简单
+相关标签
+相关企业
+提示
+给你一个整数数组 nums 和一个整数 k ，请你返回数对 (i, j) 的数目，满足 i < j 且 |nums[i] - nums[j]| == k 。
+
+|x| 的值定义为：
+
+如果 x >= 0 ，那么值为 x 。
+如果 x < 0 ，那么值为 -x 。
+
+
+示例 1：
+
+输入：nums = [1,2,2,1], k = 1
+输出：4
+解释：差的绝对值为 1 的数对为：
+- [1,2,2,1]
+- [1,2,2,1]
+- [1,2,2,1]
+- [1,2,2,1]
+示例 2：
+
+输入：nums = [1,3], k = 3
+输出：0
+解释：没有任何数对差的绝对值为 3 。
+示例 3：
+
+输入：nums = [3,2,1,5,4], k = 2
+输出：3
+解释：差的绝对值为 2 的数对为：
+- [3,2,1,5,4]
+- [3,2,1,5,4]
+- [3,2,1,5,4]
+
+
+提示：
+
+1 <= nums.length <= 200
+1 <= nums[i] <= 100
+1 <= k <= 99
+ */
+pub fn count_k_difference(nums: Vec<i32>, k: i32) -> i32 {
+    // key为nums[i] - k 或 nums[i] + k, value为nums[i]出现的次数 nums[i] - k可能出现负数，所以这里不能使用数组来作哈希表
+    let mut cnt = HashMap::new();
+    let mut res = 0;
+    for i in 0..nums.len() {
+        res += cnt.get(&(nums[i] - k)).unwrap_or(&0) + cnt.get(&(nums[i] + k)).unwrap_or(&0);
+        cnt.insert(nums[i], cnt.get(&nums[i]).unwrap_or(&0) + 1);
+    }
+    res
+}
+
+/**
+ * 强化练习 1 ：唯一元素的和
+给你一个整数数组 nums 。数组中唯一元素是那些只出现 恰好一次 的元素。
+
+请你返回 nums 中唯一元素的 和 。
+
+
+
+示例 1：
+
+输入：nums = [1,2,3,2]
+输出：4
+解释：唯一元素为 [1,3] ，和为 4 。
+示例 2：
+
+输入：nums = [1,1,1,1,1]
+输出：0
+解释：没有唯一元素，和为 0 。
+示例 3 ：
+
+输入：nums = [1,2,3,4,5]
+输出：15
+解释：唯一元素为 [1,2,3,4,5] ，和为 15 。
+
+
+提示：
+
+1 <= nums.length <= 100
+1 <= nums[i] <= 100
+ */
+pub fn sum_of_unique(nums: Vec<i32>) -> i32 {
+    let mut cnt = vec![0; 101];
+    for n in nums {
+        cnt[n as usize] += 1;
+    }
+    let mut sum = 0;
+    for (i, n) in cnt.iter().enumerate() {
+        if *n as usize == 1 {
+            sum += i;
+        }
+    }
+    sum as i32
+}
+
+/**
+ * 强化练习 3 ：检查是否所有字符出现次数相同
+给你一个字符串 s ，如果 s 是一个 好 字符串，请你返回 true ，否则请返回 false 。
+
+如果 s 中出现过的 所有 字符的出现次数 相同 ，那么我们称字符串 s 是 好 字符串。
+
+
+
+示例 1：
+
+输入：s = "abacbc"
+输出：true
+解释：s 中出现过的字符为 'a'，'b' 和 'c' 。s 中所有字符均出现 2 次。
+示例 2：
+
+输入：s = "aaabb"
+输出：false
+解释：s 中出现过的字符为 'a' 和 'b' 。
+'a' 出现了 3 次，'b' 出现了 2 次，两者出现次数不同。
+
+
+提示：
+
+1 <= s.length <= 1000
+s 只包含小写英文字母。
+ */
+pub fn are_occurrences_equal(s: String) -> bool {
+    let mut cnt = vec![0; 26];
+    let s = s.into_bytes();
+    for c in s {
+        cnt[(c - b'a') as usize] += 1;
+    }
+    let (mut left, mut right) = (0, cnt.len() - 1);
+    while left < right {
+        if cnt[left] == 0 {
+            left += 1;
+        } else if cnt[right] == 0 {
+            right -= 1;
+        } else if cnt[left] != cnt[right] {
+            return false;
+        } else {
+            left += 1;
+            right -= 1;
+        }
+    }
+    true
+}
+
+/**
+ * 强化练习 3：按照频率将数组升序排序
+给你一个整数数组 nums ，请你将数组按照每个值的频率 升序 排序。如果有多个值的频率相同，请你按照数值本身将它们 降序 排序。
+
+请你返回排序后的数组。
+
+
+
+示例 1：
+
+输入：nums = [1,1,2,2,2,3]
+输出：[3,1,1,2,2,2]
+解释：'3' 频率为 1，'1' 频率为 2，'2' 频率为 3 。
+示例 2：
+
+输入：nums = [2,3,1,3,2]
+输出：[1,3,3,2,2]
+解释：'2' 和 '3' 频率都为 2 ，所以它们之间按照数值本身降序排序。
+示例 3：
+
+输入：nums = [-1,1,-6,4,5,-6,1,4,1]
+输出：[5,-1,4,4,-6,-6,1,1,1]
+
+
+提示：
+
+1 <= nums.length <= 100
+-100 <= nums[i] <= 100
+ */
+pub fn frequency_sort(nums: Vec<i32>) -> Vec<i32> {
+    let mut nums = nums;
+    let mut cnt = vec![0; 201];
+    for n in nums.iter() {
+        // 统计频次
+        cnt[(*n + 100) as usize] += 1;
+    }
+    // 比较器排序
+    nums.sort_unstable_by(|a, b| {
+        if cnt[(*a + 100) as usize] != cnt[(*b + 100) as usize] {
+            // 如果频次不相等，那么就按照频次从大到小排
+            return cnt[(*a + 100) as usize].cmp(&cnt[(*b + 100) as usize]);
+        }
+        // 如果频次相同则按照自身数据大小从小到大排
+        b.cmp(a)
+    });
+    nums
+}
+
+/**
+ * 强化练习 6：设计哈希集合
+不使用任何内建的哈希表库设计一个哈希集合（HashSet）。
+
+实现 MyHashSet 类：
+
+void add(key) 向哈希集合中插入值 key 。
+bool contains(key) 返回哈希集合中是否存在这个值 key 。
+void remove(key) 将给定值 key 从哈希集合中删除。如果哈希集合中没有这个值，什么也不做。
+
+示例：
+
+输入：
+["MyHashSet", "add", "add", "contains", "contains", "add", "contains", "remove", "contains"]
+[[], [1], [2], [1], [3], [2], [2], [2], [2]]
+输出：
+[null, null, null, true, false, null, true, null, false]
+
+解释：
+MyHashSet myHashSet = new MyHashSet();
+myHashSet.add(1);      // set = [1]
+myHashSet.add(2);      // set = [1, 2]
+myHashSet.contains(1); // 返回 True
+myHashSet.contains(3); // 返回 False ，（未找到）
+myHashSet.add(2);      // set = [1, 2]
+myHashSet.contains(2); // 返回 True
+myHashSet.remove(2);   // set = [1]
+myHashSet.contains(2); // 返回 False ，（已移除）
+
+
+提示：
+
+0 <= key <= 106
+最多调用 104 次 add、remove 和 contains
+ */
+#[allow(dead_code)]
+struct MyHashSet {
+    val: Vec<u64>,
+}
+
+#[allow(dead_code)]
+impl MyHashSet {
+    fn new() -> Self {
+        Self {
+            val: vec![0; 15626],
+        }
+    }
+
+    fn add(&mut self, key: i32) {
+        // 将key对应的位置置为1
+        self.val[key as usize / 64] |= 1 << key as usize % 64;
+    }
+
+    fn remove(&mut self, key: i32) {
+        // 将key对应的位置置为0
+        self.val[key as usize / 64] &= !(1 << key as usize % 64);
+    }
+
+    fn contains(&self, key: i32) -> bool {
+        // 判断key对应的位置是否为1
+        self.val[key as usize / 64] & 1 << key as usize % 64 > 0
+    }
+}
+
+/**
+强化练习 7：设计哈希映射
+不使用任何内建的哈希表库设计一个哈希映射（HashMap）。
+
+实现 MyHashMap 类：
+
+MyHashMap() 用空映射初始化对象
+void put(int key, int value) 向 HashMap 插入一个键值对 (key, value) 。如果 key 已经存在于映射中，则更新其对应的值 value 。
+int get(int key) 返回特定的 key 所映射的 value ；如果映射中不包含 key 的映射，返回 -1 。
+void remove(key) 如果映射中存在 key 的映射，则移除 key 和它所对应的 value 。
+
+
+示例：
+
+输入：
+["MyHashMap", "put", "put", "get", "get", "put", "get", "remove", "get"]
+[[], [1, 1], [2, 2], [1], [3], [2, 1], [2], [2], [2]]
+输出：
+[null, null, null, 1, -1, null, 1, null, -1]
+
+解释：
+MyHashMap myHashMap = new MyHashMap();
+myHashMap.put(1, 1); // myHashMap 现在为 [[1,1]]
+myHashMap.put(2, 2); // myHashMap 现在为 [[1,1], [2,2]]
+myHashMap.get(1);    // 返回 1 ，myHashMap 现在为 [[1,1], [2,2]]
+myHashMap.get(3);    // 返回 -1（未找到），myHashMap 现在为 [[1,1], [2,2]]
+myHashMap.put(2, 1); // myHashMap 现在为 [[1,1], [2,1]]（更新已有的值）
+myHashMap.get(2);    // 返回 1 ，myHashMap 现在为 [[1,1], [2,1]]
+myHashMap.remove(2); // 删除键为 2 的数据，myHashMap 现在为 [[1,1]]
+myHashMap.get(2);    // 返回 -1（未找到），myHashMap 现在为 [[1,1]]
+
+
+提示：
+
+0 <= key, value <= 106
+最多调用 104 次 put、get 和 remove 方法
+ */
+#[allow(dead_code)]
+struct MyHashMap {
+    val: Vec<i32>,
+}
+
+#[allow(dead_code)]
+impl MyHashMap {
+    fn new() -> Self {
+        Self {
+            val: vec![-1; 1000001],
+        }
+    }
+
+    fn put(&mut self, key: i32, value: i32) {
+        self.val[key as usize] = value;
+    }
+
+    fn get(&self, key: i32) -> i32 {
+        self.val[key as usize]
+    }
+
+    fn remove(&mut self, key: i32) {
+        self.val[key as usize] = -1;
+    }
+}
+
+/**
+ * 强化练习 1：缺失的第一个正数
+
+给你一个未排序的整数数组 nums ，请你找出其中没有出现的最小的正整数。
+
+请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。
+
+
+示例 1：
+
+输入：nums = [1,2,0]
+输出：3
+解释：范围 [1,2] 中的数字都在数组中。
+示例 2：
+
+输入：nums = [3,4,-1,1]
+输出：2
+解释：1 在数组中，但 2 没有。
+示例 3：
+
+输入：nums = [7,8,9,11,12]
+输出：1
+解释：最小的正数 1 没有出现。
+
+
+提示：
+
+1 <= nums.length <= 105
+-231 <= nums[i] <= 231 - 1
+ */
+pub fn first_missing_positive(nums: Vec<i32>) -> i32 {
+    let mut nums = nums;
+    for i in 0..nums.len() {
+        // 我们可以采取这样的思路：就把 1 这个数放到下标为 0 的位置， 2 这个数放到下标为 1 的位置，按照这种思路整理一遍数组。
+        // 然后我们再遍历一次数组，第 1 个遇到的它的值不等于下标的那个数，就是我们要找的缺失的第一个正数。
+        while nums[i] > 0 && nums[i] <= nums.len() as i32 && nums[(nums[i] - 1) as usize] != nums[i]
+        {
+            let a = nums[i] as usize - 1;
+            nums.swap(a, i)
+        }
+    }
+
+    for i in 0..nums.len() {
+        if nums[i] != i as i32 + 1 {
+            return i as i32 + 1;
+        }
+    }
+    // 如果[1,N]中都找不到那么就返回N + 1
+    nums.len() as i32 + 1
+}
+
+/**
+ * LCR 120. 寻找文件副本
+简单
+相关标签
+相关企业
+设备中存有 n 个文件，文件 id 记于数组 documents。若文件 id 相同，则定义为该文件存在副本。请返回任一存在副本的文件 id。
+
+
+
+示例 1：
+
+输入：documents = [2, 5, 3, 0, 5, 0]
+输出：0 或 5
+
+
+提示：
+
+0 ≤ documents[i] ≤ n-1
+2 <= n <= 100000
+ */
+pub fn find_repeat_document(documents: Vec<i32>) -> i32 {
+    let mut documents = documents;
+    for i in 0..documents.len() {
+        while documents[i] != documents[documents[i] as usize] {
+            let a = documents[i] as usize;
+            documents.swap(a, i);
+        }
+        // 如果当前位置的索引和值不相等，且和documents[documents[i]位置的值相等，那么就找到了重复的文件
+        if documents[i] as usize != i && documents[i] == documents[documents[i] as usize] {
+            return documents[i];
+        }
+    }
+    -1
+}
+
+/**
+ * 448. 找到所有数组中消失的数字
+简单
+相关标签
+相关企业
+提示
+给你一个含 n 个整数的数组 nums ，其中 nums[i] 在区间 [1, n] 内。
+请你找出所有在 [1, n] 范围内但没有出现在 nums 中的数字，并以数组的形式返回结果。
+
+
+
+示例 1：
+
+输入：nums = [4,3,2,7,8,2,3,1]
+输出：[5,6]
+示例 2：
+
+输入：nums = [1,1]
+输出：[2]
+
+
+提示：
+
+n == nums.length
+1 <= n <= 105
+1 <= nums[i] <= n
+进阶：你能在不使用额外空间且时间复杂度为 O(n) 的情况下解决这个问题吗? 你可以假定返回的数组不算在额外空间内。
+ */
+pub fn find_disappeared_numbers(nums: Vec<i32>) -> Vec<i32> {
+    let mut nums = nums;
+    let len = nums.len();
+    for i in 0..len {
+        let num = nums[i];
+        // 如果nums[i] - 1 位置的数大于0，就把变为负数
+        if nums[(num.abs() - 1) as usize] > 0 {
+            nums[(num.abs() - 1) as usize] *= -1;
+        }
+    }
+
+    let mut res = Vec::with_capacity(len);
+    for i in 0..len {
+        // 没有变为负数的数字就是没出现的数字
+        if nums[i] > 0 {
+            res.push(i as i32 + 1)
+        }
+    }
+
+    res
+}
+
+/**
+ * 1442. 形成两个异或相等数组的三元组数目
+给你一个整数数组 arr 。
+
+现需要从数组中取三个下标 i、j 和 k ，其中 (0 <= i < j <= k < arr.length) 。
+
+a 和 b 定义如下：
+
+a = arr[i] ^ arr[i + 1] ^ ... ^ arr[j - 1]
+b = arr[j] ^ arr[j + 1] ^ ... ^ arr[k]
+注意：^ 表示 按位异或 操作。
+
+请返回能够令 a == b 成立的三元组 (i, j , k) 的数目。
+
+
+
+示例 1：
+
+输入：arr = [2,3,1,6,7]
+输出：4
+解释：满足题意的三元组分别是 (0,1,2), (0,2,2), (2,3,4) 以及 (2,4,4)
+示例 2：
+
+输入：arr = [1,1,1,1,1]
+输出：10
+示例 3：
+
+输入：arr = [2,3]
+输出：0
+示例 4：
+
+输入：arr = [1,3,5,7,9]
+输出：3
+示例 5：
+
+输入：arr = [7,11,12,9,5,2,7,17,22]
+输出：8
+
+
+提示：
+
+1 <= arr.length <= 300
+1 <= arr[i] <= 10^8
+
+解题思路：
+
+<img src="https://pic.leetcode-cn.com/1621275894-bLqcng-384ed430a407e5370c5590b44ee21c9.png" />
+ */
+pub fn count_triplets(arr: Vec<i32>) -> i32 {
+    // 定义异或值数组
+    let mut pre_xor = vec![0; arr.len() + 1];
+    for i in 0..arr.len() {
+        pre_xor[i + 1] = arr[i] ^ pre_xor[i];
+    }
+    let mut res = 0;
+    // 我们知道 a ⊕ a = 0的，由于题目让我们找到满足 a == b 的坐标，那么当 a 等于 b 时满足什么性质?
+    // a ⊕ b = 0! 我们就可以得到arr[i] ^...^ arr[j-1]^ arr[j] ^...^ arr[k] = 0。
+    // 因此在 i 之前的前缀异或值到 k 时不会变。这是法三的核心！！
+    // 因为【i，k】的区间异或值为0，可以得到： preXor[i-1] == preXor[k]
+    // 其另一点重点在于在区间 [i, k]内 j 在哪并不重要, 因为无论 j 在哪，i 到 k 的异或值都等于 0. 不影响结果。
+    for i in 1..=arr.len() {
+        for k in i + 1..=arr.len() {
+            if pre_xor[i - 1] == pre_xor[k] {
+                res += (k - i) as i32;
+            }
+        }
+    }
+    res
 }
 
 #[cfg(test)]
@@ -612,5 +1172,49 @@ mod tests {
         let nums4 = vec![0, 2];
         let result = four_sum_count(nums1, nums2, nums3, nums4);
         println!("result = {:?}", result);
+    }
+
+    #[test]
+    fn test_count_k_difference() {
+        let nums = vec![1, 3];
+        let k = 3;
+        let result = count_k_difference(nums, k);
+        assert_eq!(result, 0);
+    }
+
+    #[test]
+    fn test_are_occurrences_equal() {
+        let s = "tveixwaeoezcf".to_string();
+        let result = are_occurrences_equal(s);
+        assert_eq!(result, false);
+    }
+
+    #[test]
+    fn test_first_missing_positive() {
+        let nums = vec![3, 4, -1, 1];
+        let result = first_missing_positive(nums);
+        assert_eq!(result, 2);
+    }
+
+    #[test]
+    fn test_find_repeat_document() {
+        let documents = vec![0, 1, 2, 3, 4, 11, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+        let result = find_repeat_document(documents);
+        assert_eq!(result, 11);
+    }
+
+    #[test]
+    fn test_find_pairs_ii() {
+        let nums = vec![3, 1, 4, 1, 5];
+        let k = 2;
+        let result = find_pairs_ii(nums, k);
+        assert_eq!(result, 2);
+    }
+
+    #[test]
+    fn test_count_triplets() {
+        let arr = vec![2, 3, 1, 6, 7];
+        let result = count_triplets(arr);
+        assert_eq!(result, 4);
     }
 }

@@ -459,12 +459,18 @@ fn do_generate_parenthesis(left: usize, right: usize, path: &mut Vec<char>, res:
 ```
  */
 pub fn find_target_sum_ways(nums: Vec<i32>, target: i32) -> i32 {
-    let mut  res=Vec::new();
+    let mut res = Vec::new();
     do_find_target_sum_ways(&nums, target, 0, 0, &mut res);
     res.iter().count() as i32
 }
 
-fn do_find_target_sum_ways(nums: &Vec<i32>, target: i32, start: usize, sum: i32, res:&mut Vec<i32>) {
+fn do_find_target_sum_ways(
+    nums: &Vec<i32>,
+    target: i32,
+    start: usize,
+    sum: i32,
+    res: &mut Vec<i32>,
+) {
     if start == nums.len() {
         if target == sum {
             // 遍历到数组末尾后开始收集结果
@@ -475,6 +481,192 @@ fn do_find_target_sum_ways(nums: &Vec<i32>, target: i32, start: usize, sum: i32,
     // 回溯隐藏在 sum + nums[start] 和 sum - nums[start] 中
     do_find_target_sum_ways(nums, target, start + 1, sum + nums[start], res);
     do_find_target_sum_ways(nums, target, start + 1, sum - nums[start], res);
+}
+
+/**
+ * 2006. 差的绝对值为 K 的数对数目
+简单
+相关标签
+相关企业
+提示
+给你一个整数数组 nums 和一个整数 k ，请你返回数对 (i, j) 的数目，满足 i < j 且 |nums[i] - nums[j]| == k 。
+
+|x| 的值定义为：
+
+如果 x >= 0 ，那么值为 x 。
+如果 x < 0 ，那么值为 -x 。
+
+
+示例 1：
+
+输入：nums = [1,2,2,1], k = 1
+输出：4
+解释：差的绝对值为 1 的数对为：
+- [1,2,2,1]
+- [1,2,2,1]
+- [1,2,2,1]
+- [1,2,2,1]
+示例 2：
+
+输入：nums = [1,3], k = 3
+输出：0
+解释：没有任何数对差的绝对值为 3 。
+示例 3：
+
+输入：nums = [3,2,1,5,4], k = 2
+输出：3
+解释：差的绝对值为 2 的数对为：
+- [3,2,1,5,4]
+- [3,2,1,5,4]
+- [3,2,1,5,4]
+
+
+提示：
+
+1 <= nums.length <= 200
+1 <= nums[i] <= 100
+1 <= k <= 99
+ */
+pub fn count_k_difference(nums: Vec<i32>, k: i32) -> i32 {
+    let mut res = Vec::new();
+    let mut path = Vec::new();
+    do_count_k_difference(&nums, k, 0, &mut path, &mut res);
+    res.iter().count() as i32
+}
+
+fn do_count_k_difference(
+    nums: &Vec<i32>,
+    k: i32,
+    start: usize,
+    path: &mut Vec<i32>,
+    res: &mut Vec<Vec<i32>>,
+) {
+    if path.len() == 2 {
+        if (path[0] - path[1]).abs() == k {
+            res.push(path.clone());
+        }
+        return;
+    }
+    for i in start..nums.len() {
+        path.push(nums[i]);
+        do_count_k_difference(nums, k, i + 1, path, res);
+        path.pop();
+    }
+}
+
+/**
+ * 强化练习 5 ：好数对的数目
+给你一个整数数组 nums 。
+
+如果一组数字 (i,j) 满足 nums[i] == nums[j] 且 i < j ，就可以认为这是一组 好数对 。
+
+返回好数对的数目。
+
+
+
+示例 1：
+
+输入：nums = [1,2,3,1,1,3]
+输出：4
+解释：有 4 组好数对，分别是 (0,3), (0,4), (3,4), (2,5) ，下标从 0 开始
+示例 2：
+
+输入：nums = [1,1,1,1]
+输出：6
+解释：数组中的每组数字都是好数对
+示例 3：
+
+输入：nums = [1,2,3]
+输出：0
+
+
+提示：
+
+1 <= nums.length <= 100
+1 <= nums[i] <= 100
+ */
+pub fn num_identical_pairs(nums: Vec<i32>) -> i32 {
+    let mut res = Vec::new();
+    let mut path = Vec::new();
+    do_num_identical_pairs(&nums, 0, &mut path, &mut res);
+    res.iter().count() as i32
+}
+
+fn do_num_identical_pairs(
+    nums: &Vec<i32>,
+    start: usize,
+    path: &mut Vec<i32>,
+    res: &mut Vec<Vec<i32>>,
+) {
+    if path.len() == 2 {
+        if path[0] == path[1] {
+            res.push(path.clone());
+        }
+        return;
+    }
+    for i in start..nums.len() {
+        path.push(nums[i]);
+        do_num_identical_pairs(nums, i + 1, path, res);
+        path.pop();
+    }
+}
+
+/**
+ * 强化练习 6 ：大餐计数
+大餐 是指 恰好包含两道不同餐品 的一餐，其美味程度之和等于 2 的幂。
+
+你可以搭配 任意 两道餐品做一顿大餐。
+
+给你一个整数数组 deliciousness ，其中 deliciousness[i] 是第 i​​​​​​​​​​​​​​ 道餐品的美味程度，返回你可以用数组中的餐品做出的不同 大餐 的数量。结果需要对 109 + 7 取余。
+
+注意，只要餐品下标不同，就可以认为是不同的餐品，即便它们的美味程度相同。
+
+
+
+示例 1：
+
+输入：deliciousness = [1,3,5,7,9]
+输出：4
+解释：大餐的美味程度组合为 (1,3) 、(1,7) 、(3,5) 和 (7,9) 。
+它们各自的美味程度之和分别为 4 、8 、8 和 16 ，都是 2 的幂。
+示例 2：
+
+输入：deliciousness = [1,1,1,3,3,3,7]
+输出：15
+解释：大餐的美味程度组合为 3 种 (1,1) ，9 种 (1,3) ，和 3 种 (1,7) 。
+
+
+提示：
+
+1 <= deliciousness.length <= 105
+0 <= deliciousness[i] <= 220
+ */
+pub fn count_pairs(deliciousness: Vec<i32>) -> i32 {
+    let mut res = Vec::new();
+    let mut path = Vec::new();
+    do_count_pairs(&deliciousness, 0, &mut path, &mut res);
+    res.iter().count() as i32
+}
+
+fn do_count_pairs(
+    deliciousness: &Vec<i32>,
+    start: usize,
+    path: &mut Vec<i32>,
+    res: &mut Vec<Vec<i32>>,
+) {
+    if path.len() == 2 {
+        let sum = path[0] + path[1];
+        // n & (n - 1)来检查一个数n是否是2的幂
+        if sum > 0 && sum & (sum - 1) == 0 {
+            res.push(path.to_vec());
+        }
+        return;
+    }
+    for i in start..deliciousness.len() {
+        path.push(deliciousness[i]);
+        do_count_pairs(deliciousness, i + 1, path, res);
+        path.pop();
+    }
 }
 
 #[cfg(test)]
@@ -549,5 +741,20 @@ mod tests {
         let target = 3;
         let res = find_target_sum_ways(nums, target);
         assert_eq!(res, 5);
+    }
+
+    #[test]
+    fn test_count_k_difference() {
+        let nums = vec![1, 2, 2, 1];
+        let k = 1;
+        let res = count_k_difference(nums, k);
+        assert_eq!(res, 4);
+    }
+
+    #[test]
+    fn test_count_pairs() {
+        let deliciousness = vec![1, 3, 5, 7, 9];
+        let res = count_pairs(deliciousness);
+        assert_eq!(res, 4);
     }
 }

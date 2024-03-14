@@ -1349,6 +1349,334 @@ pub fn maxmium_score(cards: Vec<i32>, cnt: i32) -> i32 {
     }
     ans
 }
+
+/**
+ * 强化练习 1 ：两个数对之间的最大乘积差
+两个数对 (a, b) 和 (c, d) 之间的 乘积差 定义为 (a * b) - (c * d) 。
+
+例如，(5, 6) 和 (2, 7) 之间的乘积差是 (5 * 6) - (2 * 7) = 16 。
+给你一个整数数组 nums ，选出四个 不同的 下标 w、x、y 和 z ，使数对 (nums[w], nums[x]) 和 (nums[y], nums[z]) 之间的 乘积差 取到 最大值 。
+
+返回以这种方式取得的乘积差中的 最大值 。
+
+
+
+示例 1：
+
+输入：nums = [5,6,2,7,4]
+输出：34
+解释：可以选出下标为 1 和 3 的元素构成第一个数对 (6, 7) 以及下标 2 和 4 构成第二个数对 (2, 4)
+乘积差是 (6 * 7) - (2 * 4) = 34
+示例 2：
+
+输入：nums = [4,2,5,9,7,4,8]
+输出：64
+解释：可以选出下标为 3 和 6 的元素构成第一个数对 (9, 8) 以及下标 1 和 5 构成第二个数对 (2, 4)
+乘积差是 (9 * 8) - (2 * 4) = 64
+
+
+提示：
+
+4 <= nums.length <= 104
+1 <= nums[i] <= 104
+ */
+pub fn max_product_difference(nums: Vec<i32>) -> i32 {
+    let mut nums = nums;
+    nums.sort_unstable();
+    nums[nums.len() - 1] * nums[nums.len() - 2] - nums[0] * nums[1]
+}
+
+/**
+ * 强化练习 3：救生艇
+给定数组 people 。people[i]表示第 i 个人的体重 ，船的数量不限，每艘船可以承载的最大重量为 limit。
+
+每艘船最多可同时载两人，但条件是这些人的重量之和最多为 limit。
+
+返回 承载所有人所需的最小船数 。
+
+
+
+示例 1：
+
+输入：people = [1,2], limit = 3
+输出：1
+解释：1 艘船载 (1, 2)
+示例 2：
+
+输入：people = [3,2,2,1], limit = 3
+输出：3
+解释：3 艘船分别载 (1, 2), (2) 和 (3)
+示例 3：
+
+输入：people = [3,5,3,4], limit = 5
+输出：4
+解释：4 艘船分别载 (3), (3), (4), (5)
+
+
+提示：
+
+1 <= people.length <= 5 * 104
+1 <= people[i] <= limit <= 3 * 104
+ */
+pub fn num_rescue_boats(people: Vec<i32>, limit: i32) -> i32 {
+    let mut people = people;
+    people.sort_unstable();
+    let mut left = 0;
+    let mut right = people.len() - 1;
+    let mut res = 0;
+    while left <= right {
+        if left == right {
+            // 说明只有一个人,分配一个船之后退出循环
+            res += 1;
+            break;
+        } else if people[left] + people[right] > limit {
+            // 如果最重的那个人和最轻的那个人加起来不能坐一条船，那么最重的那个人势必只能 "一意孤行" 了，因为其他人更加不可能和他同行。转变成
+            right -= 1;
+            res += 1;
+        } else {
+            // 如果最重的那个人可以和最轻的人一起坐一条船，那就顺带捎上，转变成
+            res += 1;
+            left += 1;
+            right -= 1;
+        }
+    }
+    res
+}
+
+/**
+ * 324. 摆动排序 II
+中等
+相关标签
+相关企业
+给你一个整数数组 nums，将它重新排列成 nums[0] < nums[1] > nums[2] < nums[3]... 的顺序。
+
+你可以假设所有输入数组都可以得到满足题目要求的结果。
+
+
+
+示例 1：
+
+输入：nums = [1,5,1,1,6,4]
+输出：[1,6,1,5,1,4]
+解释：[1,4,1,5,1,6] 同样是符合题目要求的结果，可以被判题程序接受。
+示例 2：
+
+输入：nums = [1,3,2,2,3,1]
+输出：[2,3,1,3,1,2]
+
+
+提示：
+
+1 <= nums.length <= 5 * 104
+0 <= nums[i] <= 5000
+题目数据保证，对于给定的输入 nums ，总能产生满足题目要求的结果
+
+
+进阶：你能用 O(n) 时间复杂度和 / 或原地 O(1) 额外空间来实现吗？
+ */
+pub fn wiggle_sort_ii(nums: &mut Vec<i32>) {
+    let mut ret = nums.clone();
+    ret.sort_unstable();
+    let mut len = ret.len() - 1;
+    // 先插奇数位
+    for i in (1..ret.len()).step_by(2) {
+        nums[i] = ret[len];
+        len -= 1;
+    }
+    for i in (0..ret.len()).step_by(2) {
+        nums[i] = ret[len];
+        len -= 1;
+    }
+}
+
+/**
+ * 280. 摆动排序
+中等
+相关标签
+相关企业
+给你一个的整数数组 nums, 将该数组重新排序后使 nums[0] <= nums[1] >= nums[2] <= nums[3]...
+
+输入数组总是有一个有效的答案。
+
+
+
+示例 1:
+
+输入：nums = [3,5,2,1,6,4]
+输出：[3,5,1,6,2,4]
+解释：[1,6,2,5,3,4]也是有效的答案
+示例 2:
+
+输入：nums = [6,6,5,6,3,8]
+输出：[6,6,5,6,3,8]
+
+
+提示：
+
+1 <= nums.length <= 5 * 104
+0 <= nums[i] <= 104
+输入的 nums 保证至少有一个答案。
+
+
+
+进阶：你能在 O(n) 时间复杂度下解决这个问题吗？
+ */
+pub fn wiggle_sort(nums: &mut Vec<i32>) {
+    let mut ret = nums.clone();
+    ret.sort_unstable();
+    let mut len = ret.len() - 1;
+    // 先插奇数位
+    for i in (1..ret.len()).step_by(2) {
+        nums[i] = ret[len];
+        len -= 1;
+    }
+    for i in (0..ret.len()).step_by(2) {
+        nums[i] = ret[len];
+        len -= 1;
+    }
+}
+
+/**
+ * 强化练习 6 ：最少操作使数组递增
+给你一个整数数组 nums （下标从 0 开始）。每一次操作中，你可以选择数组中一个元素，并将它增加 1 。
+
+比方说，如果 nums = [1,2,3] ，你可以选择增加 nums[1] 得到 nums = [1,3,3] 。
+请你返回使 nums 严格递增 的 最少 操作次数。
+
+我们称数组 nums 是 严格递增的 ，当它满足对于所有的 0 <= i < nums.length - 1 都有 nums[i] < nums[i+1] 。一个长度为 1 的数组是严格递增的一种特殊情况。
+
+
+
+示例 1：
+
+输入：nums = [1,1,1]
+输出：3
+解释：你可以进行如下操作：
+1) 增加 nums[2] ，数组变为 [1,1,2] 。
+2) 增加 nums[1] ，数组变为 [1,2,2] 。
+3) 增加 nums[2] ，数组变为 [1,2,3] 。
+示例 2：
+
+输入：nums = [1,5,2,4,1]
+输出：14
+示例 3：
+
+输入：nums = [8]
+输出：0
+
+
+提示：
+
+1 <= nums.length <= 5000
+1 <= nums[i] <= 104
+ */
+pub fn min_operations(nums: Vec<i32>) -> i32 {
+    let mut res = 0;
+    // 初始化pre
+    let mut pre = nums[0] + 1;
+    for i in 1..nums.len() {
+        if pre < nums[i] {
+            // 如果当前数比pre大，就把pre替换为当前数+1
+            pre = nums[i] + 1;
+        } else {
+            // 否则，需要把 当前的数 变成 前一个数加一
+            res += pre - nums[i];
+            pre += 1;
+        }
+    }
+    res
+}
+
+/**
+ * 强化练习 7 ：使数组唯一的最小增量
+给你一个整数数组 nums 。每次 move 操作将会选择任意一个满足 0 <= i < nums.length 的下标 i，并将 nums[i] 递增 1。
+
+返回使 nums 中的每个值都变成唯一的所需要的最少操作次数。
+
+
+
+示例 1：
+
+输入：nums = [1,2,2]
+输出：1
+解释：经过一次 move 操作，数组将变为 [1, 2, 3]。
+示例 2：
+
+输入：nums = [3,2,1,2,1,7]
+输出：6
+解释：经过 6 次 move 操作，数组将变为 [3, 4, 1, 2, 5, 7]。
+可以看出 5 次或 5 次以下的 move 操作是不能让数组的每个值唯一的。
+
+
+提示：
+1 <= nums.length <= 105
+0 <= nums[i] <= 105
+ */
+pub fn min_increment_for_unique(nums: Vec<i32>) -> i32 {
+    let mut nums = nums;
+    nums.sort_unstable();
+    let (mut res, mut pre) = (0, nums[0] + 1);
+    for i in 1..nums.len() {
+        if pre < nums[i] {
+            // 如果当前数比pre大，就把pre替换为当前数+1
+            pre = nums[i] + 1;
+        } else {
+            // 否则，需要把 当前的数 变成 前一个数加一
+            res += pre - nums[i];
+            pre += 1;
+        }
+    }
+    res
+}
+
+/**
+ * 强化练习 8 ：有效三角形的个数
+给定一个包含非负整数的数组 nums ，返回其中可以组成三角形三条边的三元组个数。
+
+
+
+示例 1:
+
+输入: nums = [2,2,3,4]
+输出: 3
+解释:有效的组合是:
+2,3,4 (使用第一个 2)
+2,3,4 (使用第二个 2)
+2,2,3
+示例 2:
+
+输入: nums = [4,2,3,4]
+输出: 4
+
+
+提示:
+
+1 <= nums.length <= 1000
+0 <= nums[i] <= 1000
+ */
+pub fn triangle_number(nums: Vec<i32>) -> i32 {
+    let mut res = 0;
+    let mut nums = nums;
+    // 首先，将所有数组元素按照递增排序
+    nums.sort_unstable();
+    // [2,nums.len() - 1] 左闭右闭区间
+    for i in (2..=nums.len() - 1).rev() {
+        // 固定 i i为最长的边，通过left和right指针来寻找另外两条边
+        let (mut left, mut right) = (0, i - 1);
+        while left < right {
+            if nums[left] + nums[right] > nums[i] {
+                // 如果left和right的和大于i，那么left和right之间的数都可以和right组成三角形
+                res += right - left;
+                right -= 1;
+            } else {
+                // 如果left和right的和小于等于i，那么left需要右移
+                left += 1;
+            }
+        }
+    }
+    res as i32
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1487,5 +1815,26 @@ mod tests {
         let cnt = 1;
         let res = maxmium_score(cards, cnt);
         assert_eq!(res, 10);
+    }
+
+    #[test]
+    fn test_min_operations() {
+        let nums = vec![1, 5, 2, 4, 1];
+        let res = min_operations(nums);
+        assert_eq!(res, 14);
+    }
+
+    #[test]
+    fn test_min_increment_for_unique() {
+        let nums = vec![3, 2, 1, 2, 1, 7];
+        let res = min_increment_for_unique(nums);
+        assert_eq!(res, 6);
+    }
+
+    #[test]
+    fn test_triangle_number() {
+        let nums = vec![2, 2, 3, 4];
+        let res = triangle_number(nums);
+        assert_eq!(res, 3);
     }
 }
