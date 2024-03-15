@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 /**
  * 强化练习 2：子数组异或查询
 有一个正整数数组 arr，现给你一个对应的查询数组 queries，其中 queries[i] = [Li, Ri]。
