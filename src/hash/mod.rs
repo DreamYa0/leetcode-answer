@@ -1056,76 +1056,6 @@ pub fn find_disappeared_numbers(nums: Vec<i32>) -> Vec<i32> {
     res
 }
 
-/**
- * 1442. 形成两个异或相等数组的三元组数目
-给你一个整数数组 arr 。
-
-现需要从数组中取三个下标 i、j 和 k ，其中 (0 <= i < j <= k < arr.length) 。
-
-a 和 b 定义如下：
-
-a = arr[i] ^ arr[i + 1] ^ ... ^ arr[j - 1]
-b = arr[j] ^ arr[j + 1] ^ ... ^ arr[k]
-注意：^ 表示 按位异或 操作。
-
-请返回能够令 a == b 成立的三元组 (i, j , k) 的数目。
-
-
-
-示例 1：
-
-输入：arr = [2,3,1,6,7]
-输出：4
-解释：满足题意的三元组分别是 (0,1,2), (0,2,2), (2,3,4) 以及 (2,4,4)
-示例 2：
-
-输入：arr = [1,1,1,1,1]
-输出：10
-示例 3：
-
-输入：arr = [2,3]
-输出：0
-示例 4：
-
-输入：arr = [1,3,5,7,9]
-输出：3
-示例 5：
-
-输入：arr = [7,11,12,9,5,2,7,17,22]
-输出：8
-
-
-提示：
-
-1 <= arr.length <= 300
-1 <= arr[i] <= 10^8
-
-解题思路：
-
-<img src="https://pic.leetcode-cn.com/1621275894-bLqcng-384ed430a407e5370c5590b44ee21c9.png" />
- */
-pub fn count_triplets(arr: Vec<i32>) -> i32 {
-    // 定义异或值数组
-    let mut pre_xor = vec![0; arr.len() + 1];
-    for i in 0..arr.len() {
-        pre_xor[i + 1] = arr[i] ^ pre_xor[i];
-    }
-    let mut res = 0;
-    // 我们知道 a ⊕ a = 0的，由于题目让我们找到满足 a == b 的坐标，那么当 a 等于 b 时满足什么性质?
-    // a ⊕ b = 0! 我们就可以得到arr[i] ^...^ arr[j-1]^ arr[j] ^...^ arr[k] = 0。
-    // 因此在 i 之前的前缀异或值到 k 时不会变。这是法三的核心！！
-    // 因为【i，k】的区间异或值为0，可以得到： preXor[i-1] == preXor[k]
-    // 其另一点重点在于在区间 [i, k]内 j 在哪并不重要, 因为无论 j 在哪，i 到 k 的异或值都等于 0. 不影响结果。
-    for i in 1..=arr.len() {
-        for k in i + 1..=arr.len() {
-            if pre_xor[i - 1] == pre_xor[k] {
-                res += (k - i) as i32;
-            }
-        }
-    }
-    res
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1209,12 +1139,5 @@ mod tests {
         let k = 2;
         let result = find_pairs_ii(nums, k);
         assert_eq!(result, 2);
-    }
-
-    #[test]
-    fn test_count_triplets() {
-        let arr = vec![2, 3, 1, 6, 7];
-        let result = count_triplets(arr);
-        assert_eq!(result, 4);
     }
 }

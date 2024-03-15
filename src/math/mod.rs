@@ -527,6 +527,17 @@ fn is_palindrome(n: i32) -> bool {
     n == m
 }
 
+/// 2485. 找出中枢整数
+pub fn pivot_integer(n: i32) -> i32 {
+    let t = (n * n + n) / 2;
+    let x = (t as f64).sqrt() as i32;
+    if x.pow(2) == t {
+        x
+    } else {
+        -1
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -559,5 +570,11 @@ mod tests {
     fn test_is_prime() {
         let n = 13;
         assert_eq!(is_prime(n), true);
+    }
+
+    #[test]
+    fn test_pivot_integer() {
+        let n = 8;
+        assert_eq!(pivot_integer(n), 6);
     }
 }
