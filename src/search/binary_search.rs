@@ -427,7 +427,7 @@ pub fn search_range(nums: Vec<i32>, target: i32) -> Vec<i32> {
 
 |a - x| < |b - x| 或者
 |a - x| == |b - x| 且 a < b
- 
+
 
 示例 1：
 
@@ -437,7 +437,7 @@ pub fn search_range(nums: Vec<i32>, target: i32) -> Vec<i32> {
 
 输入：arr = [1,2,3,4,5], k = 4, x = -1
 输出：[1,2,3,4]
- 
+
 
 提示：
 
@@ -460,6 +460,62 @@ pub fn find_closest_elements(arr: Vec<i32>, k: i32, x: i32) -> Vec<i32> {
         }
     }
     arr[left..(left + k as usize)].to_vec()
+}
+
+/**
+ * 744. 寻找比目标字母大的最小字母
+简单
+相关标签
+相关企业
+提示
+给你一个字符数组 letters，该数组按非递减顺序排序，以及一个字符 target。letters 里至少有两个不同的字符。
+
+返回 letters 中大于 target 的最小的字符。如果不存在这样的字符，则返回 letters 的第一个字符。
+
+
+
+示例 1：
+
+输入: letters = ["c", "f", "j"]，target = "a"
+输出: "c"
+解释：letters 中字典上比 'a' 大的最小字符是 'c'。
+示例 2:
+
+输入: letters = ["c","f","j"], target = "c"
+输出: "f"
+解释：letters 中字典顺序上大于 'c' 的最小字符是 'f'。
+示例 3:
+
+输入: letters = ["x","x","y","y"], target = "z"
+输出: "x"
+解释：letters 中没有一个字符在字典上大于 'z'，所以我们返回 letters[0]。
+
+
+提示：
+
+2 <= letters.length <= 104
+letters[i] 是一个小写字母
+letters 按非递减顺序排序
+letters 最少包含两个不同的字母
+target 是一个小写字母
+ */
+pub fn next_greatest_letter(letters: Vec<char>, target: char) -> char {
+    let mut left = 0;
+    let mut right = letters.len();
+    while left < right {
+        let mid = (left + right) >> 1;
+        if letters[mid] <= target {
+            left = mid + 1;
+        } else {
+            right = mid;
+        }
+    }
+    // 如果right等于letters.len()，说明没有找到大于target的字符，返回letters[0]
+    if right == letters.len() {
+        letters[0]
+    } else {
+        letters[left]
+    }
 }
 
 #[cfg(test)]
@@ -506,5 +562,11 @@ mod tests {
     fn test_find_closest_elements() {
         let arr = vec![1, 2, 3, 4, 5];
         assert_eq!(find_closest_elements(arr, 4, 3), vec![1, 2, 3, 4]);
+    }
+
+    #[test]
+    fn test_next_greatest_letter() {
+        let letters = vec!['c', 'f', 'j'];
+        assert_eq!(next_greatest_letter(letters, 'a'), 'c');
     }
 }

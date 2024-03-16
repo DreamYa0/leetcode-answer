@@ -412,7 +412,7 @@ pub fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
 
 不要给另外的数组分配额外的空间，你必须原地修改输入数组、使用 O(1) 的额外空间解决这一问题。
 
- 
+
 
 示例 1：
 
@@ -422,7 +422,7 @@ pub fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
 
 输入：s = ["H","a","n","n","a","h"]
 输出：["h","a","n","n","a","H"]
- 
+
 
 提示：
 
@@ -459,7 +459,7 @@ nums 的 串联值 最初等于 0 。执行下述操作直到 nums 变为空：
 如果仅存在一个元素，则将该元素的值加到 nums 的串联值上，然后删除这个元素。
 返回执行完所有操作后 nums 的串联值。
 
- 
+
 
 示例 1：
 
@@ -470,8 +470,8 @@ nums 的 串联值 最初等于 0 。执行下述操作直到 nums 变为空：
 我们选中第一个元素 7 和最后一个元素 4 。
 二者的串联是 74 ，将其加到串联值上，所以串联值等于 74 。
 接着我们从 nums 中移除这两个元素，所以 nums 变为 [52,2] 。
- - 在第二步操作中： 
-我们选中第一个元素 52 和最后一个元素 2 。 
+ - 在第二步操作中：
+我们选中第一个元素 52 和最后一个元素 2 。
 二者的串联是 522 ，将其加到串联值上，所以串联值等于 596 。
 接着我们从 nums 中移除这两个元素，所以 nums 变为空。
 由于串联值等于 596 ，所以答案就是 596 。
@@ -479,20 +479,20 @@ nums 的 串联值 最初等于 0 。执行下述操作直到 nums 变为空：
 
 输入：nums = [5,14,13,8,12]
 输出：673
-解释：在执行任一步操作前，nums 为 [5,14,13,8,12] ，串联值为 0 。 
-- 在第一步操作中： 
-我们选中第一个元素 5 和最后一个元素 12 。 
-二者的串联是 512 ，将其加到串联值上，所以串联值等于 512 。 
+解释：在执行任一步操作前，nums 为 [5,14,13,8,12] ，串联值为 0 。
+- 在第一步操作中：
+我们选中第一个元素 5 和最后一个元素 12 。
+二者的串联是 512 ，将其加到串联值上，所以串联值等于 512 。
 接着我们从 nums 中移除这两个元素，所以 nums 变为 [14,13,8] 。
 - 在第二步操作中：
 我们选中第一个元素 14 和最后一个元素 8 。
 二者的串联是 148 ，将其加到串联值上，所以串联值等于 660 。
-接着我们从 nums 中移除这两个元素，所以 nums 变为 [13] 。 
+接着我们从 nums 中移除这两个元素，所以 nums 变为 [13] 。
 - 在第三步操作中：
 nums 只有一个元素，所以我们选中 13 并将其加到串联值上，所以串联值等于 673 。
-接着我们从 nums 中移除这个元素，所以 nums 变为空。 
+接着我们从 nums 中移除这个元素，所以 nums 变为空。
 由于串联值等于 673 ，所以答案就是 673 。
- 
+
 
 提示：
 
@@ -543,7 +543,7 @@ pub fn find_the_array_conc_val(nums: Vec<i32>) -> i64 {
 
 返回最终的回文字符串。
 
- 
+
 
 示例 1：
 
@@ -560,7 +560,7 @@ pub fn find_the_array_conc_val(nums: Vec<i32>) -> i64 {
 输入：s = "seven"
 输出："neven"
 解释：将 "seven" 变成回文字符串的最小操作次数为 1 ，修改 1 次得到的字典序最小回文字符串是 "neven" 。
- 
+
 
 提示：
 
@@ -609,7 +609,7 @@ pub fn make_smallest_palindrome(s: String) -> String {
 
 注意 ，如果最小值或者最大值有重复元素，可以删除任意一个。
 
- 
+
 
 示例 1：
 
@@ -626,7 +626,7 @@ pub fn make_smallest_palindrome(s: String) -> String {
 输出：1
 解释：
 删除 1 和 100 后只有一个平均值，所以我们返回 1 。
- 
+
 
 提示：
 
@@ -660,7 +660,7 @@ pub fn distinct_averages(nums: Vec<i32>) -> i32 {
 相关企业
 提示
 给你一个下标从 0 开始长度为 n 的整数数组 nums 和一个整数 target ，请你返回满足 0 <= i < j < n 且 nums[i] + nums[j] < target 的下标对 (i, j) 的数目。
- 
+
 
 示例 1：
 
@@ -668,7 +668,7 @@ pub fn distinct_averages(nums: Vec<i32>) -> i32 {
 输出：3
 解释：总共有 3 个下标对满足题目描述：
 - (0, 1) ，0 < 1 且 nums[0] + nums[1] = 0 < target
-- (0, 2) ，0 < 2 且 nums[0] + nums[2] = 1 < target 
+- (0, 2) ，0 < 2 且 nums[0] + nums[2] = 1 < target
 - (0, 4) ，0 < 4 且 nums[0] + nums[4] = 0 < target
 注意 (0, 3) 不计入答案因为 nums[0] + nums[3] 不是严格小于 target 。
 示例 2：
@@ -686,7 +686,7 @@ pub fn distinct_averages(nums: Vec<i32>) -> i32 {
 - (3, 5) ，3 < 5 且 nums[3] + nums[5] = -3 < target
 - (4, 5) ，4 < 5 且 nums[4] + nums[5] = -8 < target
 - (4, 6) ，4 < 6 且 nums[4] + nums[6] = -4 < target
- 
+
 
 提示：
 
@@ -796,6 +796,65 @@ fn partition(arr: &mut [i32], start: i32, end: i32) -> i32 {
     le
 }
 
+/**
+ * 2108. 找出数组中的第一个回文字符串
+简单
+相关标签
+相关企业
+提示
+给你一个字符串数组 words ，找出并返回数组中的 第一个回文字符串 。如果不存在满足要求的字符串，返回一个 空字符串 "" 。
+
+回文字符串 的定义为：如果一个字符串正着读和反着读一样，那么该字符串就是一个 回文字符串 。
+
+
+
+示例 1：
+
+输入：words = ["abc","car","ada","racecar","cool"]
+输出："ada"
+解释：第一个回文字符串是 "ada" 。
+注意，"racecar" 也是回文字符串，但它不是第一个。
+示例 2：
+
+输入：words = ["notapalindrome","racecar"]
+输出："racecar"
+解释：第一个也是唯一一个回文字符串是 "racecar" 。
+示例 3：
+
+输入：words = ["def","ghi"]
+输出：""
+解释：不存在回文字符串，所以返回一个空字符串。
+
+
+提示：
+
+1 <= words.length <= 100
+1 <= words[i].length <= 100
+words[i] 仅由小写英文字母组成
+ */
+pub fn first_palindrome(words: Vec<String>) -> String {
+    for word in words {
+        let word = word.chars().collect::<Vec<char>>();
+        if do_first_palindrome(&word) {
+            return word.iter().collect();
+        }
+    }
+    "".to_string()
+}
+
+fn do_first_palindrome(word: &Vec<char>) -> bool {
+    let mut left = 0;
+    let mut right = word.len() - 1;
+    while left < right {
+        if word[left] != word[right] {
+            return false;
+        }
+        left += 1;
+        right -= 1;
+    }
+    true
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -876,5 +935,18 @@ mod tests {
         let target = 2;
         let res = count_pairs(nums, target);
         println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_first_palindrome() {
+        let words = vec![
+            "abc".to_string(),
+            "car".to_string(),
+            "ada".to_string(),
+            "racecar".to_string(),
+            "cool".to_string(),
+        ];
+        let first_palindrome = first_palindrome(words);
+        assert_eq!(first_palindrome, "ada")
     }
 }

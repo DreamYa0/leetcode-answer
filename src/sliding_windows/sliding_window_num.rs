@@ -91,6 +91,78 @@ pub fn number_of_substrings(s: String) -> i32 {
     ans as i32
 }
 
+/**
+ * 1248. 统计「优美子数组」
+中等
+相关标签
+相关企业
+提示
+给你一个整数数组 nums 和一个整数 k。如果某个连续子数组中恰好有 k 个奇数数字，我们就认为这个子数组是「优美子数组」。
+
+请返回这个数组中 「优美子数组」 的数目。
+
+
+
+示例 1：
+
+输入：nums = [1,1,2,1,1], k = 3
+输出：2
+解释：包含 3 个奇数的子数组是 [1,1,2,1] 和 [1,2,1,1] 。
+示例 2：
+
+输入：nums = [2,4,6], k = 1
+输出：0
+解释：数列中不包含任何奇数，所以不存在优美子数组。
+示例 3：
+
+输入：nums = [2,2,2,1,2,2,1,2,2,2], k = 2
+输出：16
+
+
+提示：
+
+1 <= nums.length <= 50000
+1 <= nums[i] <= 10^5
+1 <= k <= nums.length
+ */
+pub fn number_of_subarrays(nums: Vec<i32>, k: i32) -> i32 {
+    let mut res = 0;
+    let mut slow = 0;
+    let mut fast = 0;
+    // 多少个奇数
+    let mut odd_cnt = 0;
+    while fast < nums.len() {
+        if nums[fast] % 2 == 1 {
+            // 奇数个数加1
+            odd_cnt += 1;
+        }
+        fast += 1;
+        //  若当前滑动窗口 [left, right) 中有 k 个奇数了，进入此分支统计当前滑动窗口中的优美子数组个数。
+        if odd_cnt == k {
+            // 临时保持一下fast指针
+            let tmp = fast;
+            // 先将滑动窗口的右边界向右拓展，直到遇到下一个奇数（或出界）
+            // rightEvenCnt 即为第 k 个奇数右边的偶数的个数
+            while fast < nums.len() && nums[fast] % 2 == 0 {
+                // 如果nums[fast] 为偶数，就继续向右推进fast指针
+                fast += 1;
+            }
+            let right_cnt = fast - tmp;
+            let mut left_cnt = 0;
+            // 如果nums[slow]偶数就继续向右推荐slow指针
+            while nums[slow] % 2 == 0 {
+                slow += 1;
+                left_cnt += 1;
+            }
+            res += (left_cnt + 1) * (right_cnt + 1);
+            slow += 1;
+            odd_cnt -= 1;
+        }
+        
+    }
+    res as i32
+}
+
 #[cfg(test)]
 mod tests {
 
@@ -108,5 +180,13 @@ mod tests {
         let s = "abcabc".to_string();
         let number_of_substrings = number_of_substrings(s);
         assert_eq!(number_of_substrings, 10);
+    }
+
+    #[test]
+    fn test_number_of_subarrays() {
+        let nums = vec![1, 1, 2, 1, 1];
+        let k = 3;
+        let number_of_subarrays = number_of_subarrays(nums, k);
+        assert_eq!(number_of_subarrays, 2);
     }
 }

@@ -656,24 +656,22 @@ pub fn longest_subarray_ii(nums: Vec<i32>) -> i32 {
 /// 坚持刷每日一题，会发现自己在潜移默化中进步。
 pub fn equal_substring(s: String, t: String, max_cost: i32) -> i32 {
     let n = s.len();
-    // 计算两个字符串的差值
+    // 计算两个字符串中字符的差值
     let diff = s
         .bytes()
         .zip(t.bytes())
         .map(|(a, b)| (a as i32 - b as i32).abs())
         .collect::<Vec<_>>();
-    let (mut slow, mut fast) = (0, 0);
+    let mut slow = 0;
     let mut cost = 0;
     let mut res = 0;
-    while fast < n {
+    for fast in 0..n {
         cost += diff[fast];
-        if cost > max_cost {
+        while cost > max_cost {
             cost -= diff[slow];
             slow += 1;
-        } else {
-            res = res.max(fast - slow + 1);
         }
-        fast += 1;
+        res = res.max(fast - slow + 1);
     }
     res as i32
 }
@@ -1047,8 +1045,36 @@ pub fn max_consecutive_answers(answer_key: String, k: i32) -> i32 {
     ans as i32
 }
 
-/// 1004. 最大连续1的个数 III
-/// https://leetcode.cn/problems/max-consecutive-ones-iii/
+/**
+ * 1004. 最大连续1的个数 III
+中等
+相关标签
+相关企业
+提示
+给定一个二进制数组 nums 和一个整数 k，如果可以翻转最多 k 个 0 ，则返回 数组中连续 1 的最大个数 。
+
+
+
+示例 1：
+
+输入：nums = [1,1,1,0,0,0,1,1,1,1,0], K = 2
+输出：6
+解释：[1,1,1,0,0,1,1,1,1,1,1]
+粗体数字从 0 翻转到 1，最长的子数组长度为 6。
+示例 2：
+
+输入：nums = [0,0,1,1,0,0,1,1,1,0,1,1,0,0,0,1,1,1,1], K = 3
+输出：10
+解释：[0,0,1,1,1,1,1,1,1,1,1,1,0,0,0,1,1,1,1]
+粗体数字从 0 翻转到 1，最长的子数组长度为 10。
+
+
+提示：
+
+1 <= nums.length <= 105
+nums[i] 不是 0 就是 1
+0 <= k <= nums.length
+ */
 pub fn longest_ones_ii(nums: Vec<i32>, k: i32) -> i32 {
     // 数组中连续 1 的最大个数
     let mut ans = 0;
@@ -1103,7 +1129,7 @@ pub fn longest_nice_subarray(nums: Vec<i32>) -> i32 {
 /// 594. 最长和谐子序列
 ///
 /// https://leetcode.cn/problems/longest-harmonious-subsequence/
-/// 
+///
 /// 不定长滑动窗口（求最长/最大）
 pub fn find_lhs(nums: Vec<i32>) -> i32 {
     let mut nums = nums;
