@@ -338,50 +338,8 @@ pub fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
 }
 
 /**
- * 344. 反转字符串
-简单
-相关标签
-相关企业
-提示
-编写一个函数，其作用是将输入的字符串反转过来。输入字符串以字符数组 s 的形式给出。
-
-不要给另外的数组分配额外的空间，你必须原地修改输入数组、使用 O(1) 的额外空间解决这一问题。
-
-
-
-示例 1：
-
-输入：s = ["h","e","l","l","o"]
-输出：["o","l","l","e","h"]
-示例 2：
-
-输入：s = ["H","a","n","n","a","h"]
-输出：["h","a","n","n","a","H"]
-
-
-提示：
-
-1 <= s.length <= 105
-s[i] 都是 ASCII 码表中的可打印字符
- */
-pub fn reverse_string(s: &mut Vec<char>) {
-    // 定义右指针，指向末尾
-    let mut rigth = s.len() - 1;
-    for left in 0..s.len() / 2 {
-        let temp = s[left];
-        s[left] = s[rigth];
-        s[rigth] = temp;
-        // 右指针左移
-        rigth -= 1;
-    }
-}
-
-/**
  * 2562. 找出数组的串联值
-已解答
-简单
-相关标签
-相关企业
+
 提示
 给你一个下标从 0 开始的整数数组 nums 。
 
@@ -390,7 +348,8 @@ pub fn reverse_string(s: &mut Vec<char>) {
 例如，15 和 49 的串联是 1549 。
 nums 的 串联值 最初等于 0 。执行下述操作直到 nums 变为空：
 
-如果 nums 中存在不止一个数字，分别选中 nums 中的第一个元素和最后一个元素，将二者串联得到的值加到 nums 的 串联值 上，然后从 nums 中删除第一个和最后一个元素。
+如果 nums 中存在不止一个数字，分别选中 nums 中的第一个元素和最后一个元素，将二者串联得到的值加到 nums 的 串联值 上，
+然后从 nums 中删除第一个和最后一个元素。
 如果仅存在一个元素，则将该元素的值加到 nums 的串联值上，然后删除这个元素。
 返回执行完所有操作后 nums 的串联值。
 
@@ -531,11 +490,10 @@ pub fn distinct_averages(nums: Vec<i32>) -> i32 {
 
 /**
  * 2824. 统计和小于目标的下标对数目
-简单
-相关标签
-相关企业
+
 提示
-给你一个下标从 0 开始长度为 n 的整数数组 nums 和一个整数 target ，请你返回满足 0 <= i < j < n 且 nums[i] + nums[j] < target 的下标对 (i, j) 的数目。
+给你一个下标从 0 开始长度为 n 的整数数组 nums 和一个整数 target ，
+请你返回满足 0 <= i < j < n 且 nums[i] + nums[j] < target 的下标对 (i, j) 的数目。
 
 
 示例 1：
@@ -704,13 +662,6 @@ mod tests {
         let target = 0;
         let result = four_sum(nums, target);
         println!("result = {:?}", result);
-    }
-
-    #[test]
-    fn test_reverse_string() {
-        let mut s = ['h', 'e', 'l', 'l', 'o'].to_vec();
-        reverse_string(&mut s);
-        println!("{:?}", s)
     }
 
     #[test]
