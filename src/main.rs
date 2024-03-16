@@ -1,4 +1,3 @@
-pub mod array;
 pub mod list;
 pub mod hash;
 pub mod string;
@@ -9,10 +8,10 @@ pub mod two_pointers;
 pub mod search;
 pub mod sort;
 pub mod backtracking;
-pub mod dynamic;
+pub mod dynamic_programming;
 pub mod math;
-pub mod prefix;
-pub mod greedy;
+pub mod prefix_sum;
+pub mod greedy_algorithm;
 
 fn main() {
     println!("Hello, world!");

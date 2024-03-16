@@ -1,17 +1,39 @@
-/// 541. 反转字符串II
-///
-/// https://leetcode.cn/problems/reverse-string-ii/
-///
-/// 思路
-/// 这道题目其实也是模拟，实现题目中规定的反转规则就可以了。
-///
-/// 一些同学可能为了处理逻辑：每隔2k个字符的前k的字符，写了一堆逻辑代码或者再搞一个计数器，来统计2k，再统计前k个字符。
-///
-/// 其实在遍历字符串的过程中，只要让 i += (2 * k)，i 每次移动 2 * k 就可以了，然后判断是否需要有反转的区间。
-///
-/// 因为要找的也就是每2 * k 区间的起点，这样写，程序会高效很多。
-///
-/// 所以当需要固定规律一段一段去处理字符串的时候，要想想在在for循环的表达式上做做文章。
+/**
+ * 541. 反转字符串 II
+
+简单
+相关标签
+相关企业
+给定一个字符串 s 和一个整数 k，从字符串开头算起，每计数至 2k 个字符，就反转这 2k 字符中的前 k 个字符。
+
+如果剩余字符少于 k 个，则将剩余字符全部反转。
+如果剩余字符小于 2k 但大于或等于 k 个，则反转前 k 个字符，其余字符保持原样。
+ 
+
+示例 1：
+
+输入：s = "abcdefg", k = 2
+输出："bacdfeg"
+示例 2：
+
+输入：s = "abcd", k = 2
+输出："bacd"
+ 
+
+提示：
+
+1 <= s.length <= 104
+s 仅由小写英文组成
+1 <= k <= 104
+
+思路
+
+这道题目其实也是模拟，实现题目中规定的反转规则就可以了。
+一些同学可能为了处理逻辑：每隔2k个字符的前k的字符，写了一堆逻辑代码或者再搞一个计数器，来统计2k，再统计前k个字符。
+其实在遍历字符串的过程中，只要让 i += (2 * k)，i 每次移动 2 * k 就可以了，然后判断是否需要有反转的区间。
+因为要找的也就是每2 * k 区间的起点，这样写，程序会高效很多。
+所以当需要固定规律一段一段去处理字符串的时候，要想想在在for循环的表达式上做做文章。
+ */
 pub fn reverse_str(s: String, k: i32) -> String {
     let len = s.len();
     let k = k as usize;
@@ -270,7 +292,34 @@ pub fn rotate_right(s: String, k: i32) -> String {
     s.iter().collect::<String>()
 }
 
-/// LCR 182. 动态口令
+/**
+ * LCR 182. 动态口令
+
+简单
+相关标签
+相关企业
+某公司门禁密码使用动态口令技术。初始密码为字符串 password，密码更新均遵循以下步骤：
+
+设定一个正整数目标值 target
+将 password 前 target 个字符按原顺序移动至字符串末尾
+请返回更新后的密码字符串。
+
+ 
+
+示例 1：
+
+输入: password = "s3cur1tyC0d3", target = 4
+输出: "r1tyC0d3s3cu"
+示例 2：
+
+输入: password = "lrloseumgh", target = 6
+输出: "umghlrlose"
+ 
+
+提示：
+
+1 <= target < password.length <= 10000
+ */
 pub fn dynamic_password(password: String, target: i32) -> String {
     let len = password.len();
     let k = target as usize;
@@ -284,7 +333,47 @@ pub fn dynamic_password(password: String, target: i32) -> String {
     s.iter().collect()
 }
 
-/// 557. 反转字符串中的单词 III
+/**
+ * 151. 反转字符串中的单词
+
+中等
+相关标签
+相关企业
+给你一个字符串 s ，请你反转字符串中 单词 的顺序。
+
+单词 是由非空格字符组成的字符串。s 中使用至少一个空格将字符串中的 单词 分隔开。
+
+返回 单词 顺序颠倒且 单词 之间用单个空格连接的结果字符串。
+
+注意：输入字符串 s中可能会存在前导空格、尾随空格或者单词间的多个空格。返回的结果字符串中，单词间应当仅用单个空格分隔，且不包含任何额外的空格。
+
+ 
+
+示例 1：
+
+输入：s = "the sky is blue"
+输出："blue is sky the"
+示例 2：
+
+输入：s = "  hello world  "
+输出："world hello"
+解释：反转后的字符串中不能存在前导空格和尾随空格。
+示例 3：
+
+输入：s = "a good   example"
+输出："example good a"
+解释：如果两个单词间有多余的空格，反转后的字符串需要将单词间的空格减少到仅有一个。
+ 
+
+提示：
+
+1 <= s.length <= 104
+s 包含英文大小写字母、数字和空格 ' '
+s 中 至少存在一个 单词
+ 
+
+进阶：如果字符串在你使用的编程语言中是一种可变数据类型，请尝试使用 O(1) 额外空间复杂度的 原地 解法。
+ */
 pub fn reverse_words_iii(s: String) -> String {
     let mut s = s.chars().collect::<Vec<_>>();
     let len = s.len();
@@ -300,7 +389,39 @@ pub fn reverse_words_iii(s: String) -> String {
     s.iter().collect::<String>()
 }
 
-/// LCR 181. 字符串中的单词反转
+/**
+ * LCR 181. 字符串中的单词反转
+
+你在与一位习惯从右往左阅读的朋友发消息，他发出的文字顺序都与正常相反但单词内容正确，
+为了和他顺利交流你决定写一个转换程序，把他所发的消息 message 转换为正常语序。
+
+注意：输入字符串 message 中可能会存在前导空格、尾随空格或者单词间的多个空格。
+返回的结果字符串中，单词间应当仅用单个空格分隔，且不包含任何额外的空格。
+
+ 
+
+示例 1：
+
+输入: message = "the sky is blue"
+输出: "blue is sky the"
+示例 2：
+
+输入: message = "  hello world!  "
+输出: "world! hello"
+解释: 输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。
+示例 3：
+
+输入: message = "a good   example"
+输出: "example good a"
+解释: 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。
+ 
+
+提示：
+
+1 <= message.length <= 10^4
+message 中包含英文大小写字母、空格和数字
+message 中至少有一个单词
+ */
 pub fn reverse_message(message: String) -> String {
     let mut s = message.chars().collect::<Vec<char>>();
     // 去除空格
@@ -322,7 +443,30 @@ pub fn reverse_message(message: String) -> String {
     s.iter().collect()
 }
 
-/// 345. 反转字符串中的元音字母
+/**
+ * 345. 反转字符串中的元音字母
+
+给你一个字符串 s ，仅反转字符串中的所有元音字母，并返回结果字符串。
+
+元音字母包括 'a'、'e'、'i'、'o'、'u'，且可能以大小写两种形式出现不止一次。
+
+ 
+
+示例 1：
+
+输入：s = "hello"
+输出："holle"
+示例 2：
+
+输入：s = "leetcode"
+输出："leotcede"
+ 
+
+提示：
+
+1 <= s.length <= 3 * 105
+s 由 可打印的 ASCII 字符组成
+ */
 pub fn reverse_vowels(s: String) -> String {
     // 定义元音字母
     let vowels = ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'];
@@ -345,6 +489,68 @@ pub fn reverse_vowels(s: String) -> String {
         }
     }
     s.iter().collect()
+}
+
+/**
+ * 2000. 反转单词前缀
+简单
+相关标签
+相关企业
+提示
+给你一个下标从 0 开始的字符串 word 和一个字符 ch 。找出 ch 第一次出现的下标 i ，反转 word 中从下标 0 开始、直到下标 i 结束（含下标 i ）的那段字符。如果 word 中不存在字符 ch ，则无需进行任何操作。
+
+例如，如果 word = "abcdefd" 且 ch = "d" ，那么你应该 反转 从下标 0 开始、直到下标 3 结束（含下标 3 ）。结果字符串将会是 "dcbaefd" 。
+返回 结果字符串 。
+
+
+
+示例 1：
+
+输入：word = "abcdefd", ch = "d"
+输出："dcbaefd"
+解释："d" 第一次出现在下标 3 。
+反转从下标 0 到下标 3（含下标 3）的这段字符，结果字符串是 "dcbaefd" 。
+示例 2：
+
+输入：word = "xyxzxe", ch = "z"
+输出："zxyxxe"
+解释："z" 第一次也是唯一一次出现是在下标 3 。
+反转从下标 0 到下标 3（含下标 3）的这段字符，结果字符串是 "zxyxxe" 。
+示例 3：
+
+输入：word = "abcd", ch = "z"
+输出："abcd"
+解释："z" 不存在于 word 中。
+无需执行反转操作，结果字符串是 "abcd" 。
+
+
+提示：
+
+1 <= word.length <= 250
+word 由小写英文字母组成
+ch 是一个小写英文字母
+ */
+pub fn reverse_prefix(word: String, ch: char) -> String {
+    let mut word = word.chars().collect::<Vec<char>>();
+    let mut left = 0;
+    let mut right = 0;
+    for i in 0..word.len() {
+        if word[i] == ch {
+            right = i;
+            break;
+        }
+    }
+    if right == 0 {
+        return word.iter().collect();
+    }
+    while left < right {
+        let temp = word[left];
+        word[left] = word[right];
+        word[right] = temp;
+        left += 1;
+        right -= 1;
+    }
+    word.iter().collect()
 }
 
 #[cfg(test)]
@@ -391,5 +597,13 @@ mod tests {
         let s = "hello".to_string();
         let res = reverse_vowels(s);
         println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_reverse_prefix() {
+        let word = "abcdefd".to_string();
+        let ch = 'd';
+        let res = reverse_prefix(word, ch);
+        assert_eq!(res, "dcbaefd")
     }
 }
