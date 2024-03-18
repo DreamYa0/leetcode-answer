@@ -8,7 +8,7 @@
 
 如果剩余字符少于 k 个，则将剩余字符全部反转。
 如果剩余字符小于 2k 但大于或等于 k 个，则反转前 k 个字符，其余字符保持原样。
- 
+
 
 示例 1：
 
@@ -18,7 +18,7 @@
 
 输入：s = "abcd", k = 2
 输出："bacd"
- 
+
 
 提示：
 
@@ -49,7 +49,7 @@ pub fn reverse_str(s: String, k: i32) -> String {
     s.iter().collect::<String>()
 }
 
-/// 对范围内的数组内容进行反转
+/// 对范围内的数组内容进行反转 [left, right) 左闭右开区间
 fn reverse(s: &mut Vec<char>, mut begin: usize, mut end: usize) {
     // 反转begin到end之间的字符
     while begin < end {
@@ -304,7 +304,7 @@ pub fn rotate_right(s: String, k: i32) -> String {
 将 password 前 target 个字符按原顺序移动至字符串末尾
 请返回更新后的密码字符串。
 
- 
+
 
 示例 1：
 
@@ -314,7 +314,7 @@ pub fn rotate_right(s: String, k: i32) -> String {
 
 输入: password = "lrloseumgh", target = 6
 输出: "umghlrlose"
- 
+
 
 提示：
 
@@ -347,7 +347,7 @@ pub fn dynamic_password(password: String, target: i32) -> String {
 
 注意：输入字符串 s中可能会存在前导空格、尾随空格或者单词间的多个空格。返回的结果字符串中，单词间应当仅用单个空格分隔，且不包含任何额外的空格。
 
- 
+
 
 示例 1：
 
@@ -363,14 +363,14 @@ pub fn dynamic_password(password: String, target: i32) -> String {
 输入：s = "a good   example"
 输出："example good a"
 解释：如果两个单词间有多余的空格，反转后的字符串需要将单词间的空格减少到仅有一个。
- 
+
 
 提示：
 
 1 <= s.length <= 104
 s 包含英文大小写字母、数字和空格 ' '
 s 中 至少存在一个 单词
- 
+
 
 进阶：如果字符串在你使用的编程语言中是一种可变数据类型，请尝试使用 O(1) 额外空间复杂度的 原地 解法。
  */
@@ -398,7 +398,7 @@ pub fn reverse_words_iii(s: String) -> String {
 注意：输入字符串 message 中可能会存在前导空格、尾随空格或者单词间的多个空格。
 返回的结果字符串中，单词间应当仅用单个空格分隔，且不包含任何额外的空格。
 
- 
+
 
 示例 1：
 
@@ -414,7 +414,7 @@ pub fn reverse_words_iii(s: String) -> String {
 输入: message = "a good   example"
 输出: "example good a"
 解释: 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。
- 
+
 
 提示：
 
@@ -450,7 +450,7 @@ pub fn reverse_message(message: String) -> String {
 
 元音字母包括 'a'、'e'、'i'、'o'、'u'，且可能以大小写两种形式出现不止一次。
 
- 
+
 
 示例 1：
 
@@ -460,7 +460,7 @@ pub fn reverse_message(message: String) -> String {
 
 输入：s = "leetcode"
 输出："leotcede"
- 
+
 
 提示：
 
@@ -582,14 +582,9 @@ s[i] 都是 ASCII 码表中的可打印字符
  */
 pub fn reverse_string(s: &mut Vec<char>) {
     // 定义右指针，指向末尾
+    let mut left = 0;
     let mut rigth = s.len() - 1;
-    for left in 0..s.len() / 2 {
-        let temp = s[left];
-        s[left] = s[rigth];
-        s[rigth] = temp;
-        // 右指针左移
-        rigth -= 1;
-    }
+    reverse(s, 0, s.len() - 1);
 }
 
 #[cfg(test)]
@@ -650,6 +645,6 @@ mod tests {
     fn test_reverse_string() {
         let mut s = ['h', 'e', 'l', 'l', 'o'].to_vec();
         reverse_string(&mut s);
-        println!("{:?}", s)
+        assert_eq!(s, ['o', 'l', 'l', 'e', 'h']);
     }
 }

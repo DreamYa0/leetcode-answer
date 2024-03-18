@@ -1,7 +1,6 @@
 pub mod kmp;
 pub mod str_split;
 pub mod str_cnt;
-pub mod str_rev;
 
 /// 罗马数字包含以下七种字符: I， V， X， L，C，D 和 M。
 ///

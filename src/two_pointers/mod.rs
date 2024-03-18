@@ -1,7 +1,7 @@
 pub mod fast_slow_pointer;
 pub mod left_right_pointer;
 pub mod palindrome_str;
-pub mod reverse_str;
+pub mod rev_str;
 
 /// 844. 比较含退格的字符串
 /// 给定 s 和 t 两个字符串，当它们分别被输入到空白的文本编辑器后，如果两者相等，返回 true 。# 代表退格字符。
