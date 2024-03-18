@@ -493,13 +493,12 @@ pub fn reverse_vowels(s: String) -> String {
 
 /**
  * 2000. 反转单词前缀
-简单
-相关标签
-相关企业
-提示
-给你一个下标从 0 开始的字符串 word 和一个字符 ch 。找出 ch 第一次出现的下标 i ，反转 word 中从下标 0 开始、直到下标 i 结束（含下标 i ）的那段字符。如果 word 中不存在字符 ch ，则无需进行任何操作。
 
-例如，如果 word = "abcdefd" 且 ch = "d" ，那么你应该 反转 从下标 0 开始、直到下标 3 结束（含下标 3 ）。结果字符串将会是 "dcbaefd" 。
+给你一个下标从 0 开始的字符串 word 和一个字符 ch 。找出 ch 第一次出现的下标 i ，
+反转 word 中从下标 0 开始、直到下标 i 结束（含下标 i ）的那段字符。如果 word 中不存在字符 ch ，则无需进行任何操作。
+
+例如，如果 word = "abcdefd" 且 ch = "d" ，那么你应该 反转 从下标 0 开始、直到下标 3 结束（含下标 3 ）。
+结果字符串将会是 "dcbaefd" 。
 返回 结果字符串 。
 
 
@@ -532,7 +531,6 @@ ch 是一个小写英文字母
  */
 pub fn reverse_prefix(word: String, ch: char) -> String {
     let mut word = word.chars().collect::<Vec<char>>();
-    let mut left = 0;
     let mut right = 0;
     for i in 0..word.len() {
         if word[i] == ch {
@@ -543,13 +541,7 @@ pub fn reverse_prefix(word: String, ch: char) -> String {
     if right == 0 {
         return word.iter().collect();
     }
-    while left < right {
-        let temp = word[left];
-        word[left] = word[right];
-        word[right] = temp;
-        left += 1;
-        right -= 1;
-    }
+    reverse(&mut word, 0, right);
     word.iter().collect()
 }
 
@@ -581,10 +573,58 @@ pub fn reverse_prefix(word: String, ch: char) -> String {
 s[i] 都是 ASCII 码表中的可打印字符
  */
 pub fn reverse_string(s: &mut Vec<char>) {
-    // 定义右指针，指向末尾
-    let mut left = 0;
-    let mut rigth = s.len() - 1;
     reverse(s, 0, s.len() - 1);
+}
+
+/**
+ * 917. 仅仅反转字母
+
+给你一个字符串 s ，根据下述规则反转字符串：
+
+所有非英文字母保留在原有位置。
+所有英文字母（小写或大写）位置反转。
+返回反转后的 s 。
+
+
+
+示例 1：
+
+输入：s = "ab-cd"
+输出："dc-ba"
+示例 2：
+
+输入：s = "a-bC-dEf-ghIj"
+输出："j-Ih-gfE-dCba"
+示例 3：
+
+输入：s = "Test1ng-Leet=code-Q!"
+输出："Qedo1ct-eeLg=ntse-T!"
+
+
+提示
+
+1 <= s.length <= 100
+s 仅由 ASCII 值在范围 [33, 122] 的字符组成
+s 不含 '\"' 或 '\\'
+ */
+pub fn reverse_only_letters(s: String) -> String {
+    let mut s = s.chars().collect::<Vec<char>>();
+    let mut left = 0;
+    let mut right = s.len() - 1;
+    while left < right {
+        if !s[left].is_ascii_alphabetic() {
+            left += 1;
+        } else if !s[right].is_ascii_alphabetic() {
+            right -= 1;
+        } else {
+            let temp = s[left];
+            s[left] = s[right];
+            s[right] = temp;
+            left += 1;
+            right -= 1;
+        }
+    }
+    s.iter().collect()
 }
 
 #[cfg(test)]

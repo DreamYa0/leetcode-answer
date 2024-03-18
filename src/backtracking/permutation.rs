@@ -1,3 +1,8 @@
+use std::{
+    collections::{HashMap, HashSet},
+    vec,
+};
+
 /**
  * 46. 全排列
 中等
@@ -239,6 +244,90 @@ fn do_goods_order(
     }
 }
 
+/**
+ * 267. 回文排列 II
+
+给定一个字符串 s ，返回 其重新排列组合后可能构成的所有回文字符串，并去除重复的组合 。
+
+你可以按 任意顺序 返回答案。如果 s 不能形成任何回文排列时，则返回一个空列表。
+
+
+
+示例 1：
+
+输入: s = "aabb"
+输出: ["abba", "baab"]
+示例 2：
+
+输入: s = "abc"
+输出: []
+
+
+提示：
+
+1 <= s.length <= 16
+s 仅由小写英文字母组成
+ */
+pub fn generate_palindromes(s: String) -> Vec<String> {
+    let mut m = HashMap::new();
+    let vec = s.chars().collect::<Vec<char>>();
+    if is_can_palindrome(&vec, &mut m) == false {
+        return vec![];
+    }
+    let mut st = vec![];
+    let mut c = None;
+    for ch in m.keys() {
+        if m.get(ch).unwrap() % 2 == 1 {
+            c = Some(ch.to_owned());
+        }
+        for _ in 0..(m.get(ch).unwrap() / 2) {
+            st.push(ch.to_owned());
+        }
+    }
+    let mut s = HashSet::new();
+    do_generate_palindromes(&mut st, &mut s, 0, c);
+    s.into_iter().collect::<Vec<String>>()
+}
+
+fn is_can_palindrome(vec: &Vec<char>, m: &mut HashMap<char, i32>) -> bool {
+    let mut count = 0;
+    for ch in vec.iter() {
+        let entry = m.entry(*ch).or_insert(0);
+        *entry += 1;
+        if (*entry) % 2 == 0 {
+            count -= 1;
+        } else {
+            count += 1;
+        }
+    }
+    count <= 1
+}
+
+fn do_generate_palindromes(
+    vec: &mut Vec<char>,
+    s: &mut HashSet<String>,
+    start: usize,
+    ch: Option<char>,
+) {
+    if start == vec.len() {
+        let tmp1 = vec.iter().collect::<String>();
+        let tmp2 = vec.iter().rev().collect::<String>();
+        if let Some(ch) = ch {
+            s.insert(format!("{}{}{}", tmp1, ch, tmp2));
+        } else {
+            s.insert(format!("{}{}", tmp1, tmp2));
+        }
+    } else {
+        for j in start..vec.len() {
+            if vec[j] != vec[start] || start == j {
+                vec.swap(start, j);
+                do_generate_palindromes(vec, s, start + 1, ch);
+                vec.swap(j, start);
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -286,5 +375,12 @@ mod tests {
                 "weag", "wega", "wgae", "wgea"
             ]
         );
+    }
+
+    #[test]
+    fn test_generate_palindromes() {
+        let s = "aabbccddeeffgghh".to_string();
+        let res = generate_palindromes(s);
+        println!("{:?}", res);
     }
 }

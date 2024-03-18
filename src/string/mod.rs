@@ -1,6 +1,6 @@
 pub mod kmp;
-pub mod str_split;
 pub mod str_cnt;
+pub mod str_split;
 
 /// 罗马数字包含以下七种字符: I， V， X， L，C，D 和 M。
 ///
@@ -627,6 +627,147 @@ pub fn replace_digits(s: String) -> String {
         }
     }
     res.iter().collect()
+}
+
+/**
+ * 强化练习 3：字符串中第二大的数字
+给你一个混合字符串 s ，请你返回 s 中 第二大 的数字，如果不存在第二大的数字，请你返回 -1 。
+
+混合字符串 由小写英文字母和数字组成。
+
+
+
+示例 1：
+
+输入：s = "dfa12321afd"
+输出：2
+解释：出现在 s 中的数字包括 [1, 2, 3] 。第二大的数字是 2 。
+示例 2：
+
+输入：s = "abc1111"
+输出：-1
+解释：出现在 s 中的数字只包含 [1] 。没有第二大的数字。
+
+
+提示：
+
+1 <= s.length <= 500
+s 只包含小写英文字母和（或）数字。
+ */
+pub fn second_highest(s: String) -> i32 {
+    let s = s.chars().collect::<Vec<char>>();
+    let mut nums = vec![];
+    for c in s {
+        if c.is_ascii_digit() {
+            nums.push(c.to_digit(10).unwrap());
+        }
+    }
+    nums.sort();
+    nums.dedup();
+    if nums.len() < 2 {
+        return -1;
+    }
+    nums[nums.len() - 2] as i32
+}
+
+/**
+ * 强化练习 8：字符串相加
+给定两个字符串形式的非负整数 num1 和num2 ，计算它们的和并同样以字符串形式返回。
+
+你不能使用任何內建的用于处理大整数的库（比如 BigInteger）， 也不能直接将输入的字符串转换为整数形式。
+
+ 
+
+示例 1：
+
+输入：num1 = "11", num2 = "123"
+输出："134"
+示例 2：
+
+输入：num1 = "456", num2 = "77"
+输出："533"
+示例 3：
+
+输入：num1 = "0", num2 = "0"
+输出："0"
+ 
+
+ 
+
+提示：
+
+1 <= num1.length, num2.length <= 104
+num1 和num2 都只包含数字 0-9
+num1 和num2 都不包含任何前导零
+ */
+pub fn add_strings(num1: String, num2: String) -> String {
+    let num1 = num1.chars().collect::<Vec<char>>();
+    let num2 = num2.chars().collect::<Vec<char>>();
+    let mut res = vec![];
+    let mut carry = 0;
+    let mut i = num1.len() as i32 - 1;
+    let mut j = num2.len() as i32 - 1;
+    while i >= 0 || j >= 0 {
+        let x = if i >= 0 { num1[i as usize] as i32 - '0' as i32 } else { 0 };
+        let y = if j >= 0 { num2[j as usize] as i32 - '0' as i32 } else { 0 };
+        let sum = x + y + carry;
+        res.push((sum % 10 + '0' as i32) as u8 as char);
+        carry = sum / 10;
+        i -= 1;
+        j -= 1;
+    }
+    if carry > 0 {
+        res.push((carry + '0' as i32) as u8 as char);
+    }
+    res.iter().rev().collect()
+}
+
+/**
+ * 43. 字符串相乘
+中等
+相关标签
+相关企业
+给定两个以字符串形式表示的非负整数 num1 和 num2，返回 num1 和 num2 的乘积，它们的乘积也表示为字符串形式。
+
+注意：不能使用任何内置的 BigInteger 库或直接将输入转换为整数。
+
+ 
+
+示例 1:
+
+输入: num1 = "2", num2 = "3"
+输出: "6"
+示例 2:
+
+输入: num1 = "123", num2 = "456"
+输出: "56088"
+ 
+
+提示：
+
+1 <= num1.length, num2.length <= 200
+num1 和 num2 只能由数字组成。
+num1 和 num2 都不包含任何前导零，除了数字0本身。
+ */
+pub fn multiply(num1: String, num2: String) -> String {
+    let num1 = num1.chars().collect::<Vec<char>>();
+    let num2 = num2.chars().collect::<Vec<char>>();
+    let mut res = vec![0; num1.len() + num2.len()];
+    for i in (0..num1.len()).rev() {
+        for j in (0..num2.len()).rev() {
+            let n1 = num1[i] as i32 - '0' as i32;
+            let n2 = num2[j] as i32 - '0' as i32;
+            let sum = n1 * n2 + res[i + j + 1];
+            res[i + j + 1] = sum % 10;
+            res[i + j] += sum / 10;
+        }
+    }
+    let mut res = res.iter().map(|x| x.to_string()).collect::<String>();
+    res = res.trim_start_matches('0').to_string();
+    if res.is_empty() {
+        return "0".to_string();
+    }
+    res
 }
 
 #[cfg(test)]

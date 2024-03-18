@@ -1,4 +1,32 @@
-/// 680. 验证回文串 II
+/**
+ * 680. 验证回文串 II
+
+给你一个字符串 s，最多 可以从中删除一个字符。
+
+请你判断 s 是否能成为回文字符串：如果能，返回 true ；否则，返回 false 。
+
+ 
+
+示例 1：
+
+输入：s = "aba"
+输出：true
+示例 2：
+
+输入：s = "abca"
+输出：true
+解释：你可以删除字符 'c' 。
+示例 3：
+
+输入：s = "abc"
+输出：false
+ 
+
+提示：
+
+1 <= s.length <= 105
+s 由小写英文字母组成
+ */
 pub fn valid_palindrome(s: String) -> bool {
     let s = s.chars().collect::<Vec<char>>();
     // 定义左指针
@@ -31,7 +59,35 @@ fn is_palindrome_iiii(s: Vec<char>) -> bool {
     true
 }
 
-/// LCR 018. 验证回文串
+/**
+ * LCR 018. 验证回文串
+
+给定一个字符串 s ，验证 s 是否是 回文串 ，只考虑字母和数字字符，可以忽略字母的大小写。
+
+本题中，将空字符串定义为有效的 回文串 。
+
+ 
+
+示例 1:
+
+输入: s = "A man, a plan, a canal: Panama"
+输出: true
+解释："amanaplanacanalpanama" 是回文串
+示例 2:
+
+输入: s = "race a car"
+输出: false
+解释："raceacar" 不是回文串
+ 
+
+提示：
+
+1 <= s.length <= 2 * 105
+字符串 s 由 ASCII 字符组成
+ 
+
+注意：本题与主站 125 题相同： https://leetcode-cn.com/problems/valid-palindrome/
+ */
 pub fn is_palindrome_iii(s: String) -> bool {
     let s = s.chars().collect::<Vec<char>>();
     let mut left = 0;

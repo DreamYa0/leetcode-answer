@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "leetcode-practise"
+name = "leetcode-answer"
 version = "0.1.0"
