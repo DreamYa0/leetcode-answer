@@ -1,3 +1,6 @@
+pub mod linear_enum;
+pub mod rotated_sorted_array;
+
 /// 35. 搜索插入位置
 /// 给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。
 ///
@@ -518,6 +521,60 @@ pub fn next_greatest_letter(letters: Vec<char>, target: char) -> char {
     }
 }
 
+/**
+ * 面试题 10.05. 稀疏数组搜索
+
+稀疏数组搜索。有个排好序的字符串数组，其中散布着一些空字符串，编写一种方法，找出给定字符串的位置。
+
+示例1:
+
+ 输入: words = ["at", "", "", "", "ball", "", "", "car", "", "","dad", "", ""], s = "ta"
+ 输出：-1
+ 说明: 不存在返回-1。
+示例2:
+
+ 输入：words = ["at", "", "", "", "ball", "", "", "car", "", "","dad", "", ""], s = "ball"
+ 输出：4
+提示:
+
+words的长度在[1, 1000000]之间
+ */
+pub fn find_string(words: Vec<String>, s: String) -> i32 {
+    if words.len() < 3 {
+        for i in 0..words.len() {
+            if words[i] == s {
+                return i as i32;
+            }
+        }
+    } else {
+        let mut left = 0;
+        let mut right = words.len() - 1;
+        while left <= right {
+            // left指针跳过字符串
+            while words[left].is_empty() && left < right {
+                left += 1;
+            }
+            // right 指针跳过空字符串
+            while words[right].is_empty() && left < right {
+                right -= 1;
+            }
+            let mut mid = (left + right) >> 1;
+            // mid 指针跳过空字符串
+            while words[mid].is_empty() && mid < right {
+                mid += 1;
+            }
+            if words[mid] < s {
+                left = mid + 1;
+            } else if words[mid] > s {
+                right = mid - 1;
+            } else {
+                return mid as i32;
+            }
+        }
+    }
+    -1
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -568,5 +625,11 @@ mod tests {
     fn test_next_greatest_letter() {
         let letters = vec!['c', 'f', 'j'];
         assert_eq!(next_greatest_letter(letters, 'a'), 'c');
+    }
+
+    #[test]
+    fn test_find_string() {
+        let words = vec!["nd".to_string(), "ycYAoTJBUjonLxlLBy".to_string()];
+        assert_eq!(find_string(words, "EOqIKUuWGxayVypXH XQ".to_string()), -1);
     }
 }

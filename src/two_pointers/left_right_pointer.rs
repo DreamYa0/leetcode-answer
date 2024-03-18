@@ -630,6 +630,51 @@ fn partition(arr: &mut [i32], start: i32, end: i32) -> i32 {
     le
 }
 
+/**
+ * 面试题 16.24. 数对和
+中等
+相关标签
+相关企业
+提示
+设计一个算法，找出数组中两数之和为指定值的所有整数对。一个数只能属于一个数对。
+
+示例 1:
+
+输入: nums = [5,6,5], target = 11
+输出: [[5,6]]
+示例 2:
+
+输入: nums = [5,6,5,6], target = 11
+输出: [[5,6],[5,6]]
+提示：
+
+nums.length <= 100000
+-10^5 <= nums[i], target <= 10^5
+ */
+pub fn pair_sums(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+    if nums.is_empty() {
+        return vec![];
+    }
+    let mut nums = nums;
+    nums.sort();
+    let mut res = vec![];
+    let mut left = 0;
+    let mut right = nums.len() - 1;
+    while left < right {
+        let sum = nums[left] + nums[right];
+        if sum < target {
+            left += 1;
+        } else if sum > target {
+            right -= 1;
+        } else {
+            res.push(vec![nums[left], nums[right]]);
+            left += 1;
+            right -= 1;
+        }
+    }
+    res
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -684,5 +729,12 @@ mod tests {
         let target = 2;
         let res = count_pairs(nums, target);
         println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_pair_sums() {
+        let nums = vec![5, 6, 5, 6];
+        let target = 11;
+        assert_eq!(pair_sums(nums, target), vec![vec![5, 6], vec![5, 6]]);
     }
 }

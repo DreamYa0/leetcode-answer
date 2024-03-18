@@ -1,8 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
-pub mod anagram;
-pub mod rolling_hash;
 pub mod cyclic_hash;
+pub mod rolling_hash;
+pub mod design_hash;
 
 /// 217. 存在重复元素
 ///
@@ -699,54 +699,6 @@ pub fn sum_of_unique(nums: Vec<i32>) -> i32 {
 }
 
 /**
- * 强化练习 3 ：检查是否所有字符出现次数相同
-给你一个字符串 s ，如果 s 是一个 好 字符串，请你返回 true ，否则请返回 false 。
-
-如果 s 中出现过的 所有 字符的出现次数 相同 ，那么我们称字符串 s 是 好 字符串。
-
-
-
-示例 1：
-
-输入：s = "abacbc"
-输出：true
-解释：s 中出现过的字符为 'a'，'b' 和 'c' 。s 中所有字符均出现 2 次。
-示例 2：
-
-输入：s = "aaabb"
-输出：false
-解释：s 中出现过的字符为 'a' 和 'b' 。
-'a' 出现了 3 次，'b' 出现了 2 次，两者出现次数不同。
-
-
-提示：
-
-1 <= s.length <= 1000
-s 只包含小写英文字母。
- */
-pub fn are_occurrences_equal(s: String) -> bool {
-    let mut cnt = vec![0; 26];
-    let s = s.into_bytes();
-    for c in s {
-        cnt[(c - b'a') as usize] += 1;
-    }
-    let (mut left, mut right) = (0, cnt.len() - 1);
-    while left < right {
-        if cnt[left] == 0 {
-            left += 1;
-        } else if cnt[right] == 0 {
-            right -= 1;
-        } else if cnt[left] != cnt[right] {
-            return false;
-        } else {
-            left += 1;
-            right -= 1;
-        }
-    }
-    true
-}
-
-/**
  * 强化练习 3：按照频率将数组升序排序
 给你一个整数数组 nums ，请你将数组按照每个值的频率 升序 排序。如果有多个值的频率相同，请你按照数值本身将它们 降序 排序。
 
@@ -792,133 +744,6 @@ pub fn frequency_sort(nums: Vec<i32>) -> Vec<i32> {
         b.cmp(a)
     });
     nums
-}
-
-/**
- * 强化练习 6：设计哈希集合
-不使用任何内建的哈希表库设计一个哈希集合（HashSet）。
-
-实现 MyHashSet 类：
-
-void add(key) 向哈希集合中插入值 key 。
-bool contains(key) 返回哈希集合中是否存在这个值 key 。
-void remove(key) 将给定值 key 从哈希集合中删除。如果哈希集合中没有这个值，什么也不做。
-
-示例：
-
-输入：
-["MyHashSet", "add", "add", "contains", "contains", "add", "contains", "remove", "contains"]
-[[], [1], [2], [1], [3], [2], [2], [2], [2]]
-输出：
-[null, null, null, true, false, null, true, null, false]
-
-解释：
-MyHashSet myHashSet = new MyHashSet();
-myHashSet.add(1);      // set = [1]
-myHashSet.add(2);      // set = [1, 2]
-myHashSet.contains(1); // 返回 True
-myHashSet.contains(3); // 返回 False ，（未找到）
-myHashSet.add(2);      // set = [1, 2]
-myHashSet.contains(2); // 返回 True
-myHashSet.remove(2);   // set = [1]
-myHashSet.contains(2); // 返回 False ，（已移除）
-
-
-提示：
-
-0 <= key <= 106
-最多调用 104 次 add、remove 和 contains
- */
-#[allow(dead_code)]
-struct MyHashSet {
-    val: Vec<u64>,
-}
-
-#[allow(dead_code)]
-impl MyHashSet {
-    fn new() -> Self {
-        Self {
-            val: vec![0; 15626],
-        }
-    }
-
-    fn add(&mut self, key: i32) {
-        // 将key对应的位置置为1
-        self.val[key as usize / 64] |= 1 << key as usize % 64;
-    }
-
-    fn remove(&mut self, key: i32) {
-        // 将key对应的位置置为0
-        self.val[key as usize / 64] &= !(1 << key as usize % 64);
-    }
-
-    fn contains(&self, key: i32) -> bool {
-        // 判断key对应的位置是否为1
-        self.val[key as usize / 64] & 1 << key as usize % 64 > 0
-    }
-}
-
-/**
-强化练习 7：设计哈希映射
-不使用任何内建的哈希表库设计一个哈希映射（HashMap）。
-
-实现 MyHashMap 类：
-
-MyHashMap() 用空映射初始化对象
-void put(int key, int value) 向 HashMap 插入一个键值对 (key, value) 。如果 key 已经存在于映射中，则更新其对应的值 value 。
-int get(int key) 返回特定的 key 所映射的 value ；如果映射中不包含 key 的映射，返回 -1 。
-void remove(key) 如果映射中存在 key 的映射，则移除 key 和它所对应的 value 。
-
-
-示例：
-
-输入：
-["MyHashMap", "put", "put", "get", "get", "put", "get", "remove", "get"]
-[[], [1, 1], [2, 2], [1], [3], [2, 1], [2], [2], [2]]
-输出：
-[null, null, null, 1, -1, null, 1, null, -1]
-
-解释：
-MyHashMap myHashMap = new MyHashMap();
-myHashMap.put(1, 1); // myHashMap 现在为 [[1,1]]
-myHashMap.put(2, 2); // myHashMap 现在为 [[1,1], [2,2]]
-myHashMap.get(1);    // 返回 1 ，myHashMap 现在为 [[1,1], [2,2]]
-myHashMap.get(3);    // 返回 -1（未找到），myHashMap 现在为 [[1,1], [2,2]]
-myHashMap.put(2, 1); // myHashMap 现在为 [[1,1], [2,1]]（更新已有的值）
-myHashMap.get(2);    // 返回 1 ，myHashMap 现在为 [[1,1], [2,1]]
-myHashMap.remove(2); // 删除键为 2 的数据，myHashMap 现在为 [[1,1]]
-myHashMap.get(2);    // 返回 -1（未找到），myHashMap 现在为 [[1,1]]
-
-
-提示：
-
-0 <= key, value <= 106
-最多调用 104 次 put、get 和 remove 方法
- */
-#[allow(dead_code)]
-struct MyHashMap {
-    val: Vec<i32>,
-}
-
-#[allow(dead_code)]
-impl MyHashMap {
-    fn new() -> Self {
-        Self {
-            val: vec![-1; 1000001],
-        }
-    }
-
-    fn put(&mut self, key: i32, value: i32) {
-        self.val[key as usize] = value;
-    }
-
-    fn get(&self, key: i32) -> i32 {
-        self.val[key as usize]
-    }
-
-    fn remove(&mut self, key: i32) {
-        self.val[key as usize] = -1;
-    }
 }
 
 pub fn merge_arrays(nums1: Vec<Vec<i32>>, nums2: Vec<Vec<i32>>) -> Vec<Vec<i32>> {
@@ -1090,7 +915,7 @@ pub fn check_possibility(nums: Vec<i32>) -> bool {
     return count < 2;
 }
 
-/// 寻找数组的中心索引
+/// 724. 寻找数组的中心下标
 /// 给你一个整数数组 nums ，请计算数组的 中心下标 。
 ///
 /// 数组 中心下标 是数组的一个下标，其左侧所有元素相加的和等于右侧所有元素相加的和。
@@ -1187,7 +1012,7 @@ fn reverse(nums: &mut Vec<i32>, mut start: usize, mut end: usize) {
     }
 }
 
-/// 旋转函数
+/// 396. 旋转函数
 /// 给定一个长度为 n 的整数数组 nums 。
 ///
 /// 假设 arrk 是数组 nums 顺时针旋转 k 个位置后的数组，我们定义 nums 的 旋转函数  F 为：
@@ -1255,10 +1080,6 @@ pub fn max_rotate_function(nums: Vec<i32>) -> i32 {
 
 /**
  * 121. 买卖股票的最佳时机
-
-简单
-相关标签
-相关企业
 
 给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。
 
@@ -1347,11 +1168,12 @@ pub fn majority_element(nums: Vec<i32>) -> i32 {
  * 强化练习 3 ：单调数列
 如果数组是单调递增或单调递减的，那么它是 单调 的。
 
-如果对于所有 i <= j，nums[i] <= nums[j]，那么数组 nums 是单调递增的。 如果对于所有 i <= j，nums[i]> = nums[j]，那么数组 nums 是单调递减的。
+如果对于所有 i <= j，nums[i] <= nums[j]，那么数组 nums 是单调递增的。 
+如果对于所有 i <= j，nums[i]> = nums[j]，那么数组 nums 是单调递减的。
 
 当给定的数组 nums 是单调数组时返回 true，否则返回 false。
 
- 
+
 
 示例 1：
 
@@ -1365,7 +1187,7 @@ pub fn majority_element(nums: Vec<i32>) -> i32 {
 
 输入：nums = [1,3,2]
 输出：false
- 
+
 
 提示：
 
@@ -1392,11 +1214,12 @@ pub fn is_monotonic(nums: Vec<i32>) -> bool {
 提示
 给你一个以行程长度编码压缩的整数列表 nums 。
 
-考虑每对相邻的两个元素 [freq, val] = [nums[2*i], nums[2*i+1]] （其中 i >= 0 ），每一对都表示解压后子列表中有 freq 个值为 val 的元素，你需要从左到右连接所有子列表以生成解压后的列表。
+考虑每对相邻的两个元素 [freq, val] = [nums[2*i], nums[2*i+1]] （其中 i >= 0 ），
+每一对都表示解压后子列表中有 freq 个值为 val 的元素，你需要从左到右连接所有子列表以生成解压后的列表。
 
 请你返回解压后的列表。
 
- 
+
 
 示例 1：
 
@@ -1409,7 +1232,7 @@ pub fn is_monotonic(nums: Vec<i32>) -> bool {
 
 输入：nums = [1,1,2,3]
 输出：[1,3,3]
- 
+
 
 提示：
 
@@ -1422,6 +1245,235 @@ pub fn decompress_rl_elist(nums: Vec<i32>) -> Vec<i32> {
     for i in (0..nums.len()).step_by(2) {
         // nums[i + 1] 为数组中初始化的值，nums[i] 为个数
         res.append(&mut vec![nums[i + 1]; nums[i] as usize]);
+    }
+    res
+}
+
+/**
+ * 面试题 16.24. 数对和
+中等
+相关标签
+相关企业
+提示
+设计一个算法，找出数组中两数之和为指定值的所有整数对。一个数只能属于一个数对。
+
+示例 1:
+
+输入: nums = [5,6,5], target = 11
+输出: [[5,6]]
+示例 2:
+
+输入: nums = [5,6,5,6], target = 11
+输出: [[5,6],[5,6]]
+提示：
+
+nums.length <= 100000
+-10^5 <= nums[i], target <= 10^5
+ */
+pub fn pair_sums(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+    let mut nums = nums;
+    nums.sort();
+    let mut hash = HashMap::new();
+    let mut res = Vec::new();
+    for i in 0..nums.len() {
+        if let Some(v) = hash.get(&(target - nums[i])) {
+            let mut data = vec![0, 0];
+            data[1] = nums[i];
+            data[0] = target - nums[i];
+            res.push(data);
+            if *v == 1 {
+                hash.remove(&(target - nums[i]));
+            } else {
+                hash.insert(target - nums[i], v - 1);
+            }
+        } else {
+            hash.insert(nums[i], hash.get(&nums[i]).unwrap_or(&0) + 1);
+        }
+    }
+    res
+}
+
+/**
+ * 136. 只出现一次的数字
+
+给你一个 非空 整数数组 nums ，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+
+你必须设计并实现线性时间复杂度的算法来解决此问题，且该算法只使用常量额外空间。
+
+
+
+示例 1 ：
+
+输入：nums = [2,2,1]
+输出：1
+示例 2 ：
+
+输入：nums = [4,1,2,1,2]
+输出：4
+示例 3 ：
+
+输入：nums = [1]
+输出：1
+
+
+提示：
+
+1 <= nums.length <= 3 * 104
+-3 * 104 <= nums[i] <= 3 * 104
+除了某个元素只出现一次以外，其余每个元素均出现两次。
+ */
+pub fn single_number(nums: Vec<i32>) -> i32 {
+    let mut hash = HashMap::new();
+    for n in nums {
+        hash.insert(n, hash.get(&n).unwrap_or(&0) + 1);
+    }
+    for (k, v) in hash {
+        if v == 1 {
+            return k;
+        }
+    }
+    -1
+}
+
+/**
+ * 137. 只出现一次的数字 II
+
+给你一个整数数组 nums ，除某个元素仅出现 一次 外，其余每个元素都恰出现 三次 。请你找出并返回那个只出现了一次的元素。
+
+你必须设计并实现线性时间复杂度的算法且使用常数级空间来解决此问题。
+
+
+
+示例 1：
+
+输入：nums = [2,2,3,2]
+输出：3
+示例 2：
+
+输入：nums = [0,1,0,1,0,1,99]
+输出：99
+
+
+提示：
+
+1 <= nums.length <= 3 * 104
+-231 <= nums[i] <= 231 - 1
+nums 中，除某个元素仅出现 一次 外，其余每个元素都恰出现 三次
+ */
+pub fn single_number_ii(nums: Vec<i32>) -> i32 {
+    if nums.len() == 1 {
+        return nums[0];
+    }
+    let mut nums = nums;
+    nums.sort_unstable();
+    if nums[0] != nums[1] {
+        return nums[0];
+    }
+    if nums[nums.len() - 1] != nums[nums.len() - 2] {
+        return nums[nums.len() - 1];
+    }
+    for i in 1..nums.len() - 1 {
+        if nums[i] != nums[i - 1] && nums[i] != nums[i + 1] {
+            return nums[i];
+        }
+    }
+    -1
+}
+
+/**
+ * 260. 只出现一次的数字 III
+
+给你一个整数数组 nums，其中恰好有两个元素只出现一次，其余所有元素均出现两次。 找出只出现一次的那两个元素。你可以按 任意顺序 返回答案。
+
+你必须设计并实现线性时间复杂度的算法且仅使用常量额外空间来解决此问题。
+
+
+
+示例 1：
+
+输入：nums = [1,2,1,3,2,5]
+输出：[3,5]
+解释：[5, 3] 也是有效的答案。
+示例 2：
+
+输入：nums = [-1,0]
+输出：[-1,0]
+示例 3：
+
+输入：nums = [0,1]
+输出：[1,0]
+
+
+提示：
+
+2 <= nums.length <= 3 * 104
+-231 <= nums[i] <= 231 - 1
+除两个只出现一次的整数外，nums 中的其他数字都出现两次
+ */
+pub fn single_number_iii(nums: Vec<i32>) -> Vec<i32> {
+    let xor_all = nums.iter().fold(0, |xor, &x| xor ^ x);
+    let lowbit = xor_all & -xor_all;
+    let mut ans = vec![0, 0];
+    for &x in &nums {
+        if (x & lowbit) == 0 {
+            // 分组异或
+            ans[0] ^= x;
+        } else {
+            ans[1] ^= x;
+        }
+    }
+    ans
+}
+
+/**
+ * 599. 两个列表的最小索引总和
+
+假设 Andy 和 Doris 想在晚餐时选择一家餐厅，并且他们都有一个表示最喜爱餐厅的列表，每个餐厅的名字用字符串表示。
+
+你需要帮助他们用最少的索引和找出他们共同喜爱的餐厅。 如果答案不止一个，则输出所有答案并且不考虑顺序。 你可以假设答案总是存在。
+
+
+
+示例 1:
+
+输入: list1 = ["Shogun", "Tapioca Express", "Burger King", "KFC"]，
+list2 = ["Piatti", "The Grill at Torrey Pines", "Hungry Hunter Steakhouse", "Shogun"]
+输出: ["Shogun"]
+解释: 他们唯一共同喜爱的餐厅是“Shogun”。
+示例 2:
+
+输入:list1 = ["Shogun", "Tapioca Express", "Burger King", "KFC"]，
+list2 = ["KFC", "Shogun", "Burger King"]
+输出: ["Shogun"]
+解释: 他们共同喜爱且具有最小索引和的餐厅是“Shogun”，它有最小的索引和1(0+1)。
+
+
+提示:
+
+1 <= list1.length, list2.length <= 1000
+1 <= list1[i].length, list2[i].length <= 30
+list1[i] 和 list2[i] 由空格 ' ' 和英文字母组成。
+list1 的所有字符串都是 唯一 的。
+list2 中的所有字符串都是 唯一 的。
+ */
+pub fn find_restaurant(list1: Vec<String>, list2: Vec<String>) -> Vec<String> {
+    let mut hash = HashMap::new();
+    for (i, v) in list1.iter().enumerate() {
+        hash.insert(v, i);
+    }
+    let mut min = i32::MAX;
+    let mut res = Vec::new();
+    for (i, v) in list2.iter().enumerate() {
+        if let Some(n) = hash.get(&v) {
+            let cur = (*n + i) as i32;
+            if cur < min {
+                min = (n + i) as i32;
+                res.clear();
+                res.push(v.clone());
+            } else if cur == min {
+                res.push(v.clone());
+            }
+        }
     }
     res
 }
@@ -1480,13 +1532,6 @@ mod tests {
         let k = 3;
         let result = count_k_difference(nums, k);
         assert_eq!(result, 0);
-    }
-
-    #[test]
-    fn test_are_occurrences_equal() {
-        let s = "tveixwaeoezcf".to_string();
-        let result = are_occurrences_equal(s);
-        assert_eq!(result, false);
     }
 
     #[test]
@@ -1551,5 +1596,31 @@ mod tests {
         let nums = vec![1, 2, 3, 4];
         let decompress_rl_elist = decompress_rl_elist(nums);
         assert_eq!(decompress_rl_elist, vec![2, 4, 4, 4]);
+    }
+
+    #[test]
+    fn test_pair_sums() {
+        let nums = vec![2, 1, 8, 6, 5, 7, -1, 3, 5, 5];
+        let target = 7;
+        let pair_sums = pair_sums(nums, target);
+        assert_eq!(pair_sums, vec![vec![-1, 8], vec![1, 6], vec![2, 5]]);
+    }
+
+    #[test]
+    fn test_find_restaurant() {
+        let list1 = vec![
+            "Shogun".to_string(),
+            "Tapioca Express".to_string(),
+            "Burger King".to_string(),
+            "KFC".to_string(),
+        ];
+        let list2 = vec![
+            "Piatti".to_string(),
+            "The Grill at Torrey Pines".to_string(),
+            "Hungry Hunter Steakhouse".to_string(),
+            "Shogun".to_string(),
+        ];
+        let find_restaurant = find_restaurant(list1, list2);
+        assert_eq!(find_restaurant, vec!["Shogun".to_string()]);
     }
 }
