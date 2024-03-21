@@ -158,7 +158,6 @@ pub fn number_of_subarrays(nums: Vec<i32>, k: i32) -> i32 {
             slow += 1;
             odd_cnt -= 1;
         }
-        
     }
     res as i32
 }

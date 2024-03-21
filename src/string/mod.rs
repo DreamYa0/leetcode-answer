@@ -676,7 +676,7 @@ pub fn second_highest(s: String) -> i32 {
 
 你不能使用任何內建的用于处理大整数的库（比如 BigInteger）， 也不能直接将输入的字符串转换为整数形式。
 
- 
+
 
 示例 1：
 
@@ -690,9 +690,9 @@ pub fn second_highest(s: String) -> i32 {
 
 输入：num1 = "0", num2 = "0"
 输出："0"
- 
 
- 
+
+
 
 提示：
 
@@ -708,8 +708,16 @@ pub fn add_strings(num1: String, num2: String) -> String {
     let mut i = num1.len() as i32 - 1;
     let mut j = num2.len() as i32 - 1;
     while i >= 0 || j >= 0 {
-        let x = if i >= 0 { num1[i as usize] as i32 - '0' as i32 } else { 0 };
-        let y = if j >= 0 { num2[j as usize] as i32 - '0' as i32 } else { 0 };
+        let x = if i >= 0 {
+            num1[i as usize] as i32 - '0' as i32
+        } else {
+            0
+        };
+        let y = if j >= 0 {
+            num2[j as usize] as i32 - '0' as i32
+        } else {
+            0
+        };
         let sum = x + y + carry;
         res.push((sum % 10 + '0' as i32) as u8 as char);
         carry = sum / 10;
@@ -731,7 +739,7 @@ pub fn add_strings(num1: String, num2: String) -> String {
 
 注意：不能使用任何内置的 BigInteger 库或直接将输入转换为整数。
 
- 
+
 
 示例 1:
 
@@ -741,7 +749,7 @@ pub fn add_strings(num1: String, num2: String) -> String {
 
 输入: num1 = "123", num2 = "456"
 输出: "56088"
- 
+
 
 提示：
 
@@ -767,6 +775,207 @@ pub fn multiply(num1: String, num2: String) -> String {
     if res.is_empty() {
         return "0".to_string();
     }
+    res
+}
+
+/**
+ * 14. 最长公共前缀
+
+编写一个函数来查找字符串数组中的最长公共前缀。
+
+如果不存在公共前缀，返回空字符串 ""。
+
+
+
+示例 1：
+
+输入：strs = ["flower","flow","flight"]
+输出："fl"
+示例 2：
+
+输入：strs = ["dog","racecar","car"]
+输出：""
+解释：输入不存在公共前缀。
+
+
+提示：
+
+1 <= strs.length <= 200
+0 <= strs[i].length <= 200
+strs[i] 仅由小写英文字母组成
+ */
+pub fn longest_common_prefix(strs: Vec<String>) -> String {
+    if strs.is_empty() {
+        return "".to_string();
+    }
+    let mut res = strs[0].clone().chars().collect::<Vec<char>>();
+    for i in 1..strs.len() {
+        let s = strs[i].chars().collect::<Vec<char>>();
+        let mut j = 0;
+        while j < res.len() && j < s.len() && res[j] == s[j] {
+            j += 1;
+        }
+        res = res[0..j].to_vec();
+    }
+    res.iter().collect()
+}
+
+/**
+ * 521. 最长特殊序列 Ⅰ
+简单
+相关标签
+相关企业
+提示
+给你两个字符串 a 和 b，请返回 这两个字符串中 最长的特殊序列  的长度。如果不存在，则返回 -1 。
+
+「最长特殊序列」 定义如下：该序列为 某字符串独有的最长
+子序列
+（即不能是其他字符串的子序列） 。
+
+字符串 s 的子序列是在从 s 中删除任意数量的字符后可以获得的字符串。
+
+例如，"abc" 是 "aebdc" 的子序列，因为删除 "aebdc" 中斜体加粗的字符可以得到 "abc" 。 "aebdc" 的子序列还包括 "aebdc" 、 "aeb" 和 "" (空字符串)。
+
+
+示例 1：
+
+输入: a = "aba", b = "cdc"
+输出: 3
+解释: 最长特殊序列可为 "aba" (或 "cdc")，两者均为自身的子序列且不是对方的子序列。
+示例 2：
+
+输入：a = "aaa", b = "bbb"
+输出：3
+解释: 最长特殊序列是 "aaa" 和 "bbb" 。
+示例 3：
+
+输入：a = "aaa", b = "aaa"
+输出：-1
+解释: 字符串 a 的每个子序列也是字符串 b 的每个子序列。同样，字符串 b 的每个子序列也是字符串 a 的子序列。
+
+
+提示：
+
+1 <= a.length, b.length <= 100
+a 和 b 由小写英文字母组成
+ */
+pub fn find_lu_slength(a: String, b: String) -> i32 {
+    if a == b {
+        return -1;
+    }
+    a.len().max(b.len()) as i32
+}
+
+/**
+ * 522. 最长特殊序列 II
+中等
+相关标签
+相关企业
+给定字符串列表 strs ，返回其中 最长的特殊序列 的长度。如果最长特殊序列不存在，返回 -1 。
+
+特殊序列 定义如下：该序列为某字符串 独有的子序列（即不能是其他字符串的子序列）。
+
+ s 的 子序列可以通过删去字符串 s 中的某些字符实现。
+
+例如，"abc" 是 "aebdc" 的子序列，因为您可以删除"aebdc"中的下划线字符来得到 "abc" 。"aebdc"的子序列还包括"aebdc"、 "aeb" 和 "" (空字符串)。
+
+
+示例 1：
+
+输入: strs = ["aba","cdc","eae"]
+输出: 3
+示例 2:
+
+输入: strs = ["aaa","aaa","aa"]
+输出: -1
+
+
+提示:
+
+2 <= strs.length <= 50
+1 <= strs[i].length <= 10
+strs[i] 只包含小写英文字母
+ */
+pub fn find_lu_slength_ii(strs: Vec<String>) -> i32 {
+    let is_subsequence = |dst: &str, src: &str| -> bool {
+        if src == dst {
+            return true;
+        }
+        let (mut i, mut j, dst_arr, src_arr) = (
+            0,
+            0,
+            dst.chars().collect::<Vec<char>>(),
+            src.chars().collect::<Vec<char>>(),
+        );
+        while i < dst.len() && j < src.len() {
+            if dst_arr[i] == src_arr[j] {
+                i += 1;
+            }
+            j += 1;
+        }
+        i == dst.len()
+    };
+    let mut res = -1;
+    for i in 0..strs.len() {
+        let mut flag = true;
+        for j in 0..strs.len() {
+            if i != j && is_subsequence(strs[i].as_str(), strs[j].as_str()) {
+                flag = false;
+                break;
+            }
+        }
+        if flag {
+            res = res.max(strs[i].len() as i32);
+        }
+    }
+    res
+}
+
+/**
+ * 66. 加一
+简单
+相关标签
+相关企业
+给定一个由 整数 组成的 非空 数组所表示的非负整数，在该数的基础上加一。
+
+最高位数字存放在数组的首位， 数组中每个元素只存储单个数字。
+
+你可以假设除了整数 0 之外，这个整数不会以零开头。
+
+ 
+
+示例 1：
+
+输入：digits = [1,2,3]
+输出：[1,2,4]
+解释：输入数组表示数字 123。
+示例 2：
+
+输入：digits = [4,3,2,1]
+输出：[4,3,2,2]
+解释：输入数组表示数字 4321。
+示例 3：
+
+输入：digits = [0]
+输出：[1]
+ 
+
+提示：
+
+1 <= digits.length <= 100
+0 <= digits[i] <= 9
+ */
+pub fn plus_one(digits: Vec<i32>) -> Vec<i32> {
+    let mut res = digits;
+    for i in (0..res.len()).rev() {
+        res[i] += 1;
+        res[i] %= 10;
+        if res[i] != 0 {
+            // 如果不等于0，说明没有进位，直接返回
+            return res;
+        }
+    }
+    res.insert(0, 1);
     res
 }
 
@@ -810,5 +1019,23 @@ mod tests {
         let s = "a1b2c3d4e".to_string();
         let replace_digits = replace_digits(s);
         assert_eq!(replace_digits, "abbdcfdhe");
+    }
+
+    #[test]
+    fn test_longest_common_prefix() {
+        let strs = vec![
+            "flower".to_string(),
+            "flow".to_string(),
+            "flight".to_string(),
+        ];
+        let longest_common_prefix = longest_common_prefix(strs);
+        assert_eq!(longest_common_prefix, "fl");
+    }
+
+    #[test]
+    fn test_find_lu_slength_ii() {
+        let strs = vec!["aaa".to_string(), "aaa".to_string(), "aa".to_string()];
+        let find_lu_slength_ii = find_lu_slength_ii(strs);
+        assert_eq!(find_lu_slength_ii, -1);
     }
 }

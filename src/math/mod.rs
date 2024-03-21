@@ -1,3 +1,5 @@
+pub mod bit_and;
+pub mod bit_or;
 /**
  * 强化练习 4： Pow(x, n) 实现 pow(x, n) ，即计算 x 的整数 n 次幂函数（即，xn ）。
  */
@@ -536,6 +538,178 @@ pub fn pivot_integer(n: i32) -> i32 {
     } else {
         -1
     }
+}
+
+/**
+ * 118. 杨辉三角
+
+给定一个非负整数 numRows，生成「杨辉三角」的前 numRows 行。
+
+在「杨辉三角」中，每个数是它左上方和右上方的数的和。
+
+<img src="https://pic.leetcode-cn.com/1626927345-DZmfxB-PascalTriangleAnimated2.gif" alt="image.png" style="zoom:50%;" />
+
+示例 1:
+
+输入: numRows = 5
+输出: [[1],[1,1],[1,2,1],[1,3,3,1],[1,4,6,4,1]]
+示例 2:
+
+输入: numRows = 1
+输出: [[1]]
+
+
+提示:
+
+1 <= numRows <= 30
+ */
+pub fn generate(num_rows: i32) -> Vec<Vec<i32>> {
+    let mut v = vec![];
+    for i in 0..num_rows as usize {
+        // 从零开始，所以size+1，全部赋值1
+        v.push(vec![1; i + 1]);
+        for j in 1..i {
+            // 按照杨辉三角的算法，上一行的前一个和上一行的这个之和
+            v[i][j] = v[i - 1][j - 1] + v[i - 1][j];
+        }
+    }
+    v
+}
+
+/**
+ * 119. 杨辉三角 II
+简单
+相关标签
+相关企业
+给定一个非负索引 rowIndex，返回「杨辉三角」的第 rowIndex 行。
+
+在「杨辉三角」中，每个数是它左上方和右上方的数的和。
+
+<img src="https://pic.leetcode-cn.com/1626927345-DZmfxB-PascalTriangleAnimated2.gif" alt="image.png" style="zoom:50%;" />
+
+示例 1:
+
+输入: rowIndex = 3
+输出: [1,3,3,1]
+示例 2:
+
+输入: rowIndex = 0
+输出: [1]
+示例 3:
+
+输入: rowIndex = 1
+输出: [1,1]
+
+
+提示:
+
+0 <= rowIndex <= 33
+
+
+进阶：
+
+你可以优化你的算法到 O(rowIndex) 空间复杂度吗？
+ */
+pub fn get_row(row_index: i32) -> Vec<i32> {
+    //新建一个空的Vec，用于存放结果
+    let mut result: Vec<i32> = Vec::new();
+    for i in 0..row_index + 1 {
+        //对于每一行，新建一个空的Vec，用于存放每一行的结果
+        let mut row: Vec<i32> = Vec::new();
+        for j in 0..i + 1 {
+            //对于每一行的每一个元素，如果是第一个或者最后一个，就是1，否则就是上一行的前一个元素加上上一行的当前元素
+            if j == 0 || j == i {
+                row.push(1);
+            } else {
+                row.push(result[(j - 1) as usize] + result[j as usize]);
+            }
+        }
+        //将每一行的结果赋值给result，这样就不用再新建一个Vec来存放结果了
+        result = row;
+    }
+    result
+}
+
+/**
+ * 2469. 温度转换
+简单
+相关标签
+相关企业
+提示
+给你一个四舍五入到两位小数的非负浮点数 celsius 来表示温度，以 摄氏度（Celsius）为单位。
+
+你需要将摄氏度转换为 开氏度（Kelvin）和 华氏度（Fahrenheit），并以数组 ans = [kelvin, fahrenheit] 的形式返回结果。
+
+返回数组 ans 。与实际答案误差不超过 10-5 的会视为正确答案。
+
+注意：
+
+开氏度 = 摄氏度 + 273.15
+华氏度 = 摄氏度 * 1.80 + 32.00
+
+
+示例 1 ：
+
+输入：celsius = 36.50
+输出：[309.65000,97.70000]
+解释：36.50 摄氏度：转换为开氏度是 309.65 ，转换为华氏度是 97.70 。
+示例 2 ：
+
+输入：celsius = 122.11
+输出：[395.26000,251.79800]
+解释：122.11 摄氏度：转换为开氏度是 395.26 ，转换为华氏度是 251.798 。
+
+
+提示：
+
+0 <= celsius <= 1000
+ */
+pub fn convert_temperature(celsius: f64) -> Vec<f64> {
+    let mut res = Vec::new();
+    res.push(celsius + 273.15);
+    res.push(celsius * 1.80 + 32.00);
+    res
+}
+
+/**
+ * 2652. 倍数求和
+简单
+相关标签
+相关企业
+提示
+给你一个正整数 n ，请你计算在 [1，n] 范围内能被 3、5、7 整除的所有整数之和。
+
+返回一个整数，用于表示给定范围内所有满足约束条件的数字之和。
+
+
+
+示例 1：
+
+输入：n = 7
+输出：21
+解释：在 [1, 7] 范围内能被 3、5、7 整除的所有整数分别是 3、5、6、7 。数字之和为 21。
+示例 2：
+
+输入：n = 10
+输出：40
+解释：在 [1, 10] 范围内能被 3、5、7 整除的所有整数分别是 3、5、6、7、9、10 。数字之和为 40。
+示例 3：
+
+输入：n = 9
+输出：30
+解释：在 [1, 9] 范围内能被 3、5、7 整除的所有整数分别是 3、5、6、7、9 。数字之和为 30。
+提示：
+
+1 <= n <= 103
+ */
+pub fn sum_of_multiples(n: i32) -> i32 {
+    let mut res = 0;
+    for i in 1..=n {
+        if i % 3 == 0 || i % 5 == 0 || i % 7 == 0 {
+            res += i;
+        }
+    }
+    res
 }
 
 #[cfg(test)]

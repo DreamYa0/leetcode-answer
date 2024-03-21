@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 /**
  * 面试题 01.01. 判定字符是否唯一
 简单
@@ -441,7 +443,7 @@ pub fn num_jewels_in_stones(jewels: String, stones: String) -> i32 {
 
 回文串不一定是字典当中的单词。
 
- 
+
 
 示例1：
 
@@ -461,6 +463,207 @@ pub fn can_permute_palindrome(s: String) -> bool {
         }
     }
     odd_count <= 1
+}
+
+/**
+ * 389. 找不同
+简单
+相关标签
+相关企业
+给定两个字符串 s 和 t ，它们只包含小写字母。
+
+字符串 t 由字符串 s 随机重排，然后在随机位置添加一个字母。
+
+请找出在 t 中被添加的字母。
+
+
+
+示例 1：
+
+输入：s = "abcd", t = "abcde"
+输出："e"
+解释：'e' 是那个被添加的字母。
+示例 2：
+
+输入：s = "", t = "y"
+输出："y"
+
+
+提示：
+
+0 <= s.length <= 1000
+t.length == s.length + 1
+s 和 t 只包含小写字母
+ */
+pub fn find_the_difference(s: String, t: String) -> char {
+    let s = s.chars().collect::<Vec<char>>();
+    let t = t.chars().collect::<Vec<char>>();
+    let mut cnt = vec![0; 26];
+    for c in s {
+        cnt[(c as u8 - b'a') as usize] += 1;
+    }
+
+    for c in t {
+        cnt[(c as u8 - b'a') as usize] -= 1;
+    }
+    for (i, v) in cnt.iter().enumerate() {
+        if *v == -1 {
+            return (i as u8 + b'a') as char;
+        }
+    }
+    ' '
+}
+
+/**
+ * 451. 根据字符出现频率排序
+
+给定一个字符串 s ，根据字符出现的 频率 对其进行 降序排序 。一个字符出现的 频率 是它出现在字符串中的次数。
+
+返回 已排序的字符串 。如果有多个答案，返回其中任何一个。
+
+
+
+示例 1:
+
+输入: s = "tree"
+输出: "eert"
+解释: 'e'出现两次，'r'和't'都只出现一次。
+因此'e'必须出现在'r'和't'之前。此外，"eetr"也是一个有效的答案。
+示例 2:
+
+输入: s = "cccaaa"
+输出: "cccaaa"
+解释: 'c'和'a'都出现三次。此外，"aaaccc"也是有效的答案。
+注意"cacaca"是不正确的，因为相同的字母必须放在一起。
+示例 3:
+
+输入: s = "Aabb"
+输出: "bbAa"
+解释: 此外，"bbaA"也是一个有效的答案，但"Aabb"是不正确的。
+注意'A'和'a'被认为是两种不同的字符。
+
+
+提示:
+
+1 <= s.length <= 5 * 105
+s 由大小写英文字母和数字组成
+ */
+pub fn frequency_sort(s: String) -> String {
+    let mut hash = HashMap::new();
+    let s = s.chars().collect::<Vec<char>>();
+    for c in s {
+        hash.insert(c, hash.get(&c).unwrap_or(&0) + 1);
+    }
+    // 对hash进行排序
+    let mut vec: Vec<(&char, &i32)> = hash.iter().collect();
+    vec.sort_by(|a, b| b.1.cmp(a.1));
+    // 定义结果
+    let mut res = vec![];
+    for (c, n) in vec {
+        for _ in 0..*n {
+            res.push(*c);
+        }
+    }
+    res.iter().collect()
+}
+
+/**
+ * 423. 从英文中重建数字
+
+给你一个字符串 s ，其中包含字母顺序打乱的用英文单词表示的若干数字（0-9）。按 升序 返回原始的数字。
+
+
+
+示例 1：
+
+输入：s = "owoztneoer"
+输出："012"
+示例 2：
+
+输入：s = "fviefuro"
+输出："45"
+
+
+提示：
+
+1 <= s.length <= 105
+s[i] 为 ["e","g","f","i","h","o","n","s","r","u","t","w","v","x","z"] 这些字符之一
+s 保证是一个符合题目要求的字符串
+ */
+pub fn original_digits(s: String) -> String {
+    let mut tab = [0; 256];
+    let mut ans = [0; 10];
+    for c in s.into_bytes() {
+        tab[c as usize] += 1
+    }
+    helper(&mut tab, &mut ans[0], 'z', "zero");
+    helper(&mut tab, &mut ans[2], 'w', "two");
+    helper(&mut tab, &mut ans[4], 'u', "four");
+    helper(&mut tab, &mut ans[6], 'x', "six");
+    helper(&mut tab, &mut ans[8], 'g', "eight");
+    helper(&mut tab, &mut ans[1], 'o', "one");
+    helper(&mut tab, &mut ans[3], 'r', "three");
+    helper(&mut tab, &mut ans[5], 'f', "five");
+    helper(&mut tab, &mut ans[7], 'v', "seven");
+    helper(&mut tab, &mut ans[9], 'e', "nine");
+    let mut res = String::with_capacity(ans.iter().sum::<usize>());
+    for i in 0..10 {
+        for _ in 0..ans[i] {
+            res.push((i as u8 + b'0') as char);
+        }
+    }
+    res
+}
+
+fn helper(tab: &mut [usize], ans: &mut usize, check: char, s: &str) {
+    let cnt = tab[check as usize];
+    if cnt > 0 {
+        *ans = cnt;
+        for c in s.bytes() {
+            tab[c as usize] -= cnt;
+        }
+    }
+}
+
+/**
+ * 551. 学生出勤记录 I
+
+给你一个字符串 s 表示一个学生的出勤记录，其中的每个字符用来标记当天的出勤情况（缺勤、迟到、到场）。记录中只含下面三种字符：
+
+'A'：Absent，缺勤
+'L'：Late，迟到
+'P'：Present，到场
+如果学生能够 同时 满足下面两个条件，则可以获得出勤奖励：
+
+按 总出勤 计，学生缺勤（'A'）严格 少于两天。
+学生 不会 存在 连续 3 天或 连续 3 天以上的迟到（'L'）记录。
+如果学生可以获得出勤奖励，返回 true ；否则，返回 false 。
+
+
+
+示例 1：
+
+输入：s = "PPALLP"
+输出：true
+解释：学生缺勤次数少于 2 次，且不存在 3 天或以上的连续迟到记录。
+示例 2：
+
+输入：s = "PPALLL"
+输出：false
+解释：学生最后三天连续迟到，所以不满足出勤奖励的条件。
+
+
+提示：
+
+1 <= s.length <= 1000
+s[i] 为 'A'、'L' 或 'P'
+ */
+pub fn check_record(s: String) -> bool {
+    let mut hash = HashMap::new();
+    for c in s.chars() {
+        *hash.entry(c).or_insert(0) += 1;
+    }
+    hash.get(&'A').unwrap_or(&0) < &2 && !s.contains("LLL")
 }
 
 #[cfg(test)]
@@ -508,5 +711,11 @@ mod tests {
         let jewels = "aA".to_string();
         let stones = "aAAbbbb".to_string();
         assert_eq!(num_jewels_in_stones(jewels, stones), 3);
+    }
+
+    #[test]
+    fn test_frequency_sort() {
+        let s = "tree".to_string();
+        assert_eq!(frequency_sort(s), "eert".to_string());
     }
 }

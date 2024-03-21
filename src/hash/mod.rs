@@ -1,8 +1,8 @@
 use std::collections::{HashMap, HashSet};
 
 pub mod cyclic_hash;
-pub mod rolling_hash;
 pub mod design_hash;
+pub mod rolling_hash;
 
 /// 217. 存在重复元素
 ///
@@ -1168,7 +1168,7 @@ pub fn majority_element(nums: Vec<i32>) -> i32 {
  * 强化练习 3 ：单调数列
 如果数组是单调递增或单调递减的，那么它是 单调 的。
 
-如果对于所有 i <= j，nums[i] <= nums[j]，那么数组 nums 是单调递增的。 
+如果对于所有 i <= j，nums[i] <= nums[j]，那么数组 nums 是单调递增的。
 如果对于所有 i <= j，nums[i]> = nums[j]，那么数组 nums 是单调递减的。
 
 当给定的数组 nums 是单调数组时返回 true，否则返回 false。
@@ -1476,6 +1476,58 @@ pub fn find_restaurant(list1: Vec<String>, list2: Vec<String>) -> Vec<String> {
         }
     }
     res
+}
+
+/**
+ * 747. 至少是其他数字两倍的最大数
+简单
+相关标签
+相关企业
+提示
+给你一个整数数组 nums ，其中总是存在 唯一的 一个最大整数 。
+
+请你找出数组中的最大元素并检查它是否 至少是数组中每个其他数字的两倍 。如果是，则返回 最大元素的下标 ，否则返回 -1 。
+
+
+
+示例 1：
+
+输入：nums = [3,6,1,0]
+输出：1
+解释：6 是最大的整数，对于数组中的其他整数，6 至少是数组中其他元素的两倍。6 的下标是 1 ，所以返回 1 。
+示例 2：
+
+输入：nums = [1,2,3,4]
+输出：-1
+解释：4 没有超过 3 的两倍大，所以返回 -1 。
+
+
+提示：
+
+2 <= nums.length <= 50
+0 <= nums[i] <= 100
+nums 中的最大元素是唯一的
+ */
+pub fn dominant_index(nums: Vec<i32>) -> i32 {
+    // 最大元素
+    let mut max = 0;
+    // 最大元素坐标
+    let mut max_idx = 0;
+    // 第二大元素
+    let mut s_max = 0;
+    for (i, v) in nums.iter().enumerate() {
+        if *v > max {
+            s_max = max;
+            max = *v;
+            max_idx = i;
+        } else if *v > s_max {
+            s_max = *v;
+        }
+    }
+    if max >= s_max * 2 {
+        return max_idx as i32;
+    }
+    -1
 }
 
 #[cfg(test)]

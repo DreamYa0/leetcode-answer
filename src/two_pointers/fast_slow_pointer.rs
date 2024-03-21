@@ -7,7 +7,7 @@ use crate::list::ListNode;
 
 请注意 ，必须在不复制数组的情况下原地对数组进行操作。
 
- 
+
 
 示例 1:
 
@@ -17,13 +17,13 @@ use crate::list::ListNode;
 
 输入: nums = [0]
 输出: [0]
- 
+
 
 提示:
 
 1 <= nums.length <= 104
 -231 <= nums[i] <= 231 - 1
- 
+
 
 进阶：你能尽量减少完成的操作次数吗？
 
@@ -308,7 +308,7 @@ pub fn remove_duplicates_ii(nums: &mut Vec<i32>) -> i32 {
 
 请你返回 最多 可以摧毁的敌人城堡数目。如果 无法 移动你的军队，或者没有你控制的城堡，请返回 0 。
 
- 
+
 
 示例 1：
 
@@ -323,7 +323,7 @@ pub fn remove_duplicates_ii(nums: &mut Vec<i32>) -> i32 {
 输入：forts = [0,0,1,-1]
 输出：0
 解释：由于无法摧毁敌人的城堡，所以返回 0 。
- 
+
 
 提示：
 
@@ -369,14 +369,14 @@ pub fn capture_forts(forts: Vec<i32>) -> i32 {
 为增强训练趣味性，需要将所有奇数编号训练项目调整至偶数编号训练项目之前。
 请将调整后的训练项目编号以 数组 形式返回。
 
- 
+
 
 示例 1：
 
 输入：actions = [1,2,3,4,5]
-输出：[1,3,5,2,4] 
+输出：[1,3,5,2,4]
 解释：为正确答案之一
- 
+
 
 提示：
 
@@ -409,7 +409,7 @@ pub fn training_plan(actions: Vec<i32>) -> Vec<i32> {
 
 返回满足此条件的 任一数组 作为答案。
 
- 
+
 
 示例 1：
 
@@ -420,7 +420,7 @@ pub fn training_plan(actions: Vec<i32>) -> Vec<i32> {
 
 输入：nums = [0]
 输出：[0]
- 
+
 
 提示：
 
@@ -441,6 +441,192 @@ pub fn sort_array_by_parity(nums: Vec<i32>) -> Vec<i32> {
         }
     }
     nums
+}
+
+/**
+ * LCR 180. 文件组合
+简单
+相关标签
+相关企业
+待传输文件被切分成多个部分，按照原排列顺序，每部分文件编号均为一个 正整数（至少含有两个文件）。
+传输要求为：连续文件编号总和为接收方指定数字 target 的所有文件。请返回所有符合该要求的文件传输组合列表。
+
+注意，返回时需遵循以下规则：
+
+每种组合按照文件编号 升序 排列；
+不同组合按照第一个文件编号 升序 排列。
+
+
+示例 1：
+
+输入：target = 12
+输出：[[3, 4, 5]]
+解释：在上述示例中，存在一个连续正整数序列的和为 12，为 [3, 4, 5]。
+示例 2：
+
+输入：target = 18
+输出：[[3,4,5,6],[5,6,7]]
+解释：在上述示例中，存在两个连续正整数序列的和分别为 18，分别为 [3, 4, 5, 6] 和 [5, 6, 7]。
+
+
+提示：
+
+1 <= target <= 10^5
+ */
+pub fn file_combination(target: i32) -> Vec<Vec<i32>> {
+    let mut res = vec![];
+    let mut slow = 1;
+    let mut sum = 0;
+    for fast in 1..target {
+        sum += fast;
+        // 当sum超过target时，slow右移缩小窗口
+        while slow < fast && sum > target {
+            sum -= slow;
+            slow += 1;
+        }
+        // 当sum等于target时，将slow到fast的连续正整数序列加入res
+        if sum == target {
+            let mut temp = vec![];
+            for i in slow..=fast {
+                temp.push(i);
+            }
+            res.push(temp);
+        }
+    }
+    res
+}
+
+/**
+ * 696. 计数二进制子串
+简单
+相关标签
+相关企业
+提示
+给定一个字符串 s，统计并返回具有相同数量 0 和 1 的非空（连续）子字符串的数量，并且这些子字符串中的所有 0 和所有 1 都是成组连续的。
+
+重复出现（不同位置）的子串也要统计它们出现的次数。
+
+
+示例 1：
+
+输入：s = "00110011"
+输出：6
+解释：6 个子串满足具有相同数量的连续 1 和 0 ："0011"、"01"、"1100"、"10"、"0011" 和 "01" 。
+注意，一些重复出现的子串（不同位置）要统计它们出现的次数。
+另外，"00110011" 不是有效的子串，因为所有的 0（还有 1 ）没有组合在一起。
+示例 2：
+
+输入：s = "10101"
+输出：4
+解释：有 4 个子串："10"、"01"、"10"、"01" ，具有相同数量的连续 1 和 0 。
+
+
+提示：
+
+1 <= s.length <= 105
+s[i] 为 '0' 或 '1'
+ */
+pub fn count_binary_substrings(s: String) -> i32 {
+    let mut res = 0;
+    let mut pre = 0;
+    let mut cur = 1;
+    let s = s.as_bytes();
+    for i in 1..s.len() {
+        if s[i] == s[i - 1] {
+            cur += 1;
+        } else {
+            res += cur.min(pre);
+            pre = cur;
+            cur = 1;
+        }
+    }
+    res + cur.min(pre)
+}
+
+/**
+ * 2903. 找出满足差值条件的下标 I
+简单
+相关标签
+相关企业
+提示
+给你一个下标从 0 开始、长度为 n 的整数数组 nums ，以及整数 indexDifference 和整数 valueDifference 。
+
+你的任务是从范围 [0, n - 1] 内找出  2 个满足下述所有条件的下标 i 和 j ：
+
+abs(i - j) >= indexDifference 且
+abs(nums[i] - nums[j]) >= valueDifference
+返回整数数组 answer。如果存在满足题目要求的两个下标，则 answer = [i, j] ；否则，answer = [-1, -1] 。
+如果存在多组可供选择的下标对，只需要返回其中任意一组即可。
+
+注意：i 和 j 可能 相等 。
+
+
+
+示例 1：
+
+输入：nums = [5,1,4,1], indexDifference = 2, valueDifference = 4
+输出：[0,3]
+解释：在示例中，可以选择 i = 0 和 j = 3 。
+abs(0 - 3) >= 2 且 abs(nums[0] - nums[3]) >= 4 。
+因此，[0,3] 是一个符合题目要求的答案。
+[3,0] 也是符合题目要求的答案。
+示例 2：
+
+输入：nums = [2,1], indexDifference = 0, valueDifference = 0
+输出：[0,0]
+解释：
+在示例中，可以选择 i = 0 和 j = 0 。
+abs(0 - 0) >= 0 且 abs(nums[0] - nums[0]) >= 0 。
+因此，[0,0] 是一个符合题目要求的答案。
+[0,1]、[1,0] 和 [1,1] 也是符合题目要求的答案。
+示例 3：
+
+输入：nums = [1,2,3], indexDifference = 2, valueDifference = 4
+输出：[-1,-1]
+解释：在示例中，可以证明无法找出 2 个满足所有条件的下标。
+因此，返回 [-1,-1] 。
+
+
+提示：
+
+1 <= n == nums.length <= 100
+0 <= nums[i] <= 50
+0 <= indexDifference <= 100
+0 <= valueDifference <= 50
+
+思路：
+不妨设 i≤j−indexDifference。
+类似 121. 买卖股票的最佳时机，我们可以在枚举 j 的同时，维护 nums[i] 的最大值 mx 和最小值 mn。
+
+那么只要满足下面两个条件中的一个，就可以返回答案了。
+
+mx − nums[j] ≥ valueDifference
+nums[j] − mn ≥ valueDifference
+代码实现时，可以维护最大值的下标 maxIdx\textit{maxIdx}maxIdx 和最小值的下标 minIdx。
+
+答疑
+问：为什么不用算绝对值？如果 mx<nums[j] 并且 ∣mx − nums[j]∣ ≥ valueDifference，不就错过答案了吗？
+答：不会的，如果出现这种情况，那么一定会有 nums[j] − mn ≥ valueDifference。
+
+ */
+pub fn find_indices(nums: Vec<i32>, index_difference: i32, value_difference: i32) -> Vec<i32> {
+    // 维护最大值和最小值坐标
+    let mut max_idx = 0;
+    let mut min_idx = 0;
+    for fast in index_difference as usize..nums.len() {
+        let slow = (fast as i32 - index_difference) as usize;
+        if nums[slow] > nums[max_idx] {
+            max_idx = slow;
+        } else if nums[slow] < nums[min_idx] {
+            min_idx = slow;
+        }
+        if nums[max_idx] - nums[fast] >= value_difference {
+            return vec![max_idx as i32, fast as i32];
+        } else if nums[fast] - nums[min_idx] >= value_difference {
+            return vec![min_idx as i32, fast as i32];
+        }
+    }
+    vec![-1, -1]
 }
 
 #[cfg(test)]
@@ -515,5 +701,19 @@ mod tests {
         let nums = vec![3, 1, 2, 4];
         let res = sort_array_by_parity(nums);
         println!("{:?}", res)
+    }
+
+    #[test]
+    fn test_file_combination() {
+        let target = 12;
+        let res = file_combination(target);
+        assert_eq!(res, vec![vec![3, 4, 5]]);
+    }
+
+    #[test]
+    fn test_count_binary_substrings() {
+        let s = "00110011".to_string();
+        let res = count_binary_substrings(s);
+        assert_eq!(res, 6);
     }
 }
