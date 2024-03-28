@@ -675,6 +675,102 @@ pub fn pair_sums(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
     res
 }
 
+/**
+ * 5. 最长回文子串
+中等
+相关标签
+相关企业
+提示
+给你一个字符串 s，找到 s 中最长的回文
+子串
+。
+
+如果字符串的反序与原始字符串相同，则该字符串称为回文字符串。
+
+
+
+示例 1：
+
+输入：s = "babad"
+输出："bab"
+解释："aba" 同样是符合题意的答案。
+示例 2：
+
+输入：s = "cbbd"
+输出："bb"
+
+
+提示：
+
+1 <= s.length <= 1000
+s 仅由数字和英文字母组成
+ */
+pub fn longest_palindrome(s: String) -> String {
+    let s = s.chars().collect::<Vec<char>>();
+    let mut res = vec![];
+    for i in 0..s.len() {
+        let len1 = sub_palindrome(&s, i as i32, i as i32);
+        let len2 = sub_palindrome(&s, i as i32, (i + 1) as i32);
+        if len1.len() > res.len() {
+            res = len1;
+        }
+        if len2.len() > res.len() {
+            res = len2;
+        }
+    }
+    res.iter().collect()
+}
+
+fn sub_palindrome(s: &Vec<char>, mut left: i32, mut right: i32) -> Vec<char> {
+    while left >= 0 && right < s.len() as i32 && s[left as usize] == s[right as usize] {
+        // 从中间往两边扩散
+        left -= 1;
+        right += 1;
+    }
+    s[(left + 1) as usize..right as usize].to_vec()
+}
+
+/**
+ * LCR 179. 查找总价格为目标值的两个商品
+简单
+相关标签
+相关企业
+购物车内的商品价格按照升序记录于数组 price。请在购物车中找到两个商品的价格总和刚好是 target。若存在多种情况，返回任一结果即可。
+
+示例 1：
+
+输入：price = [3, 9, 12, 15], target = 18
+输出：[3,15] 或者 [15,3]
+示例 2：
+
+输入：price = [8, 21, 27, 34, 52, 66], target = 61
+输出：[27,34] 或者 [34,27]
+ 
+
+提示：
+
+1 <= price.length <= 10^5
+1 <= price[i] <= 10^6
+1 <= target <= 2*10^6
+ */
+pub fn two_sum(price: Vec<i32>, target: i32) -> Vec<i32> {
+    let mut res = vec![-1, -1];
+    let mut left = 0;
+    let mut right = price.len() - 1;
+    while left < right {
+        if price[left] + price[right] < target {
+            left += 1;
+        } else if price[left] + price[right] > target {
+            right -= 1;
+        } else {
+            res[0] = price[left] as i32;
+            res[1] = price[right] as i32;
+            break;
+        }
+    }
+    res
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -736,5 +832,12 @@ mod tests {
         let nums = vec![5, 6, 5, 6];
         let target = 11;
         assert_eq!(pair_sums(nums, target), vec![vec![5, 6], vec![5, 6]]);
+    }
+
+    #[test]
+    fn test_longest_palindrome() {
+        let s = "babad".to_string();
+        let res = longest_palindrome(s);
+        assert_eq!(res, "bab".to_string());
     }
 }

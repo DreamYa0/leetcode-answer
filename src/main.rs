@@ -12,6 +12,7 @@ pub mod dynamic_programming;
 pub mod math;
 pub mod prefix_sum;
 pub mod greedy_algorithm;
+pub mod tree;
 
 fn main() {
     println!("Hello, world!");

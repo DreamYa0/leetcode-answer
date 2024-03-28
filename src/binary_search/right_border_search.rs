@@ -168,6 +168,94 @@ pub fn find_peak_element(nums: Vec<i32>) -> i32 {
     left as i32
 }
 
+/**
+ * 1170. 比较字符串最小字母出现频次
+中等
+相关标签
+相关企业
+提示
+定义一个函数 f(s)，统计 s  中（按字典序比较）最小字母的出现频次 ，其中 s 是一个非空字符串。
+
+例如，若 s = "dcce"，那么 f(s) = 2，因为字典序最小字母是 "c"，它出现了 2 次。
+
+现在，给你两个字符串数组待查表 queries 和词汇表 words 。对于每次查询 queries[i] ，
+需统计 words 中满足 f(queries[i]) < f(W) 的 词的数目 ，W 表示词汇表 words 中的每个词。
+
+请你返回一个整数数组 answer 作为答案，其中每个 answer[i] 是第 i 次查询的结果。
+
+
+
+示例 1：
+
+输入：queries = ["cbd"], words = ["zaaaz"]
+输出：[1]
+解释：查询 f("cbd") = 1，而 f("zaaaz") = 3 所以 f("cbd") < f("zaaaz")。
+示例 2：
+
+输入：queries = ["bbb","cc"], words = ["a","aa","aaa","aaaa"]
+输出：[1,2]
+解释：第一个查询 f("bbb") < f("aaaa")，第二个查询 f("aaa") 和 f("aaaa") 都 > f("cc")。
+
+
+提示：
+
+1 <= queries.length <= 2000
+1 <= words.length <= 2000
+1 <= queries[i].length, words[i].length <= 10
+queries[i][j]、words[i][j] 都由小写英文字母组成
+
+解题思路：本题由于是要去f(s)<f(w)的所以是寻找右侧边界的二分查找，如果f(s)<=f(w)的话那么就是寻找左侧边界的二分查找
+ */
+pub fn num_smaller_by_frequency(queries: Vec<String>, words: Vec<String>) -> Vec<i32> {
+    // 把queries和words中字符字典序最小出现的次数统计出来放到数组中
+    let mut q = Vec::new();
+    queries.iter().for_each(|s| {
+        // 用hash表来统计
+        let mut map = [0; 26];
+        s.chars().for_each(|c| {
+            map[c as usize - 'a' as usize] += 1;
+        });
+        // 从左到右找到第一个不为0的元素
+        let mut i = 0;
+        while i < 26 && map[i] == 0 {
+            i += 1;
+        }
+        q.push(map[i]);
+    });
+    let mut w = Vec::new();
+    words.iter().for_each(|s| {
+        let mut map = [0; 26];
+        s.chars().for_each(|c| {
+            map[c as usize - 'a' as usize] += 1;
+        });
+        let mut i = 0;
+        while i < 26 && map[i] == 0 {
+            i += 1;
+        }
+        w.push(map[i]);
+    });
+    // 对w进行排序
+    w.sort_unstable();
+    let mut res = Vec::new();
+    for i in 0..q.len() {
+        let mut left = 0;
+        let mut right = w.len();
+        while left < right {
+            let mid = (left + right) >> 1;
+            if q[i] == w[mid] {
+                left = mid + 1;
+            } else if q[i] < w[mid] {
+                right = mid;
+            } else {
+                left = mid + 1;
+            }
+        }
+        // w[left - 1] 是等于 q[i] 的 满足 寻找右侧边界的二分查找 定律
+        res.push((w.len() - left) as i32);
+    }
+    res
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -182,5 +270,17 @@ mod tests {
     fn test_find_peak_element() {
         let nums = vec![1, 2, 3, 1];
         assert_eq!(find_peak_element(nums), 2);
+    }
+
+    #[test]
+    fn test_num_smaller_by_frequency() {
+        let queries = vec!["bbb".to_string(), "cc".to_string()];
+        let words = vec![
+            "a".to_string(),
+            "aa".to_string(),
+            "aaa".to_string(),
+            "aaaa".to_string(),
+        ];
+        assert_eq!(num_smaller_by_frequency(queries, words), vec![1, 2]);
     }
 }

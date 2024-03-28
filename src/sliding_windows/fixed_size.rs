@@ -171,66 +171,6 @@ pub fn max_vowels(s: String, k: i32) -> i32 {
     max_vowels
 }
 
-/// 强化练习 3：字符串的排列
-///
-/// 给你两个字符串 s1 和 s2 ，写一个函数来判断 s2 是否包含 s1 的排列。如果是，返回 true ；否则，返回 false 。
-///
-/// 换句话说，s1 的排列之一是 s2 的 子串 。
-///
-/// 示例 1：
-///
-/// 输入：s1 = "ab" s2 = "eidbaooo"
-///
-/// 输出：true
-///
-/// 解释：s2 包含 s1 的排列之一 ("ba").
-///
-/// 示例 2：
-///
-/// 输入：s1= "ab" s2 = "eidboaoo"
-///
-/// 输出：false
-///
-/// 提示：
-///
-/// 1 <= s1.length, s2.length <= 104
-///
-/// s1 和 s2 仅包含小写字母
-pub fn check_inclusion(s1: String, s2: String) -> bool {
-    let (s, p) = (s2, s1);
-    let mut rst = vec![];
-    if s.len() < p.len() {
-        // 如果s的长度小于p的长度，直接返回false
-        return false;
-    }
-    let mut count_p = [0; 128];
-    let mut count_s = [0; 128];
-    let s = s.as_bytes();
-    let p = p.as_bytes();
-    for i in 0..p.len() {
-        // 分别统计 s1 和 s2 中的字符出现的次数
-        count_p[p[i] as usize] += 1;
-        count_s[s[i] as usize] += 1;
-    }
-    if count_p == count_s {
-        // 如果s1和s2的前p.len()个字符的出现次数相同，则把0放入结果集中
-        rst.push(0);
-    }
-    for r in p.len()..s.len() {
-        // 滑动窗口左边滑出的元素索引
-        let l = r - p.len();
-        // 对新滑入窗口的字符进行统计
-        count_s[s[r] as usize] += 1;
-        // 对滑出窗口的字符进行统计
-        count_s[s[l] as usize] -= 1;
-        if count_p == count_s {
-            // 如果s1和s2的前p.len()个字符的出现次数相同，则把l+1放入结果集中
-            rst.push(l as i32 + 1);
-        }
-    }
-    !rst.is_empty()
-}
-
 /// 强化练习 5：半径为 k 的子数组平均值
 ///
 /// 给你一个下标从 0 开始的数组 nums ，数组中有 n 个整数，另给你一个整数 k 。
@@ -940,14 +880,6 @@ mod tests {
         let k = 3;
         let max_vowels = max_vowels(s, k);
         println!("{:?}", max_vowels)
-    }
-
-    #[test]
-    fn test_check_inclusion() {
-        let s1 = "hello".to_string();
-        let s2 = "ooolleoooleh".to_string();
-        let check_inclusion = check_inclusion(s1, s2);
-        println!("{:?}", check_inclusion)
     }
 
     #[test]

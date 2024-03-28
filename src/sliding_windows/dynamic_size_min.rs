@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 /// 209. 长度最小的子数组
 /// 给定一个含有 n 个正整数的数组和一个正整数 target 。
 ///
@@ -99,7 +101,7 @@ pub fn min_sub_array_len(target: i32, nums: Vec<i32>) -> i32 {
     }
 }
 
-/// 强化练习 4：最小覆盖子串
+/// 76. 最小覆盖子串
 ///
 /// 给你一个字符串 s 、一个字符串 t 。返回 s 中涵盖 t 所有字符的最小子串。如果 s 中不存在涵盖 t 所有字符的子串，则返回空字符串 "" 。
 ///
@@ -146,9 +148,133 @@ pub fn min_sub_array_len(target: i32, nums: Vec<i32>) -> i32 {
 /// s 和 t 由英文字母组成
 ///
 /// 进阶：你能设计一个在 o(m+n) 时间内解决此问题的算法吗？
-#[allow(unused)]
 pub fn min_window(s: String, t: String) -> String {
-    "".to_string()
+    let mut need = HashMap::new();
+    // 统计t中字符出现的次数
+    for c in t.chars() {
+        need.insert(c as usize, need.get(&(c as usize)).unwrap_or(&0) + 1);
+    }
+    // 定义窗口
+    let mut windows = vec![0; 128];
+    // 定义慢指针
+    let mut slow = 0;
+    // 定义快指针
+    let mut fast = 0;
+    let mut start = 0;
+    // 定义有效字符个数
+    let mut valid = 0;
+    let s = s.as_bytes();
+    // 定义最小覆盖子串的长度
+    let mut min_len = std::usize::MAX;
+    // 此处用不用for循环的原因是 for循环是[left,right]闭区间，而这里需要[left,right)左闭右开区间
+    while fast < s.len() {
+        // 当快指针指向的字符是t中的字符时，更新窗口中字符出现的次数
+        if need.contains_key(&(s[fast] as usize)) {
+            // 统计窗口中字符出现的次数
+            windows[s[fast] as usize] += 1;
+            // 只有当 window[c] 和 need[c] 对应的出现次数一致时，才能满足条件，valid 才能 +1
+            if windows[s[fast] as usize] == *need.get(&(s[fast] as usize)).unwrap() {
+                valid += 1;
+            }
+        }
+        // 右移快指针,扩大窗口
+        fast += 1;
+        while valid == need.len() {
+            // 当窗口符合条件时，进行窗口内数据的更新，并缩小窗口
+            if fast - slow < min_len {
+                // 更新最小覆盖子串的起始位置
+                start = slow;
+                // 更新最小覆盖子串
+                min_len = fast - slow;
+            }
+            // 移除掉左边划出窗口的字符
+            if need.contains_key(&(s[slow] as usize)) {
+                // 当 window[c] 等于 need[c] 时，说明窗口左边的字符划出窗口后不再满足条件，valid 需要减 1
+                if windows[s[slow] as usize] == *need.get(&(s[slow] as usize)).unwrap() {
+                    valid -= 1;
+                }
+                windows[s[slow] as usize] -= 1;
+            }
+            // 左移慢指针，缩小窗口
+            slow += 1;
+        }
+    }
+
+    if min_len == std::usize::MAX {
+        "".to_string()
+    } else {
+        s[start..start + min_len]
+            .iter()
+            .map(|&c| c as char)
+            .collect()
+    }
+}
+
+/// 567. 字符串的排列
+///
+/// 给你两个字符串 s1 和 s2 ，写一个函数来判断 s2 是否包含 s1 的排列。如果是，返回 true ；否则，返回 false 。
+///
+/// 换句话说，s1 的排列之一是 s2 的 子串 。
+///
+/// 示例 1：
+///
+/// 输入：s1 = "ab" s2 = "eidbaooo"
+///
+/// 输出：true
+///
+/// 解释：s2 包含 s1 的排列之一 ("ba").
+///
+/// 示例 2：
+///
+/// 输入：s1= "ab" s2 = "eidboaoo"
+///
+/// 输出：false
+///
+/// 提示：
+///
+/// 1 <= s1.length, s2.length <= 104
+///
+/// s1 和 s2 仅包含小写字母
+///
+/// 解题思路
+///
+/// 这种题目，是明显的滑动窗口算法，相当给你一个 s1 和一个 s2，请问你 s2 中是否存在一个子串，包含 s1 中所有字符且不包含其他字符？
+pub fn check_inclusion(s1: String, s2: String) -> bool {
+    let s2 = s2.as_bytes();
+    // 统计s1中字符出现的次数
+    let mut need = HashMap::new();
+    for c in s1.chars() {
+        need.insert(c as usize, need.get(&(c as usize)).unwrap_or(&0) + 1);
+    }
+    // 定义窗口
+    let mut windows = vec![0; 128];
+    // 定义慢指针
+    let mut slow = 0;
+    // 定义快指针
+    let mut fast = 0;
+    let mut valid = 0;
+    while fast < s2.len() {
+        if need.contains_key(&(s2[fast] as usize)) {
+            windows[s2[fast] as usize] += 1;
+            if windows[s2[fast] as usize] == *need.get(&(s2[fast] as usize)).unwrap() {
+                valid += 1;
+            }
+        }
+        fast += 1;
+        while fast - slow >= s1.len() {
+            if valid == need.len() {
+                return true;
+            }
+            if need.contains_key(&(s2[slow] as usize)) {
+                if windows[s2[slow] as usize] == *need.get(&(s2[slow] as usize)).unwrap() {
+                    valid -= 1;
+                }
+                windows[s2[slow] as usize] -= 1;
+            }
+            slow += 1;
+        }
+    }
+    false
 }
 
 /// 将 x 减到 0 的最小操作数
@@ -306,5 +432,20 @@ mod tests {
         let s = "QQWE".to_string();
         let balanced_string = balanced_string(s);
         assert_eq!(balanced_string, 1);
+    }
+
+    #[test]
+    fn test_min_window() {
+        let s = "bbaa".to_string();
+        let t = "aba".to_string();
+        assert_eq!(min_window(s, t), "baa".to_string());
+    }
+
+    #[test]
+    fn test_check_inclusion() {
+        let s1 = "ab".to_string();
+        let s2 = "eidbaooo".to_string();
+        let check_inclusion = check_inclusion(s1, s2);
+        assert_eq!(check_inclusion, true);
     }
 }
