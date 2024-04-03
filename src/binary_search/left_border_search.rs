@@ -31,15 +31,12 @@
 pub fn search_insert(nums: Vec<i32>, target: i32) -> i32 {
     let mut left = 0;
     let mut right = nums.len();
-    // [left,right)左闭右开区间
     while left < right {
         let mid = left + (right - left) / 2;
-        if nums[mid] == target {
-            return mid as i32;
-        } else if nums[mid] < target {
-            left = mid + 1;
-        } else if nums[mid] > target {
+        if target <= nums[mid] {
             right = mid;
+        } else {
+            left = mid + 1;
         }
     }
     left as i32
@@ -86,20 +83,27 @@ nums.length <= threshold <= 10^6
  */
 pub fn smallest_divisor(nums: Vec<i32>, threshold: i32) -> i32 {
     let mut left = 1;
+    // x 取值范围为 1 到 nums中最大元素
     let mut right = *nums.iter().max().unwrap();
     // [left,right) 左闭右闭区间
     while left < right {
         let mid = right + left >> 1;
-        let sum: i32 = nums.iter().map(|&x| (x + mid - 1) / mid).sum();
-        if sum == threshold {
+        if f_divisor(&nums, mid) <= threshold {
             right = mid;
-        } else if sum < threshold {
-            right = mid;
-        } else if sum > threshold {
+        } else {
             left = mid + 1;
         }
     }
     left
+}
+
+fn f_divisor(nums: &Vec<i32>, x: i32) -> i32 {
+    // 定义x为除数，f(x)为nums的和，随着x增大f(x)呈单调递减
+    let mut sum = 0;
+    for n in nums {
+        sum += (n + x - 1) / x;
+    }
+    sum
 }
 
 /**
@@ -511,6 +515,295 @@ pub fn successful_pairs(spells: Vec<i32>, potions: Vec<i32>, success: i64) -> Ve
         res[i] = (potions.len() - left) as i32;
     }
     res
+}
+
+/**
+ * 1870. 准时到达的列车最小时速
+中等
+相关标签
+相关企业
+提示
+给你一个浮点数 hour ，表示你到达办公室可用的总通勤时间。要到达办公室，你必须按给定次序乘坐 n 趟列车。另给你一个长度为 n 的整数数组 dist ，其中 dist[i] 表示第 i 趟列车的行驶距离（单位是千米）。
+
+每趟列车均只能在整点发车，所以你可能需要在两趟列车之间等待一段时间。
+
+例如，第 1 趟列车需要 1.5 小时，那你必须再等待 0.5 小时，搭乘在第 2 小时发车的第 2 趟列车。
+返回能满足你准时到达办公室所要求全部列车的 最小正整数 时速（单位：千米每小时），如果无法准时到达，则返回 -1 。
+
+生成的测试用例保证答案不超过 107 ，且 hour 的 小数点后最多存在两位数字 。
+
+
+
+示例 1：
+
+输入：dist = [1,3,2], hour = 6
+输出：1
+解释：速度为 1 时：
+- 第 1 趟列车运行需要 1/1 = 1 小时。
+- 由于是在整数时间到达，可以立即换乘在第 1 小时发车的列车。第 2 趟列车运行需要 3/1 = 3 小时。
+- 由于是在整数时间到达，可以立即换乘在第 4 小时发车的列车。第 3 趟列车运行需要 2/1 = 2 小时。
+- 你将会恰好在第 6 小时到达。
+示例 2：
+
+输入：dist = [1,3,2], hour = 2.7
+输出：3
+解释：速度为 3 时：
+- 第 1 趟列车运行需要 1/3 = 0.33333 小时。
+- 由于不是在整数时间到达，故需要等待至第 1 小时才能搭乘列车。第 2 趟列车运行需要 3/3 = 1 小时。
+- 由于是在整数时间到达，可以立即换乘在第 2 小时发车的列车。第 3 趟列车运行需要 2/3 = 0.66667 小时。
+- 你将会在第 2.66667 小时到达。
+示例 3：
+
+输入：dist = [1,3,2], hour = 1.9
+输出：-1
+解释：不可能准时到达，因为第 3 趟列车最早是在第 2 小时发车。
+
+
+提示：
+
+n == dist.length
+1 <= n <= 105
+1 <= dist[i] <= 105
+1 <= hour <= 109
+hours 中，小数点后最多存在两位数字
+ */
+pub fn min_speed_on_time(dist: Vec<i32>, hour: f64) -> i32 {
+    let mut dist = dist;
+    let mut left = 1;
+    let mut right = 10000002;
+    let lst = dist.pop().unwrap();
+    let mut ans = -1;
+    while left < right {
+        let mid = (left + right) >> 1;
+        if f_speed_hour(&mut dist, mid, lst) <= hour {
+            // 由于f_speed_hour 单调递减 所有在左区间搜索的条件是 <= hour , 如果是单调递增的那么搜索条件应该为 >= hour
+            right = mid;
+            ans = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    ans
+}
+
+fn f_speed_hour(dist: &mut Vec<i32>, x: i32, lst: i32) -> f64 {
+    // 定义x为时速f(x)为小时，当x增大时f(x)单调递减
+    let mut hour = 0;
+    for d in dist {
+        hour += ((*d - 1) / x) + 1;
+    }
+    let hour = hour as f64 + lst as f64 / x as f64;
+    hour
+}
+
+/**
+ * 2064. 分配给商店的最多商品的最小值
+中等
+相关标签
+相关企业
+提示
+给你一个整数 n ，表示有 n 间零售商店。总共有 m 种产品，每种产品的数目用一个下标从 0 开始的整数数组 quantities 表示，其中 quantities[i] 表示第 i 种商品的数目。
+
+你需要将 所有商品 分配到零售商店，并遵守这些规则：
+
+一间商店 至多 只能有 一种商品 ，但一间商店拥有的商品数目可以为 任意 件。
+分配后，每间商店都会被分配一定数目的商品（可能为 0 件）。用 x 表示所有商店中分配商品数目的最大值，你希望 x 越小越好。也就是说，你想 最小化 分配给任意商店商品数目的 最大值 。
+请你返回最小的可能的 x 。
+
+
+
+示例 1：
+
+输入：n = 6, quantities = [11,6]
+输出：3
+解释： 一种最优方案为：
+- 11 件种类为 0 的商品被分配到前 4 间商店，分配数目分别为：2，3，3，3 。
+- 6 件种类为 1 的商品被分配到另外 2 间商店，分配数目分别为：3，3 。
+分配给所有商店的最大商品数目为 max(2, 3, 3, 3, 3, 3) = 3 。
+示例 2：
+
+输入：n = 7, quantities = [15,10,10]
+输出：5
+解释：一种最优方案为：
+- 15 件种类为 0 的商品被分配到前 3 间商店，分配数目为：5，5，5 。
+- 10 件种类为 1 的商品被分配到接下来 2 间商店，数目为：5，5 。
+- 10 件种类为 2 的商品被分配到最后 2 间商店，数目为：5，5 。
+分配给所有商店的最大商品数目为 max(5, 5, 5, 5, 5, 5, 5) = 5 。
+示例 3：
+
+输入：n = 1, quantities = [100000]
+输出：100000
+解释：唯一一种最优方案为：
+- 所有 100000 件商品 0 都分配到唯一的商店中。
+分配给所有商店的最大商品数目为 max(100000) = 100000 。
+
+
+提示：
+
+m == quantities.length
+1 <= m <= n <= 105
+1 <= quantities[i] <= 105
+ */
+pub fn minimized_maximum(n: i32, quantities: Vec<i32>) -> i32 {
+    let mut left = 1;
+    let mut right = quantities.iter().max().unwrap() + 1;
+    while left < right {
+        let mid = (left + right) >> 1;
+        if f_maximum(&quantities, mid) <= n {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    left
+}
+
+fn f_maximum(quantities: &Vec<i32>, x: i32) -> i32 {
+    // 定义x为所有商店中分配商品数目的最大值，f(x)为零售店数量，当x递增，f(x)单调递减
+    let mut total = 0;
+    for q in quantities {
+        total += (q - 1) / x + 1;
+    }
+    total
+}
+
+/**
+ * 1760. 袋子里最少数目的球
+中等
+相关标签
+相关企业
+提示
+给你一个整数数组 nums ，其中 nums[i] 表示第 i 个袋子里球的数目。同时给你一个整数 maxOperations 。
+
+你可以进行如下操作至多 maxOperations 次：
+
+选择任意一个袋子，并将袋子里的球分到 2 个新的袋子中，每个袋子里都有 正整数 个球。
+比方说，一个袋子里有 5 个球，你可以把它们分到两个新袋子里，分别有 1 个和 4 个球，或者分别有 2 个和 3 个球。
+你的开销是单个袋子里球数目的 最大值 ，你想要 最小化 开销。
+
+请你返回进行上述操作后的最小开销。
+
+
+
+示例 1：
+
+输入：nums = [9], maxOperations = 2
+输出：3
+解释：
+- 将装有 9 个球的袋子分成装有 6 个和 3 个球的袋子。[9] -> [6,3] 。
+- 将装有 6 个球的袋子分成装有 3 个和 3 个球的袋子。[6,3] -> [3,3,3] 。
+装有最多球的袋子里装有 3 个球，所以开销为 3 并返回 3 。
+示例 2：
+
+输入：nums = [2,4,8,2], maxOperations = 4
+输出：2
+解释：
+- 将装有 8 个球的袋子分成装有 4 个和 4 个球的袋子。[2,4,8,2] -> [2,4,4,4,2] 。
+- 将装有 4 个球的袋子分成装有 2 个和 2 个球的袋子。[2,4,4,4,2] -> [2,2,2,4,4,2] 。
+- 将装有 4 个球的袋子分成装有 2 个和 2 个球的袋子。[2,2,2,4,4,2] -> [2,2,2,2,2,4,2] 。
+- 将装有 4 个球的袋子分成装有 2 个和 2 个球的袋子。[2,2,2,2,2,4,2] -> [2,2,2,2,2,2,2,2] 。
+装有最多球的袋子里装有 2 个球，所以开销为 2 并返回 2 。
+示例 3：
+
+输入：nums = [7,17], maxOperations = 2
+输出：7
+
+
+提示：
+
+1 <= nums.length <= 105
+1 <= maxOperations, nums[i] <= 109
+ */
+pub fn minimum_size(nums: Vec<i32>, max_operations: i32) -> i32 {
+    let mut left = 1;
+    let mut right = nums.iter().max().unwrap() + 1;
+    while left < right {
+        let mid = (left + right) >> 1;
+        if f_min_size(&nums, mid) <= max_operations {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    left
+}
+
+fn f_min_size(nums: &Vec<i32>, x: i32) -> i32 {
+    // 定义x为球的个数，f(x)为操作次数，当x递增时f(x)单调递减
+    let mut total = 0;
+    for n in nums {
+        total += (n - 1) / x;
+    }
+    total
+}
+
+/**
+ * 2439. 最小化数组中的最大值
+中等
+相关标签
+相关企业
+提示
+给你一个下标从 0 开始的数组 nums ，它含有 n 个非负整数。
+
+每一步操作中，你需要：
+
+选择一个满足 1 <= i < n 的整数 i ，且 nums[i] > 0 。
+将 nums[i] 减 1 。
+将 nums[i - 1] 加 1 。
+你可以对数组执行 任意 次上述操作，请你返回可以得到的 nums 数组中 最大值 最小 为多少。
+
+
+
+示例 1：
+
+输入：nums = [3,7,1,6]
+输出：5
+解释：
+一串最优操作是：
+1. 选择 i = 1 ，nums 变为 [4,6,1,6] 。
+2. 选择 i = 3 ，nums 变为 [4,6,2,5] 。
+3. 选择 i = 1 ，nums 变为 [5,5,2,5] 。
+nums 中最大值为 5 。无法得到比 5 更小的最大值。
+所以我们返回 5 。
+示例 2：
+
+输入：nums = [10,1]
+输出：10
+解释：
+最优解是不改动 nums ，10 是最大值，所以返回 10 。
+
+
+提示：
+
+n == nums.length
+2 <= n <= 105
+0 <= nums[i] <= 109
+ */
+pub fn minimize_array_value(nums: Vec<i32>) -> i32 {
+    let mut left = 0;
+    let mut right = *nums.iter().max().unwrap();
+    while left < right {
+        let mid = (left + right) >> 1;
+        if f_array_value(&nums, mid) {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    left
+}
+
+fn f_array_value(nums: &Vec<i32>, x: i32) -> bool {
+    let mut have: i64 = 0;
+    for n in nums.iter() {
+        //看看能帮忙填补多少，有剩则盈，没剩则亏
+        have += (&x - n) as i64;
+        //遍历到的n的前面这部分数组已经压力爆炸，则失败
+        if have < 0 {
+            return false;
+        }
+    }
+    true
 }
 
 #[cfg(test)]

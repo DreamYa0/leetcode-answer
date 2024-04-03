@@ -256,6 +256,179 @@ pub fn num_smaller_by_frequency(queries: Vec<String>, words: Vec<String>) -> Vec
     res
 }
 
+/**
+ * 2529. 正整数和负整数的最大计数
+简单
+相关标签
+相关企业
+提示
+给你一个按 非递减顺序 排列的数组 nums ，返回正整数数目和负整数数目中的最大值。
+
+换句话讲，如果 nums 中正整数的数目是 pos ，而负整数的数目是 neg ，返回 pos 和 neg二者中的最大值。
+注意：0 既不是正整数也不是负整数。
+
+
+
+示例 1：
+
+输入：nums = [-2,-1,-1,1,2,3]
+输出：3
+解释：共有 3 个正整数和 3 个负整数。计数得到的最大值是 3 。
+示例 2：
+
+输入：nums = [-3,-2,-1,0,0,1,2]
+输出：3
+解释：共有 2 个正整数和 3 个负整数。计数得到的最大值是 3 。
+示例 3：
+
+输入：nums = [5,20,66,1314]
+输出：4
+解释：共有 4 个正整数和 0 个负整数。计数得到的最大值是 4 。
+
+
+提示：
+
+1 <= nums.length <= 2000
+-2000 <= nums[i] <= 2000
+nums 按 非递减顺序 排列。
+
+
+进阶：你可以设计并实现时间复杂度为 O(log(n)) 的算法解决此问题吗？
+ */
+pub fn maximum_count(nums: Vec<i32>) -> i32 {
+    let less = lower_bound(&nums, 0);
+    let great = nums.len() as i32 - lower_bound(&nums, 1);
+    less.max(great)
+}
+
+fn lower_bound(nums: &Vec<i32>, target: i32) -> i32 {
+    let mut left: i32 = 0;
+    let mut right = nums.len() as i32;
+    while left < right {
+        let mid = (left + right) >> 1;
+        if target <= nums[mid as usize] {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    right as i32
+}
+
+/**
+ * 2563. 统计公平数对的数目
+中等
+相关标签
+相关企业
+提示
+给你一个下标从 0 开始、长度为 n 的整数数组 nums ，和两个整数 lower 和 upper ，返回 公平数对的数目 。
+
+如果 (i, j) 数对满足以下情况，则认为它是一个 公平数对 ：
+
+0 <= i < j < n，且
+lower <= nums[i] + nums[j] <= upper
+
+
+示例 1：
+
+输入：nums = [0,1,7,4,4,5], lower = 3, upper = 6
+输出：6
+解释：共计 6 个公平数对：(0,3)、(0,4)、(0,5)、(1,3)、(1,4) 和 (1,5) 。
+示例 2：
+
+输入：nums = [1,7,9,2,5], lower = 11, upper = 11
+输出：1
+解释：只有单个公平数对：(2,9) 。
+
+
+提示：
+
+1 <= nums.length <= 105
+nums.length == n
+-109 <= nums[i] <= 109
+-109 <= lower <= upper <= 109
+ */
+pub fn count_fair_pairs(nums: Vec<i32>, lower: i32, upper: i32) -> i64 {
+    let mut nums = nums;
+    nums.sort_unstable();
+    let mut ans = 0_i64;
+    for j in 0..nums.len() {
+        let l = lower_bound_ii(&nums, j as i32, lower - nums[j]);
+        let r = lower_bound_ii(&nums, j as i32, upper - nums[j] + 1);
+        ans += r - l;
+    }
+    ans
+}
+
+fn lower_bound_ii(nums: &Vec<i32>, mut right: i32, target: i32) -> i64 {
+    let mut left: i32 = 0;
+    while left < right {
+        let mid = (left + right) >> 1;
+        if target <= nums[mid as usize] {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    right as i64
+}
+
+/**
+ * 2226. 每个小孩最多能分到多少糖果
+中等
+相关标签
+相关企业
+提示
+给你一个 下标从 0 开始 的整数数组 candies 。数组中的每个元素表示大小为 candies[i] 的一堆糖果。你可以将每堆糖果分成任意数量的 子堆 ，但 无法 再将两堆合并到一起。
+
+另给你一个整数 k 。你需要将这些糖果分配给 k 个小孩，使每个小孩分到 相同 数量的糖果。每个小孩可以拿走 至多一堆 糖果，有些糖果可能会不被分配。
+
+返回每个小孩可以拿走的 最大糖果数目 。
+
+
+
+示例 1：
+
+输入：candies = [5,8,6], k = 3
+输出：5
+解释：可以将 candies[1] 分成大小分别为 5 和 3 的两堆，然后把 candies[2] 分成大小分别为 5 和 1 的两堆。现在就有五堆大小分别为 5、5、3、5 和 1 的糖果。可以把 3 堆大小为 5 的糖果分给 3 个小孩。可以证明无法让每个小孩得到超过 5 颗糖果。
+示例 2：
+
+输入：candies = [2,5], k = 11
+输出：0
+解释：总共有 11 个小孩，但只有 7 颗糖果，但如果要分配糖果的话，必须保证每个小孩至少能得到 1 颗糖果。因此，最后每个小孩都没有得到糖果，答案是 0 。
+
+
+提示：
+
+1 <= candies.length <= 105
+1 <= candies[i] <= 107
+1 <= k <= 1012
+ */
+pub fn maximum_candies(candies: Vec<i32>, k: i64) -> i32 {
+    let mut left = 1;
+    let mut right = *candies.iter().max().unwrap() as i32 + 1;
+    while left < right {
+        let mid = (left + right) >> 1;
+        // f_candies单调递减，再右区间搜索条件为 >= k 如果单调递增在右区间搜索的条件为 <= k
+        if k <= f_candies(&candies, mid as i64) {
+            left = mid + 1;
+        } else {
+            right = mid
+        }
+    }
+    left - 1
+}
+
+fn f_candies(candies: &Vec<i32>, x: i64) -> i64 {
+    // 定义 x 每个小孩可以拿走的最大糖果数目 f(x) 可以分到糖果的小孩数量，如果x增大f(x)呈单调递减
+    let mut sum = 0;
+    for c in candies {
+        sum += *c as i64 / x;
+    }
+    sum
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

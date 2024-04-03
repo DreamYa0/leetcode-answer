@@ -178,28 +178,56 @@ nums 是一个非递减数组
 -109 <= target <= 109
  */
 pub fn search_range(nums: Vec<i32>, target: i32) -> Vec<i32> {
-    let mut left = 0;
-    let mut right = nums.len() as i32 - 1;
-    let mut result = -1;
-    while left <= right {
-        let mid = left + (right - left) / 2;
-        let mid_num = nums[mid as usize];
-        if target == mid_num {
-            result = mid;
-            // 找左边界等于target的位置，所有需要在左区间找
-            right = mid - 1;
-        } else if mid_num > target {
-            right = mid - 1;
+    if nums.is_empty() {
+        return vec![-1, -1];
+    }
+    let left = left_border(&nums, target);
+    let right = right_border(&nums, target);
+    vec![left, right]
+}
+
+fn left_border(nums: &Vec<i32>, target: i32) -> i32 {
+    let mut left: i32 = 0;
+    let mut right = nums.len() as i32;
+    while left < right {
+        let mid = (left + right) >> 1;
+        if target <= nums[mid as usize] {
+            right = mid;
         } else {
             left = mid + 1;
         }
     }
-
-    if result == -1 {
-        vec![-1, -1]
+    // 如果索引越界，说明数组中无目标元素，返回 -1
+    if left < 0 || left >= nums.len() as i32 {
+        return -1;
+    }
+    if nums[left as usize] == target {
+        left as i32
     } else {
-        let pos = nums.iter().rposition(|&num| num == target).unwrap();
-        vec![result, pos as i32]
+        -1
+    }
+}
+
+fn right_border(nums: &Vec<i32>, target: i32) -> i32 {
+    let mut left: i32 = 0;
+    let mut right = nums.len() as i32;
+    while left < right {
+        let mid = (left + right) >> 1;
+        if target >= nums[mid as usize] {
+            left = mid + 1;
+        } else {
+            right = mid;
+        }
+    }
+    // 判断 target 是否存在于 nums 中
+    // left - 1 索引越界的话 target 肯定不存在
+    if left - 1 < 0 || left - 1 >= nums.len() as i32 {
+        return -1;
+    }
+    if nums[(left - 1) as usize] == target {
+        (left - 1) as i32
+    } else {
+        -1
     }
 }
 
