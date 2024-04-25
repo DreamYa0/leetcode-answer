@@ -745,7 +745,7 @@ fn sub_palindrome(s: &Vec<char>, mut left: i32, mut right: i32) -> Vec<char> {
 
 输入：price = [8, 21, 27, 34, 52, 66], target = 61
 输出：[27,34] 或者 [34,27]
- 
+
 
 提示：
 
@@ -766,6 +766,112 @@ pub fn two_sum(price: Vec<i32>, target: i32) -> Vec<i32> {
             res[0] = price[left] as i32;
             res[1] = price[right] as i32;
             break;
+        }
+    }
+    res
+}
+
+/**
+ * 42. 接雨水
+困难
+相关标签
+相关企业
+给定 n 个非负整数表示每个宽度为 1 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+
+
+
+示例 1：
+
+
+
+输入：height = [0,1,0,2,1,0,1,3,2,1,2,1]
+输出：6
+解释：上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。
+示例 2：
+
+输入：height = [4,2,0,3,2,5]
+输出：9
+
+
+提示：
+
+n == height.length
+1 <= n <= 2 * 104
+0 <= height[i] <= 105
+
+解法：双指针
+ */
+pub fn trap(height: Vec<i32>) -> i32 {
+    // 定义左指针
+    let mut left = 0;
+    // 定义右指针
+    let mut right = height.len() - 1;
+    // 定义左边最高
+    let mut l_max = 0;
+    // 定义右边最高
+    let mut r_max = 0;
+    let mut res = 0;
+    while left < right {
+        l_max = l_max.max(height[left]);
+        r_max = r_max.max(height[right]);
+        // res += min(l_max, r_max) - height[i]
+        if l_max < r_max {
+            res += l_max as i32 - height[left];
+            left += 1;
+        } else {
+            res += r_max as i32 - height[right];
+            right -= 1;
+        }
+    }
+    res
+}
+
+/**
+ * 11. 盛最多水的容器
+中等
+相关标签
+相关企业
+提示
+给定一个长度为 n 的整数数组 height 。有 n 条垂线，第 i 条线的两个端点是 (i, 0) 和 (i, height[i]) 。
+
+找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+
+返回容器可以储存的最大水量。
+
+说明：你不能倾斜容器。
+
+
+
+示例 1：
+
+
+
+输入：[1,8,6,2,5,4,8,3,7]
+输出：49
+解释：图中垂直线代表输入数组 [1,8,6,2,5,4,8,3,7]。在此情况下，容器能够容纳水（表示为蓝色部分）的最大值为 49。
+示例 2：
+
+输入：height = [1,1]
+输出：1
+
+
+提示：
+
+n == height.length
+2 <= n <= 105
+0 <= height[i] <= 104
+ */
+pub fn max_area(height: Vec<i32>) -> i32 {
+    let mut left = 0;
+    let mut right = height.len() - 1;
+    let mut res = 0;
+    while left < right {
+        // min(height[left], height[right]) * (right - left)
+        res = res.max(height[left].min(height[right]) * (right - left) as i32);
+        if height[left] < height[right] {
+            left += 1;
+        } else {
+            right -= 1;
         }
     }
     res

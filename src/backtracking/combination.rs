@@ -126,6 +126,73 @@ fn backtracking3(
 }
 
 /**
+ * 377. 组合总和 Ⅳ
+中等
+相关标签
+相关企业
+给你一个由 不同 整数组成的数组 nums ，和一个目标整数 target 。请你从 nums 中找出并返回总和为 target 的元素组合的个数。
+
+题目数据保证答案符合 32 位整数范围。
+
+
+
+示例 1：
+
+输入：nums = [1,2,3], target = 4
+输出：7
+解释：
+所有可能的组合为：
+(1, 1, 1, 1)
+(1, 1, 2)
+(1, 2, 1)
+(1, 3)
+(2, 1, 1)
+(2, 2)
+(3, 1)
+请注意，顺序不同的序列被视作不同的组合。
+示例 2：
+
+输入：nums = [9], target = 3
+输出：0
+
+
+提示：
+
+1 <= nums.length <= 200
+1 <= nums[i] <= 1000
+nums 中的所有元素 互不相同
+1 <= target <= 1000
+
+
+进阶：如果给定的数组中含有负数会发生什么？问题会产生何种变化？如果允许负数出现，需要向题目中添加哪些限制条件？
+ */
+pub fn combination_sum4(nums: Vec<i32>, target: i32) -> i32 {
+    fn dfs(i: usize, nums: &Vec<i32>, memo: &mut Vec<i32>) -> i32 {
+        if i == 0 {
+            // 爬完了
+            return 1;
+        }
+        if memo[i] != -1 {
+            // 之前计算过
+            return memo[i];
+        }
+        let mut res = 0;
+        for &x in nums {
+            // 枚举所有可以爬的台阶数
+            let x = x as usize;
+            if x <= i {
+                res += dfs(i - x, nums, memo);
+            }
+        }
+        memo[i] = res; // 记忆化
+        res
+    }
+    let t = target as usize;
+    let mut memo = vec![-1; t + 1]; // -1 表示没有计算过
+    dfs(t, &nums, &mut memo)
+}
+
+/**
  * 17. 电话号码的字母组合
 中等
 
@@ -756,5 +823,13 @@ mod tests {
         let deliciousness = vec![1, 3, 5, 7, 9];
         let res = count_pairs(deliciousness);
         assert_eq!(res, 4);
+    }
+
+    #[test]
+    fn test_combination_sum4() {
+        let nums = vec![1, 2, 3];
+        let target = 4;
+        let res = combination_sum4(nums, target);
+        assert_eq!(res, 7);
     }
 }

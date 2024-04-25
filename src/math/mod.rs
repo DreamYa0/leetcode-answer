@@ -1,5 +1,6 @@
 pub mod bit_and;
 pub mod bit_or;
+pub mod ugly;
 /**
  * 强化练习 4： Pow(x, n) 实现 pow(x, n) ，即计算 x 的整数 n 次幂函数（即，xn ）。
  */
@@ -710,6 +711,59 @@ pub fn sum_of_multiples(n: i32) -> i32 {
         }
     }
     res
+}
+
+/**
+ * 204. 计数质数
+中等
+相关标签
+相关企业
+提示
+给定整数 n ，返回 所有小于非负整数 n 的质数的数量 。
+
+
+
+示例 1：
+
+输入：n = 10
+输出：4
+解释：小于 10 的质数一共有 4 个, 它们是 2, 3, 5, 7 。
+示例 2：
+
+输入：n = 0
+输出：0
+示例 3：
+
+输入：n = 1
+输出：0
+
+
+提示：
+
+0 <= n <= 5 * 106
+
+解题思路：素数筛选法
+ */
+pub fn count_primes(n: i32) -> i32 {
+    let mut is_prime = vec![true; n as usize];
+    let mut i = 2;
+    while i * i < n as usize {
+        if is_prime[i] {
+            let mut j = i * i;
+            while j < n as usize {
+                is_prime[j] = false;
+                j = j + i;
+            }
+        }
+        i = i + 1;
+    }
+    let mut count = 0;
+    for i in 2..n as usize {
+        if is_prime[i] {
+            count += 1;
+        }
+    }
+    count
 }
 
 #[cfg(test)]
