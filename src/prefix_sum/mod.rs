@@ -1,11 +1,10 @@
-use std::
-    cmp::{max, min};
+use std::cmp::{max, min};
 
+pub mod diff_array;
+pub mod prefix_and_hash;
+pub mod prefix_and_suffix;
 pub mod prefix_pro;
 pub mod prefix_xor;
-pub mod diff_array;
-pub mod prefix_and_suffix;
-pub mod prefix_and_hash;
 
 /// 53. 最大子数组和
 /// 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
@@ -531,6 +530,145 @@ pub fn can_make_pali_queries(s: String, queries: Vec<Vec<i32>>) -> Vec<bool> {
     res
 }
 
+/**
+ * 2559. 统计范围内的元音字符串数
+中等
+相关标签
+相关企业
+提示
+给你一个下标从 0 开始的字符串数组 words 以及一个二维整数数组 queries 。
+
+每个查询 queries[i] = [li, ri] 会要求我们统计在 words 中下标在 li 到 ri 范围内（包含 这两个值）并且以元音开头和结尾的字符串的数目。
+
+返回一个整数数组，其中数组的第 i 个元素对应第 i 个查询的答案。
+
+注意：元音字母是 'a'、'e'、'i'、'o' 和 'u' 。
+
+
+
+示例 1：
+
+输入：words = ["aba","bcb","ece","aa","e"], queries = [[0,2],[1,4],[1,1]]
+输出：[2,3,0]
+解释：以元音开头和结尾的字符串是 "aba"、"ece"、"aa" 和 "e" 。
+查询 [0,2] 结果为 2（字符串 "aba" 和 "ece"）。
+查询 [1,4] 结果为 3（字符串 "ece"、"aa"、"e"）。
+查询 [1,1] 结果为 0 。
+返回结果 [2,3,0] 。
+示例 2：
+
+输入：words = ["a","e","i"], queries = [[0,2],[0,1],[2,2]]
+输出：[3,2,1]
+解释：每个字符串都满足这一条件，所以返回 [3,2,1] 。
+
+
+提示：
+
+1 <= words.length <= 105
+1 <= words[i].length <= 40
+words[i] 仅由小写英文字母组成
+sum(words[i].length) <= 3 * 105
+1 <= queries.length <= 105
+0 <= queries[j][0] <= queries[j][1] < words.length
+ */
+pub fn vowel_strings(words: Vec<String>, queries: Vec<Vec<i32>>) -> Vec<i32> {
+    // 定义元音数组
+    let vowel = vec![b'a', b'e', b'i', b'o', b'u'];
+    // word中前后字符都是元音字符时用1表示，否则用0表示
+    let mut word = vec![0; words.len()];
+    for (idx, w) in words.iter().enumerate() {
+        let w = w.as_bytes();
+        if vowel.contains(&w[0]) && vowel.contains(&w[w.len() - 1]) {
+            // 如果首尾字符都是元音字符就把对应位置设置为1
+            word[idx] = 1;
+        }
+    }
+    // 统计前缀和
+    let mut prefix = vec![0; words.len() + 1];
+    for i in 0..words.len() {
+        prefix[i + 1] = prefix[i] + word[i];
+    }
+    // 定义结果数组
+    let mut res = vec![];
+    for query in queries {
+        let left = query[0] as usize;
+        let right = query[1] as usize;
+        // 计算前缀和
+        res.push(prefix[right + 1] - prefix[left]);
+    }
+    res
+}
+
+/**
+ * 2389. 和有限的最长子序列
+简单
+相关标签
+相关企业
+提示
+给你一个长度为 n 的整数数组 nums ，和一个长度为 m 的整数数组 queries 。
+
+返回一个长度为 m 的数组 answer ，其中 answer[i] 是 nums 中 元素之和小于等于 queries[i] 的 子序列 的 最大 长度  。
+
+子序列 是由一个数组删除某些元素（也可以不删除）但不改变剩余元素顺序得到的一个数组。
+
+
+
+示例 1：
+
+输入：nums = [4,5,2,1], queries = [3,10,21]
+输出：[2,3,4]
+解释：queries 对应的 answer 如下：
+- 子序列 [2,1] 的和小于或等于 3 。可以证明满足题目要求的子序列的最大长度是 2 ，所以 answer[0] = 2 。
+- 子序列 [4,5,1] 的和小于或等于 10 。可以证明满足题目要求的子序列的最大长度是 3 ，所以 answer[1] = 3 。
+- 子序列 [4,5,2,1] 的和小于或等于 21 。可以证明满足题目要求的子序列的最大长度是 4 ，所以 answer[2] = 4 。
+示例 2：
+
+输入：nums = [2,3,4,5], queries = [1]
+输出：[0]
+解释：空子序列是唯一一个满足元素和小于或等于 1 的子序列，所以 answer[0] = 0 。
+
+
+提示：
+
+n == nums.length
+m == queries.length
+1 <= n, m <= 1000
+1 <= nums[i], queries[i] <= 106
+ */
+pub fn answer_queries(nums: Vec<i32>, queries: Vec<i32>) -> Vec<i32> {
+    // 前缀和数组
+    let mut prefix = vec![0; nums.len() + 1];
+    let mut nums = nums;
+    // 先排序
+    nums.sort();
+    // 计算前缀和
+    nums.iter().enumerate().for_each(|(i, &num)| {
+        prefix[i + 1] = prefix[i] + num;
+    });
+    // 定义结果数组
+    let mut res = vec![];
+    for i in 0..queries.len() {
+        let target = queries[i];
+        // 在前缀和数组中二分查找
+        let mut left = 0;
+        let mut right = prefix.len();
+        while left < right {
+            let mid = left + (right - left) / 2;
+            // 右边界二分搜索
+            if prefix[mid] == target {
+                // 当相等时继续向左收缩左边界
+                left = mid + 1;
+            } else if prefix[mid] < target {
+                left = mid + 1;
+            } else {
+                right = mid;
+            }
+        }
+        res.push(left as i32 - 1);
+    }
+    res
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -599,5 +737,22 @@ mod tests {
             can_make_pali_queries(s, queries),
             vec![true, false, false, true, true]
         );
+    }
+
+    #[test]
+    fn test_vowel_strings() {
+        let words = vec!["aba", "bcb", "ece", "aa", "e"]
+            .iter()
+            .map(|s| s.to_string())
+            .collect();
+        let queries = vec![vec![0, 2], vec![1, 4], vec![1, 1]];
+        assert_eq!(vowel_strings(words, queries), vec![2, 3, 0]);
+    }
+
+    #[test]
+    fn test_answer_queries() {
+        let nums = vec![4, 5, 2, 1];
+        let queries = vec![3, 10, 21];
+        assert_eq!(answer_queries(nums, queries), vec![2, 3, 4]);
     }
 }

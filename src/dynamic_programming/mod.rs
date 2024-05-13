@@ -124,7 +124,7 @@ pub fn fib(n: i32) -> i32 {
 
 每次你可以爬 1 或 2 个台阶。你有多少种不同的方法可以爬到楼顶呢？
 
- 
+
 
 示例 1：
 
@@ -141,7 +141,7 @@ pub fn fib(n: i32) -> i32 {
 1. 1 阶 + 1 阶 + 1 阶
 2. 1 阶 + 2 阶
 3. 2 阶 + 1 阶
- 
+
 
 提示：
 
@@ -170,13 +170,13 @@ pub fn climb_stairs(n: i32) -> i32 {
 相关标签
 相关企业
 提示
-泰波那契序列 Tn 定义如下： 
+泰波那契序列 Tn 定义如下：
 
 T0 = 0, T1 = 1, T2 = 1, 且在 n >= 0 的条件下 Tn+3 = Tn + Tn+1 + Tn+2
 
 给你整数 n，请返回第 n 个泰波那契数 Tn 的值。
 
- 
+
 
 示例 1：
 
@@ -189,7 +189,7 @@ T_4 = 1 + 1 + 2 = 4
 
 输入：n = 25
 输出：1389537
- 
+
 
 提示：
 
@@ -225,7 +225,7 @@ pub fn tribonacci(n: i32) -> i32 {
 
 请你计算并返回达到楼梯顶部的最低花费。
 
- 
+
 
 示例 1：
 
@@ -246,7 +246,7 @@ pub fn tribonacci(n: i32) -> i32 {
 - 支付 1 ，向上爬两个台阶，到达下标为 9 的台阶。
 - 支付 1 ，向上爬一个台阶，到达楼梯顶部。
 总花费为 6 。
- 
+
 
 提示：
 
@@ -256,15 +256,76 @@ pub fn tribonacci(n: i32) -> i32 {
 pub fn min_cost_climbing_stairs(cost: Vec<i32>) -> i32 {
     // 1. dp[i] 到达i位置最小花费为dp[i]
     // 2. 递推公式 dp[i] = min(dp[i-1] + cost[i-1] , dp[i-2] + cost[i-2])
-    let mut f0 = 0;
-    let mut f1 = 0;
-    for i in 1..cost.len() {
-        let new_f = (f1 + cost[i]).min(f0 + cost[i - 1]);
-        f0 = f1;
-        f1 = new_f;
+    // 3. 初始化dp数组，dp[0] = 0, dp[1] = 0
+    // 4. 遍历顺序：从前往后
+    // 5. 打印dp数组
+    let mut dp = vec![0; cost.len() + 1];
+    for i in 2..=cost.len() {
+        dp[i] = (dp[i - 1] + cost[i - 1]).min(dp[i - 2] + cost[i - 2]);
     }
-    f1
+    println!("{:?}", dp);
+    dp[cost.len()]
 }
+
+/**
+ * 62. 不同路径
+中等
+相关标签
+相关企业
+一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。
+
+机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。
+
+问总共有多少条不同的路径？
+
+
+
+示例 1：
+
+<img src="https://pic.leetcode.cn/1697422740-adxmsI-image.png" alt="">
+
+输入：m = 3, n = 7
+输出：28
+示例 2：
+
+输入：m = 3, n = 2
+输出：3
+解释：
+从左上角开始，总共有 3 条路径可以到达右下角。
+1. 向右 -> 向下 -> 向下
+2. 向下 -> 向下 -> 向右
+3. 向下 -> 向右 -> 向下
+示例 3：
+
+输入：m = 7, n = 3
+输出：28
+示例 4：
+
+输入：m = 3, n = 3
+输出：6
+
+
+提示：
+
+1 <= m, n <= 100
+题目数据保证答案小于等于 2 * 109
+ */
+pub fn unique_paths(m: i32, n: i32) -> i32 {
+    // 1. 定义dp数组的含义：dp[i][j]表示到达i,j位置的路径数
+    // 2. 递推公式 dp[i][j] = dp[i-1][j] + dp[i][j-1]
+    // 3. 初始化dp数组：dp[0][j] = 1 dp[i][0] = 1
+    // 4. 遍历顺序：从上往下遍历，从左往右遍历
+    // 5. 打印dp数组
+    let (m, n) = (m as usize, n as usize);
+    let mut dp = vec![vec![1; n]; m];
+    for i in 1..m {
+        for j in 1..n {
+            dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+        }
+    }
+    dp[m - 1][n - 1]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -279,5 +340,18 @@ mod tests {
     fn test_climb_stairs() {
         let n = 1;
         assert_eq!(climb_stairs(n), 1);
+    }
+
+    #[test]
+    fn test_min_cost_climbing_stairs() {
+        let cost = vec![10, 15, 20];
+        assert_eq!(min_cost_climbing_stairs(cost), 15);
+    }
+
+    #[test]
+    fn test_unique_paths() {
+        let m = 3;
+        let n = 7;
+        assert_eq!(unique_paths(m, n), 28);
     }
 }
