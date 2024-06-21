@@ -257,123 +257,6 @@ pub fn num_smaller_by_frequency(queries: Vec<String>, words: Vec<String>) -> Vec
 }
 
 /**
- * 2529. 正整数和负整数的最大计数
-简单
-相关标签
-相关企业
-提示
-给你一个按 非递减顺序 排列的数组 nums ，返回正整数数目和负整数数目中的最大值。
-
-换句话讲，如果 nums 中正整数的数目是 pos ，而负整数的数目是 neg ，返回 pos 和 neg二者中的最大值。
-注意：0 既不是正整数也不是负整数。
-
-
-
-示例 1：
-
-输入：nums = [-2,-1,-1,1,2,3]
-输出：3
-解释：共有 3 个正整数和 3 个负整数。计数得到的最大值是 3 。
-示例 2：
-
-输入：nums = [-3,-2,-1,0,0,1,2]
-输出：3
-解释：共有 2 个正整数和 3 个负整数。计数得到的最大值是 3 。
-示例 3：
-
-输入：nums = [5,20,66,1314]
-输出：4
-解释：共有 4 个正整数和 0 个负整数。计数得到的最大值是 4 。
-
-
-提示：
-
-1 <= nums.length <= 2000
--2000 <= nums[i] <= 2000
-nums 按 非递减顺序 排列。
-
-
-进阶：你可以设计并实现时间复杂度为 O(log(n)) 的算法解决此问题吗？
- */
-pub fn maximum_count(nums: Vec<i32>) -> i32 {
-    let less = lower_bound(&nums, 0);
-    let great = nums.len() as i32 - lower_bound(&nums, 1);
-    less.max(great)
-}
-
-fn lower_bound(nums: &Vec<i32>, target: i32) -> i32 {
-    let mut left: i32 = 0;
-    let mut right = nums.len() as i32;
-    while left < right {
-        let mid = (left + right) >> 1;
-        if target <= nums[mid as usize] {
-            right = mid;
-        } else {
-            left = mid + 1;
-        }
-    }
-    right as i32
-}
-
-/**
- * 2563. 统计公平数对的数目
-中等
-相关标签
-相关企业
-提示
-给你一个下标从 0 开始、长度为 n 的整数数组 nums ，和两个整数 lower 和 upper ，返回 公平数对的数目 。
-
-如果 (i, j) 数对满足以下情况，则认为它是一个 公平数对 ：
-
-0 <= i < j < n，且
-lower <= nums[i] + nums[j] <= upper
-
-
-示例 1：
-
-输入：nums = [0,1,7,4,4,5], lower = 3, upper = 6
-输出：6
-解释：共计 6 个公平数对：(0,3)、(0,4)、(0,5)、(1,3)、(1,4) 和 (1,5) 。
-示例 2：
-
-输入：nums = [1,7,9,2,5], lower = 11, upper = 11
-输出：1
-解释：只有单个公平数对：(2,9) 。
-
-
-提示：
-
-1 <= nums.length <= 105
-nums.length == n
--109 <= nums[i] <= 109
--109 <= lower <= upper <= 109
- */
-pub fn count_fair_pairs(nums: Vec<i32>, lower: i32, upper: i32) -> i64 {
-    let mut nums = nums;
-    nums.sort_unstable();
-    let mut ans = 0_i64;
-    for j in 0..nums.len() {
-        let l = lower_bound_ii(&nums, j as i32, lower - nums[j]);
-        let r = lower_bound_ii(&nums, j as i32, upper - nums[j] + 1);
-        ans += r - l;
-    }
-    ans
-}
-
-fn lower_bound_ii(nums: &Vec<i32>, mut right: i32, target: i32) -> i64 {
-    let mut left: i32 = 0;
-    while left < right {
-        let mid = (left + right) >> 1;
-        if target <= nums[mid as usize] {
-            right = mid;
-        } else {
-            left = mid + 1;
-        }
-    }
-    right as i64
-}
-
-/**
  * 2226. 每个小孩最多能分到多少糖果
 中等
 相关标签
@@ -429,6 +312,95 @@ fn f_candies(candies: &Vec<i32>, x: i64) -> i64 {
     sum
 }
 
+/**
+ * 69. x 的平方根
+简单
+相关标签
+相关企业
+提示
+给你一个非负整数 x ，计算并返回 x 的 算术平方根 。
+
+由于返回类型是整数，结果只保留 整数部分 ，小数部分将被 舍去 。
+
+注意：不允许使用任何内置指数函数和算符，例如 pow(x, 0.5) 或者 x ** 0.5 。
+
+
+
+示例 1：
+
+输入：x = 4
+输出：2
+示例 2：
+
+输入：x = 8
+输出：2
+解释：8 的算术平方根是 2.82842..., 由于返回类型是整数，小数部分将被舍去。
+
+
+提示：
+
+0 <= x <= 231 - 1
+ */
+pub fn my_sqrt(x: i32) -> i32 {
+    let (mut left, mut right) = (0, x);
+    let mut ans = -1;
+    while left <= right {
+        let mid = (left + right) >> 1;
+        if mid * mid <= x {
+            ans = mid;
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    ans
+}
+
+/**
+ * 367. 有效的完全平方数
+已解答
+简单
+相关标签
+相关企业
+给你一个正整数 num 。如果 num 是一个完全平方数，则返回 true ，否则返回 false 。
+
+完全平方数 是一个可以写成某个整数的平方的整数。换句话说，它可以写成某个整数和自身的乘积。
+
+不能使用任何内置的库函数，如  sqrt 。
+
+ 
+
+示例 1：
+
+输入：num = 16
+输出：true
+解释：返回 true ，因为 4 * 4 = 16 且 4 是一个整数。
+示例 2：
+
+输入：num = 14
+输出：false
+解释：返回 false ，因为 3.742 * 3.742 = 14 但 3.742 不是一个整数。
+ 
+
+提示：
+
+1 <= num <= 231 - 1
+ */
+pub fn is_perfect_square(num: i32) -> bool {
+    let (mut left, mut right) = (0, num);
+    while left <= right {
+        let mid = (left + right) >> 1;
+        if mid * mid == num {
+            return true;
+        } else if mid * mid < num {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    false
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -455,5 +427,11 @@ mod tests {
             "aaaa".to_string(),
         ];
         assert_eq!(num_smaller_by_frequency(queries, words), vec![1, 2]);
+    }
+
+    #[test]
+    fn test_is_perfect_square() {
+        let num = 16;
+        assert_eq!(is_perfect_square(num), true);
     }
 }

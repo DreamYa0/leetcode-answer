@@ -806,6 +806,123 @@ fn f_array_value(nums: &Vec<i32>, x: i32) -> bool {
     true
 }
 
+/**
+ * 2529. 正整数和负整数的最大计数
+简单
+相关标签
+相关企业
+提示
+给你一个按 非递减顺序 排列的数组 nums ，返回正整数数目和负整数数目中的最大值。
+
+换句话讲，如果 nums 中正整数的数目是 pos ，而负整数的数目是 neg ，返回 pos 和 neg二者中的最大值。
+注意：0 既不是正整数也不是负整数。
+
+
+
+示例 1：
+
+输入：nums = [-2,-1,-1,1,2,3]
+输出：3
+解释：共有 3 个正整数和 3 个负整数。计数得到的最大值是 3 。
+示例 2：
+
+输入：nums = [-3,-2,-1,0,0,1,2]
+输出：3
+解释：共有 2 个正整数和 3 个负整数。计数得到的最大值是 3 。
+示例 3：
+
+输入：nums = [5,20,66,1314]
+输出：4
+解释：共有 4 个正整数和 0 个负整数。计数得到的最大值是 4 。
+
+
+提示：
+
+1 <= nums.length <= 2000
+-2000 <= nums[i] <= 2000
+nums 按 非递减顺序 排列。
+
+
+进阶：你可以设计并实现时间复杂度为 O(log(n)) 的算法解决此问题吗？
+ */
+pub fn maximum_count(nums: Vec<i32>) -> i32 {
+    let less = lower_bound(&nums, 0);
+    let great = nums.len() as i32 - lower_bound(&nums, 1);
+    less.max(great)
+}
+
+fn lower_bound(nums: &Vec<i32>, target: i32) -> i32 {
+    let mut left: i32 = 0;
+    let mut right = nums.len() as i32;
+    while left < right {
+        let mid = (left + right) >> 1;
+        if target <= nums[mid as usize] {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    right as i32
+}
+
+/**
+ * 2563. 统计公平数对的数目
+中等
+相关标签
+相关企业
+提示
+给你一个下标从 0 开始、长度为 n 的整数数组 nums ，和两个整数 lower 和 upper ，返回 公平数对的数目 。
+
+如果 (i, j) 数对满足以下情况，则认为它是一个 公平数对 ：
+
+0 <= i < j < n，且
+lower <= nums[i] + nums[j] <= upper
+
+
+示例 1：
+
+输入：nums = [0,1,7,4,4,5], lower = 3, upper = 6
+输出：6
+解释：共计 6 个公平数对：(0,3)、(0,4)、(0,5)、(1,3)、(1,4) 和 (1,5) 。
+示例 2：
+
+输入：nums = [1,7,9,2,5], lower = 11, upper = 11
+输出：1
+解释：只有单个公平数对：(2,9) 。
+
+
+提示：
+
+1 <= nums.length <= 105
+nums.length == n
+-109 <= nums[i] <= 109
+-109 <= lower <= upper <= 109
+ */
+pub fn count_fair_pairs(nums: Vec<i32>, lower: i32, upper: i32) -> i64 {
+    let mut nums = nums;
+    nums.sort_unstable();
+    let mut ans = 0_i64;
+    for j in 0..nums.len() {
+        let l = lower_bound_ii(&nums, j as i32, lower - nums[j]);
+        let r = lower_bound_ii(&nums, j as i32, upper - nums[j] + 1);
+        ans += r - l;
+    }
+    ans
+}
+
+fn lower_bound_ii(nums: &Vec<i32>, mut right: i32, target: i32) -> i64 {
+    let mut left: i32 = 0;
+    while left < right {
+        let mid = (left + right) >> 1;
+        if target <= nums[mid as usize] {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    right as i64
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

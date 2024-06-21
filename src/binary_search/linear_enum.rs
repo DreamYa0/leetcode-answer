@@ -43,12 +43,15 @@ pub fn two_sum(numbers: Vec<i32>, target: i32) -> Vec<i32> {
     let mut res = vec![-1, -1];
     while left < right {
         if numbers[left] + numbers[left + 1] > target {
+            // 非递减数组第一个和第二个元素之和大于目标值时，无需在遍历右边元素
             break;
         }
         if numbers[right] + numbers[right - 1] < target {
+            // 非递减数组倒数两个元素之和都小于目标值时，无需在遍历左边元素
             break;
         }
         if left > 0 && numbers[left] == numbers[left - 1] {
+            // 跳过重复元素
             left += 1;
             continue;
         }
@@ -57,8 +60,10 @@ pub fn two_sum(numbers: Vec<i32>, target: i32) -> Vec<i32> {
             res[1] = right as i32 + 1;
             break;
         } else if numbers[left] + numbers[right] < target {
+            // 小于目标值右移左指针
             left += 1;
         } else {
+            // 大于目标值左移右指针
             right -= 1;
         }
     }
