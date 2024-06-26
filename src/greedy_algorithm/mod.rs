@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 /// 【变量说明】
 /// 数组长度为 n ，最小操作次数为 k ，操作前数组的最小值为 min ，操作前数组的最大值为 max ，操作前数组的第二大值为 max2 ，操作前数组所有数和为 sum 。
 ///
@@ -1725,6 +1727,62 @@ pub fn maximum69_number(num: i32) -> i32 {
         }
     }
     nums.iter().collect::<String>().parse::<i32>().unwrap()
+}
+
+/**
+ * 767. 重构字符串
+中等
+相关标签
+相关企业
+提示
+给定一个字符串 s ，检查是否能重新排布其中的字母，使得两相邻的字符不同。
+
+返回 s 的任意可能的重新排列。若不可行，返回空字符串 "" 。
+
+
+
+示例 1:
+
+输入: s = "aab"
+输出: "aba"
+示例 2:
+
+输入: s = "aaab"
+输出: ""
+
+
+提示:
+
+1 <= s.length <= 500
+s 只包含小写字母
+ */
+pub fn reorganize_string(s: String) -> String {
+    let n = s.len();
+    let mut count = HashMap::new();
+    for c in s.bytes() {
+        *count.entry(c).or_insert(0) += 1;
+    }
+    // 转换为元祖后再按照值从大到小排序
+    let mut a = count.into_iter().collect::<Vec<_>>();
+    // 按出现次数从大到小排序
+    a.sort_unstable_by(|p, q| q.1.cmp(&p.1));
+    let m = a[0].1;
+    if m > n - m + 1 {
+        return "".to_string();
+    }
+
+    let mut ans = vec![b'\0'; n];
+    let mut i = 0;
+    for (ch, cnt) in a {
+        for _ in 0..cnt {
+            ans[i] = ch;
+            i += 2;
+            if i >= n {
+                i = 1; // 从奇数下标开始填
+            }
+        }
+    }
+    unsafe { String::from_utf8_unchecked(ans) }
 }
 
 #[cfg(test)]
