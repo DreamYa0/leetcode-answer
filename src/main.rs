@@ -13,6 +13,7 @@ pub mod math;
 pub mod prefix_sum;
 pub mod greedy_algorithm;
 pub mod tree;
+pub mod temp;
 
 fn main() {
     println!("Hello, world!");

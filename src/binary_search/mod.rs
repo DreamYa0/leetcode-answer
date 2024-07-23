@@ -1,7 +1,7 @@
+pub mod left_bound;
 pub mod linear_enum;
-pub mod rotated_sorted_array;
-pub mod left_border_search;
-pub mod right_border_search;
+pub mod right_bound;
+pub mod spiral_array;
 
 /**
 704. 二分查找
@@ -145,6 +145,45 @@ pub fn search_range(nums: Vec<i32>, target: i32) -> Vec<i32> {
     let left = left_border(&nums, target);
     let right = right_border(&nums, target);
     vec![left, right]
+}
+
+/**
+ * LCR 172. 统计目标成绩的出现次数
+简单
+相关标签
+相关企业
+某班级考试成绩按非严格递增顺序记录于整数数组 scores，请返回目标成绩 target 的出现次数。
+
+
+
+示例 1：
+
+输入: scores = [2, 2, 3, 4, 4, 4, 5, 6, 6, 8], target = 4
+输出: 3
+示例 2：
+
+输入: scores = [1, 2, 3, 5, 7, 9], target = 6
+输出: 0
+
+
+提示：
+
+0 <= scores.length <= 105
+-109 <= scores[i] <= 109
+scores 是一个非递减数组
+-109 <= target <= 109
+ */
+pub fn count_target(scores: Vec<i32>, target: i32) -> i32 {
+    if scores.is_empty() {
+        return 0;
+    }
+    let left = left_border(&scores, target);
+    let right = right_border(&scores, target);
+    return if right == -1 || left == -1 {
+        0
+    } else {
+        right - left + 1
+    };
 }
 
 fn left_border(nums: &Vec<i32>, target: i32) -> i32 {

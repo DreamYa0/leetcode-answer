@@ -33,9 +33,11 @@ pub fn search_insert(nums: Vec<i32>, target: i32) -> i32 {
     let mut right = nums.len();
     while left < right {
         let mid = left + (right - left) / 2;
-        if target <= nums[mid] {
+        if target == nums[mid] {
             right = mid;
-        } else {
+        } else if target < nums[mid] {
+            right = mid;
+        } else if target > nums[mid] {
             left = mid + 1;
         }
     }
@@ -153,6 +155,44 @@ pub fn find_closest_elements(arr: Vec<i32>, k: i32, x: i32) -> Vec<i32> {
         }
     }
     arr[left..(left + k as usize)].to_vec()
+}
+
+pub fn find_closest_elements_ii(arr: Vec<i32>, k: i32, x: i32) -> Vec<i32> {
+    let p = left(&arr, x);
+    let mut left = p - 1;
+    let mut right = p;
+    let mut res = Vec::with_capacity(k as usize);
+    // 区间中直到包含k个元素
+    while right - left - 1 < k {
+        if left == -1 {
+            res.push(arr[right as usize]);
+            right += 1;
+        } else if right == arr.len() as i32 {
+            res.push(arr[left as usize]);
+            left -= 1;
+        } else if x - arr[left as usize] > arr[right as usize] - x {
+            res.push(arr[right as usize]);
+            right += 1;
+        } else {
+            res.push(arr[left as usize]);
+            left -= 1;
+        }
+    }
+    res
+}
+
+fn left(arr: &Vec<i32>, x: i32) -> i32 {
+    let mut left = 0;
+    let mut right = arr.len();
+    while left < right {
+        let mid = (right + left) >> 1;
+        if x <= arr[mid] {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    left as i32
 }
 
 /**
@@ -921,6 +961,94 @@ fn lower_bound_ii(nums: &Vec<i32>, mut right: i32, target: i32) -> i64 {
         }
     }
     right as i64
+}
+
+/**
+ * 852. 山脉数组的峰顶索引
+中等
+相关标签
+相关企业
+给定一个长度为 n 的整数 山脉 数组 arr ，其中的值递增到一个 峰值元素 然后递减。
+
+返回峰值元素的下标。
+
+你必须设计并实现时间复杂度为 O(log(n)) 的解决方案。
+
+
+
+示例 1：
+
+输入：arr = [0,1,0]
+输出：1
+示例 2：
+
+输入：arr = [0,2,1,0]
+输出：1
+示例 3：
+
+输入：arr = [0,10,5,2]
+输出：1
+
+
+提示：
+
+3 <= arr.length <= 105
+0 <= arr[i] <= 106
+题目数据 保证 arr 是一个山脉数组
+ */
+pub fn peak_index_in_mountain_array(arr: Vec<i32>) -> i32 {
+    let mut left = 0;
+    let mut right = arr.len() - 1;
+    while left < right {
+        let mid = (right + left) >> 1;
+        if arr[mid] >= arr[mid + 1] {
+            right = mid;
+        } else {
+            left = mid + 1;
+        }
+    }
+    left as i32
+}
+
+/**
+ * LCR 173. 点名
+简单
+相关标签
+相关企业
+某班级 n 位同学的学号为 0 ~ n-1。点名结果记录于升序数组 records。假定仅有一位同学缺席，请返回他的学号。
+
+
+
+示例 1:
+
+输入: records = [0,1,2,3,5]
+输出: 4
+示例 2:
+
+输入: records = [0, 1, 2, 3, 4, 5, 6, 8]
+输出: 7
+
+
+提示：
+
+1 <= records.length <= 10000
+ */
+pub fn take_attendance(records: Vec<i32>) -> i32 {
+    // 定义左右指针
+    let mut left = 0;
+    let mut right = records.len();
+    while left < right {
+        let mid = (right + left) >> 1;
+        // records[mid] == mid 时缺少的值在records[mid]右边
+        if records[mid] == mid as i32 {
+            // 搜索左边界
+            left = mid + 1;
+        } else {
+            // records[mid] != mid 时收缩右边界，在左区间找
+            right = mid;
+        }
+    }
+    left as i32
 }
 
 #[cfg(test)]

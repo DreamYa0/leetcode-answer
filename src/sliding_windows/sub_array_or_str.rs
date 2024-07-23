@@ -231,6 +231,94 @@ fn at_most_k(arr: &Vec<i32>, mut k: i32) -> i32 {
     res
 }
 
+/**
+ * 718. 最长重复子数组
+中等
+相关标签
+相关企业
+提示
+给两个整数数组 nums1 和 nums2 ，返回 两个数组中 公共的 、长度最长的子数组的长度 。
+
+
+
+示例 1：
+
+输入：nums1 = [1,2,3,2,1], nums2 = [3,2,1,4,7]
+输出：3
+解释：长度最长的公共子数组是 [3,2,1] 。
+示例 2：
+
+输入：nums1 = [0,0,0,0,0], nums2 = [0,0,0,0,0]
+输出：5
+
+
+提示：
+
+1 <= nums1.length, nums2.length <= 1000
+0 <= nums1[i], nums2[i] <= 100
+ */
+pub fn find_length(nums1: Vec<i32>, nums2: Vec<i32>) -> i32 {
+    if nums1.len() > nums2.len() {
+        find_length(nums2, nums1)
+    } else {
+        find_max(nums1, nums2)
+    }
+}
+
+fn find_max(nums1: Vec<i32>, nums2: Vec<i32>)-> i32  {
+    let m = nums1.len();
+    let n = nums2.len();
+    let mut max = 0;
+
+    /*
+        A:           |*|*|*|*|
+        B: |*|*|*|*|*|*|
+                 ↓
+        A:       |*|*|*|*|
+        B: |*|*|*|*|*|*|
+    */
+    for i in 1..m {
+        max = max.max(find(&nums1, &nums2, 0, n - i, i));
+    }
+
+    /*
+        A:     |*|*|*|*|
+        B: |*|*|*|*|*|*|
+                 ↓
+        A: |*|*|*|*|
+        B: |*|*|*|*|*|*|
+    */
+    for i in (0..=(n - m)).rev() {
+        max = max.max(find(&nums1, &nums2, 0, i, m));
+    }
+
+    /*
+        A: |*|*|*|*|
+        B:   |*|*|*|*|*|*|
+                 ↓
+        A: |*|*|*|*|
+        B:       |*|*|*|*|*|*|
+    */
+    for i in (1..=(m - 1)).rev() {
+        max = max.max(find(&nums1, &nums2, m - i, 0, i));
+    }
+    max
+}
+
+fn find(nums1: &Vec<i32>, nums2: &Vec<i32>, i: usize, j: usize, len: usize) -> i32 {
+    let mut max = 0;
+    let mut count = 0;
+    for k in 0..len {
+        if nums1[i + k] == nums2[j + k] {
+            count += 1;
+        } else {
+            max = max.max(count);
+            count = 0;
+        }
+    }
+    max.max(count)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -241,5 +329,12 @@ mod tests {
         let left = 2;
         let right = 3;
         assert_eq!(num_subarray_bounded_max(nums, left, right), 3);
+    }
+
+    #[test]
+    fn test_find_length() {
+        let nums1 = vec![1,2,3,2,1];
+        let nums2 = vec![3,2,1,4];
+        assert_eq!(find_length(nums1, nums2), 3);
     }
 }

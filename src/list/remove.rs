@@ -75,41 +75,28 @@ pub fn remove_elements(head: Option<Box<ListNode<i32>>>, val: i32) -> Option<Box
 ///
 /// 进阶：你能尝试使用一趟扫描实现吗？
 pub fn remove_nth_from_end(head: Option<Box<ListNode<i32>>>, n: i32) -> Option<Box<ListNode<i32>>> {
-    if n <= 0 {
-        return head;
-    }
-    // 定义起始位置
-    let mut len = 0;
-    let mut cur = head.as_ref();
-    // 第一遍遍历确定链表的长度
-    while cur.is_some() {
-        // 确定链表的长度
-        len += 1;
-        // 遍历链表
-        cur = cur.unwrap().next.as_ref();
-    }
-
     // 定义虚拟头节点
     let mut dummy_head = Box::new(ListNode::new(0));
-    // 把虚拟头节点的next指向head
+    // 把虚拟头节点的next指向头节点
     dummy_head.next = head;
-    // 定义可变借用，定义虚拟头节点为当前节点
-    let mut cur = dummy_head.as_mut();
-    // 定义索引
-    let mut i = 0;
-    while let Some(nxt) = cur.next.take() {
-        if len - n == i {
-            // 如果是需要删除的节点，则把cur.next指向nxt.next
-            cur.next = nxt.next;
-        } else {
-            // 如果不是删除的节点，由于cur.next已经被取出了，所以需要重新放回去
-            cur.next = Some(nxt);
-            // 继续向下一个节点移动
-            cur = cur.next.as_mut().unwrap();
-        }
-        i += 1;
+    // 定义快指针
+    let mut fast = &dummy_head.clone();
+    // 定义慢指针
+    let mut slow = &mut dummy_head;
+    let mut n = n;
+    while n > 0 {
+        // 让快指针先移动 n+1，这里是先移动在递减n，所以循环n次实际是移动了n+1
+        fast = fast.next.as_ref().unwrap();
+        n -= 1;
     }
-    // 返回虚拟头节点的下一个节点
+
+    // 同时移动快慢指针
+    while fast.next.is_some() {
+        // 循环结束的条件是 fast指针指向None
+        fast = fast.next.as_ref().unwrap();
+        slow = slow.next.as_mut().unwrap();
+    }
+    slow.next = slow.next.as_mut().unwrap().next.take();
     dummy_head.next
 }
 
@@ -253,25 +240,25 @@ pub fn delete_duplicates(head: Option<Box<ListNode<i32>>>) -> Option<Box<ListNod
 /// 示例 1：
 ///
 /// 输入：head = [1,2,3,3,4,4,5]
-/// 
+///
 /// 输出：[1,2,5]
-/// 
+///
 /// 示例 2：
 ///
 /// 输入：head = [1,1,1,2,3]
-/// 
+///
 /// 输出：[2,3]
 ///
 /// 提示：
 ///
 /// 链表中节点数目在范围 [0, 300] 内
-/// 
+///
 /// -100 <= Node.val <= 100
-/// 
+///
 /// 题目数据保证链表已经按升序 排列
-/// 
+///
 /// 方法二：一次遍历
-/// 
+///
 /// 这里说的一次遍历，是说一边遍历、一边统计相邻节点的值是否相等，如果值相等就继续后移找到值不等的位置，然后删除值相等的这个区间。
 ///
 /// 其实思路很简单，跟递归方法中的 while 语句跳过所有值相等的节点的思路是一样的：
@@ -281,13 +268,13 @@ pub fn delete_duplicates(head: Option<Box<ListNode<i32>>>) -> Option<Box<ListNod
 /// 比如： 1 -> 2 -> 2 -> 2 -> 3，我们用一个 pre 指向 1；当 cur 指向第一个 2 的时候，发现 cur.val == cur.next.val  ，
 /// 所以出现了值重复的节点啊，所以 cur 一直后移到最后一个 2 的时候，发现 cur.val != cur.next.val  ，
 /// 此时 cur.next = 3 ，所以 pre.next = cur.next ，即让1 的 next 节点是 3，就把中间的所有 2 都删除了。
-/// 
+///
 /// 代码中用到了一个常用的技巧：dummy 节点，也叫做 哑节点。它在链表的迭代写法中非常常见，
 /// 因为对于本题而言，我们可能会删除头结点 head，为了维护一个不变的头节点，所以我们添加了 dummy，
 /// 让dummy.next = head，这样即使 head 被删了，那么会操作 dummy.next 指向新的链表头部，所以最终返回的也是 dummy.next。
-/// 
+///
 /// 时间复杂度：O(N)，对链表每个节点遍历了一次。
-/// 
+///
 /// 空间复杂度：O(1)，只使用了常量的空间。
 pub fn delete_duplicates_2(head: Option<Box<ListNode<i32>>>) -> Option<Box<ListNode<i32>>> {
     if head.is_none() {

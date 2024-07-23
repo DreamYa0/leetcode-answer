@@ -862,6 +862,82 @@ fn calc_score(sum: i32, lower: i32, upper: i32) -> i32 {
     }
 }
 
+/**
+ * LCR 014. 字符串的排列
+中等
+相关标签
+相关企业
+给定两个字符串 s1 和 s2，写一个函数来判断 s2 是否包含 s1 的某个变位词。
+
+换句话说，第一个字符串的排列之一是第二个字符串的 子串 。
+
+
+
+示例 1：
+
+输入: s1 = "ab" s2 = "eidbaooo"
+输出: True
+解释: s2 包含 s1 的排列之一 ("ba").
+示例 2：
+
+输入: s1= "ab" s2 = "eidboaoo"
+输出: False
+
+
+提示：
+
+1 <= s1.length, s2.length <= 104
+s1 和 s2 仅包含小写字母
+
+思路：固定大小滑动窗口，窗口大小为 s1字符串长度
+ */
+pub fn check_inclusion(s1: String, s2: String) -> bool {
+    // 统计s1字符串中字符出现的次数
+    let mut s1_cnt = HashMap::with_capacity(26);
+    for c in s1.as_bytes() {
+        s1_cnt.entry(*c as usize - 'a' as usize).and_modify(|e| *e += 1).or_insert(1);
+    }
+    let s2 = s2.as_bytes();
+    // 定义窗口
+    let mut windows = vec![0; 26];
+    // 定义快慢指针
+    let (mut slow, mut fast) = (0, 0);
+    // 定义有效字符个数
+    let mut vaild = 0;
+    while fast < s2.len() {
+        // 窗口右边界的字符
+        let f = s2[fast] as usize - 'a' as usize;
+        // 窗口右边界的字符是否在s1中
+        if s1_cnt.contains_key(&f) {
+            windows[f] += 1;
+            // 窗口右边界的字符在s1中出现的次数是否和s1中出现的次数相等
+            if windows[f] == *s1_cnt.get(&f).unwrap() {
+                // 有效字符个数加一
+                vaild += 1;
+            }
+        }
+        // 窗口右边界向右移动
+        fast += 1;
+        // 当窗口大小大于等于s1的长度时，此时窗口需要进行缩小
+        while fast - slow >= s1.len() {
+            if vaild == s1_cnt.len() {
+                return true;
+            }
+            // 窗口左边界的字符
+            let s: usize = s2[slow] as usize - 'a' as usize;
+            if s1_cnt.contains_key(&s) {
+                if windows[s] == *s1_cnt.get(&s).unwrap() {
+                    vaild -= 1;
+                }
+                windows[s] -= 1;
+            }
+            // 窗口左边界向右移动
+            slow += 1;
+        }
+    }
+    false
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -971,5 +1047,12 @@ mod tests {
         let x = 4;
         let get_subarray_beauty = get_subarray_beauty(nums, k, x);
         println!("{:?}", get_subarray_beauty);
+    }
+
+    #[test]
+    fn test_check_inclusion() {
+        let s1 = "abcdxabcde".to_string();
+        let s2 = "abcdeabcdx".to_string();
+        assert_eq!(check_inclusion(s1, s2), true);
     }
 }

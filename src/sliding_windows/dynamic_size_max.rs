@@ -1368,6 +1368,112 @@ pub fn find_lhs(nums: Vec<i32>) -> i32 {
     ans as i32
 }
 
+/**
+ * 395. 至少有 K 个重复字符的最长子串
+中等
+相关标签
+相关企业
+给你一个字符串 s 和一个整数 k ，请你找出 s 中的最长子串， 要求该子串中的每一字符出现次数都不少于 k 。返回这一子串的长度。
+
+如果不存在这样的子字符串，则返回 0。
+
+
+
+示例 1：
+
+输入：s = "aaabb", k = 3
+输出：3
+解释：最长子串为 "aaa" ，其中 'a' 重复了 3 次。
+示例 2：
+
+输入：s = "ababbc", k = 2
+输出：5
+解释：最长子串为 "ababb" ，其中 'a' 重复了 2 次， 'b' 重复了 3 次。
+
+
+提示：
+
+1 <= s.length <= 104
+s 仅由小写英文字母组成
+1 <= k <= 105
+
+思路：
+
+题目说让我们求每个字符都出现至少 k 次的子串，我们可以再添加一个约束条件：求每个字符都出现至少 k 次，仅包含 count 种不同字符的最长子串。
+
+添加了字符种类的限制，我们就可以回答滑动窗口算法的三个灵魂问题了：
+
+1、什么时候应该扩大窗口？窗口中字符种类小于 count 时扩大窗口。
+
+2、什么时候应该缩小窗口？窗口中字符种类大于 count 时扩大窗口。
+
+3、什么时候得到一个合法的答案？窗口中所有字符出现的次数都大于等于 k 时，得到一个合法的子串。
+
+然后就可以套用滑动窗口算法模板实现 logestKLetterSubstr 函数了。
+
+当然，题目没有 count 的约束，那没关系呀，count 能有几种取值？因为 s 中只包含小写字母，所以 count 的取值也就是 1~26，
+所以最后用一个 for 循环把这些值都输入 logestKLetterSubstr 计算一遍，求最大值就是题目想要的答案了。
+这充分体现了前文 我的刷题经验总结 中所说：算法的本质是穷举。
+
+滑动窗口算法的时间复杂度是 O(N)，循环 26 次依然是 O(26N) = O(N)。
+ */
+pub fn longest_substring(s: String, k: i32) -> i32 {
+    let s = s.chars().collect::<Vec<char>>();
+    let mut len = 0;
+    for i in 0..=26 {
+        len = len.max(longest_k_letter_substring(&s, k, i));
+    }
+    len
+}
+
+fn longest_k_letter_substring(s: &Vec<char>, k: i32, count: i32) -> i32 {
+    let mut cnt = vec![0; 26];
+    // 定义慢指针
+    let mut slow = 0;
+    let mut fast = 0;
+    // 记录窗口中存在几种不同的字符（字符种类）
+    let mut kind = 0;
+    // 记录窗口中有几种字符的出现次数达标（大于等于 k）
+    let mut valid = 0;
+    // 定义结果
+    let mut ans = 0;
+    while fast < s.len() {
+        let c = s[fast] as usize;
+        // 如果是第一次出现的字符，计数加1
+        if cnt[c - b'a' as usize] == 0 {
+            kind += 1;
+        }
+        // 字符计数
+        cnt[c - b'a' as usize] += 1;
+        // 如果数量等于k，达标计数加1
+        if cnt[c - b'a' as usize] == k {
+            valid += 1;
+        }
+        fast += 1;
+        // 如果字符数量大于k，就需要移动左指针来缩小窗口
+        while kind > count {
+            let c = s[slow] as usize;
+            // 字符串数量小于k，达标计数减1
+            if cnt[c - b'a' as usize] == k {
+                valid -= 1;
+            }
+            // 扣减计数
+            cnt[c - b'a' as usize] -= 1;
+            // 如果字符未出现，计数减1
+            if cnt[c - b'a' as usize] == 0 {
+                kind -= 1;
+            }
+            // 右移动慢指针
+            slow += 1;
+        }
+        // 当窗口中字符种类为 count 且每个字符出现次数都满足 k 时，更新答案
+        if valid == count {
+            ans = ans.max(fast - slow);
+        }
+    }
+    ans as i32
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1490,5 +1596,13 @@ mod tests {
         let nums = vec![1, 3, 2, 2, 5, 2, 3, 7];
         let find_lhs = find_lhs(nums);
         assert_eq!(find_lhs, 5);
+    }
+
+    #[test]
+    fn test_longest_substring() {
+        let s = "aaabb".to_string();
+        let k = 3;
+        let longest_substring = longest_substring(s, k);
+        assert_eq!(longest_substring, 3);
     }
 }

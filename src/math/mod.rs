@@ -766,6 +766,55 @@ pub fn count_primes(n: i32) -> i32 {
     count
 }
 
+/**
+ * 3099. 哈沙德数
+简单
+相关标签
+提示
+如果一个整数能够被其各个数位上的数字之和整除，则称之为 哈沙德数（Harshad number）。给你一个整数 x 。如果 x 是 哈沙德数 ，则返回 x 各个数位上的数字之和，否则，返回 -1 。
+
+ 
+
+示例 1：
+
+输入： x = 18
+
+输出： 9
+
+解释：
+
+x 各个数位上的数字之和为 9 。18 能被 9 整除。因此 18 是哈沙德数，答案是 9 。
+
+示例 2：
+
+输入： x = 23
+
+输出： -1
+
+解释：
+
+x 各个数位上的数字之和为 5 。23 不能被 5 整除。因此 23 不是哈沙德数，答案是 -1 。
+
+ 
+
+提示：
+
+1 <= x <= 100
+ */
+pub fn sum_of_the_digits_of_harshad_number(x: i32) -> i32 {
+    let mut sum = 0;
+    let mut tep = x;
+    while tep > 0 {
+        sum += tep % 10;
+        tep /= 10;
+    }
+    if x % sum == 0 {
+        sum
+    } else {
+        -1
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -804,5 +853,11 @@ mod tests {
     fn test_pivot_integer() {
         let n = 8;
         assert_eq!(pivot_integer(n), 6);
+    }
+    
+    #[test]
+    fn test_sum_of_the_digits_of_harshad_number() {
+        let x = 23;
+        assert_eq!(sum_of_the_digits_of_harshad_number(x), -1);
     }
 }
